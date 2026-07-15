@@ -1,0 +1,289 @@
+* {
+    font-family: 'Montserrat', sans-serif;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #c9d6ff;
+    background: linear-gradient(to right, #e2e2e2, #c9d6ff);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+}
+
+.main-content {
+    margin-left: 200px;
+    padding: 40px;
+    min-height: 100vh;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+}
+
+.site-header {
+    overflow: hidden;
+    position: fixed;
+
+    /* Увеличиваем отступы от левого и верхнего края экрана */
+    left: 40px;
+    /* Было 20px */
+    top: 40px;
+    /* Было 20px */
+
+    width: 240px;
+
+    /* Высота: из 100vh вычитаем отступ сверху (40px) и отступ снизу (40px) */
+    height: calc(100vh - 80px);
+    /* Было calc(100vh - 40px) */
+
+    border-radius: 30px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 0 20px 20px;
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276)
+}
+
+.div-place {
+    width: 100%;
+    height: 100%;
+}
+
+.div-box {
+    position: fixed;
+
+    /* НОВАЯ МАТЕМАТИКА LEFT: 
+       40px (отступ шапки слева) + 240px (ширина шапки) + 40px (новый увеличенный зазор между ними) = 320px */
+    left: 320px;
+
+    /* Увеличиваем отступы от верхнего и правого края экрана */
+    top: 40px;
+    /* Было 20px */
+    right: 40px;
+    /* Было 20px */
+
+    /* Высота должна идеально совпадать с шапкой */
+    height: calc(100vh - 80px);
+
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 13px 13px 13px rgba(0, 0, 0, 0.364);
+
+    /* Внутренние отступы контента (чтобы внутри формы тоже было просторно) */
+    padding: 40px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.div-box button {
+    margin-top: 25px;
+    padding: 10px 30px;
+    background-color: #512da8;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.div-box button:hover {
+    background-color: #3d1f85;
+}
+
+.site-header .logo {
+    text-align: center;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding-right: 20px;
+}
+
+.site-header .logo a {
+    text-decoration: none;
+    color: #512da8;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 26px;
+}
+
+.site-nav {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    /* Скрываем скроллбар для Firefox */
+    scrollbar-width: none;
+
+    /* Скрываем скроллбар для Internet Explorer и старого Edge */
+    -ms-overflow-style: none;
+}
+
+.site-nav::-webkit-scrollbar {
+    display: none;
+    /* Полностью отключает визуальное отображение полосы прокрутки */
+}
+
+.site-nav:hover {
+    scrollbar-color: #512da8 transparent;
+}
+
+/* --- Для Chrome, Safari, Яндекс и Edge --- */
+
+.site-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.site-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.site-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-nav::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.site-nav:hover::-webkit-scrollbar-thumb {
+    background-color: #512da8;
+}
+
+/* --- НАВИГАЦИЯ С ИСПРАВЛЕННЫМИ ЗАЗОРАМИ --- */
+
+/* --- АБСОЛЮТНО ПЛАВНЫЙ "ТРАМПЛИН" БЕЗ ЛЕСЕНОК И ЩЕЛЕЙ --- */
+
+.site-nav li {
+    margin-top: 15px;
+    position: relative;
+    height: 54px;
+    /* Немного увеличили высоту для большей солидности */
+}
+
+.site-nav a {
+    display: flex;
+    align-items: center;
+    /* Центрируем иконку и текст по вертикали */
+    justify-content: center;
+    /* Центрируем всю группу по горизонтали */
+    gap: 12px;
+    /* Делаем аккуратный зазор между иконкой и текстом */
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
+    color: #512da8;
+    font-weight: 600;
+    z-index: 3;
+    transition: color 0.3s ease;
+    padding: 0 20px;
+}
+
+.site-nav li:hover a {
+    color: #fff;
+}
+
+.site-nav a i {
+    color: rgb(30, 48, 80);
+    transition: color 0.3s ease;
+    /* Чтобы цвет менялся так же плавно, как и у текста */
+}
+
+.site-nav li:hover a i {
+    color: #fff;
+}
+
+/* ЦЕНТРАЛЬНАЯ ФИОЛЕТОВАЯ ПЛАШКА */
+.site-nav li::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 0;
+    height: 80%;
+    width: 0;
+
+    /* ГЛАВНОЕ ИСПРАВЛЕНИЕ: делаем плашку полностью прозрачной по умолчанию, 
+       чтобы убрать пиксельный баг отображения */
+    opacity: 0;
+
+    background: #512da8;
+    border-radius: 30px 0 0 30px;
+
+    /* Добавляем плавность анимации не только для ширины, но и для прозрачности */
+    transition: width 0.4s ease, opacity 0.15s ease;
+    z-index: 1;
+}
+
+.site-nav li:hover::before {
+    width: 100%;
+    opacity: 1;
+}
+
+/* УШКИ-ТРАМПЛИНЫ (Через идеально гладкие тени) */
+.site-nav a::before,
+.site-nav a::after {
+    content: '';
+    position: absolute;
+    right: -2px;
+    width: 25px;
+    height: 36px;
+    background: transparent;
+    opacity: 0;
+    transition: opacity 1.0s ease;
+    z-index: 2;
+    pointer-events: none;
+    transition: opacity 0.03s ease-in;
+}
+
+/* Верхний плавный трамплин */
+.site-nav a::before {
+    margin-top: 4px;
+    /* Корректируем высоту сдвига, делая нахлест на центральную плашку в 1px */
+    top: -34px;
+    border-radius: 0 0 30px 0;
+    /* Увеличили толщину тени с 15px до 20px, чтобы фиолетовый цвет глубже заходил в центр */
+    box-shadow: 0 20px 0 0 #512da8;
+}
+
+/* Нижний плавный трамплин */
+.site-nav a::after {
+    margin-bottom: 4px;
+    /* Корректируем высоту сдвига, делая нахлест на центральную плашку в 1px */
+    bottom: -34px;
+    border-radius: 0 30px 0 0;
+    /* Увеличили толщину тени с 15px до 20px */
+    box-shadow: 0 -20px 0 0 #512da8;
+}
+
+/* Показываем трамплины при наведении */
+.site-nav li:hover a::before,
+.site-nav li:hover a::after {
+    opacity: 1;
+    transition: opacity 0.17s ease-in;
+}
+
+.site-nav .bottom-nav {
+    margin-top: auto;
+    padding-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.site-nav a i {
+    margin-right: 10px;
+}

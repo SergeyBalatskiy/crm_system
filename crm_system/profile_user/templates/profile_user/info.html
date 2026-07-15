@@ -1,0 +1,11 @@
+{% extends "profile_user/base.html" %}
+{% load static %}
+
+{% block content %}
+<h2>{{ user.name }}</h2>
+<h2>{{ service_info.name_service }}</h2>
+<h2>{{ service_info.address }}</h2>
+{% for employee in employee_info %}
+<p>{{ employee.name }} {{ employee.surname }} {{ employee.patronymic }}</p>
+{% endfor %}
+{% endblock %}

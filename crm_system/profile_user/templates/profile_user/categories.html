@@ -1,0 +1,175 @@
+{% extends "profile_user/base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- Тут у меня логика показа категорий и форма для добавления настройки -->
+
+<!-- Здесь ссылаюсь на скрипт функции openModalForAdd для того чтобы создать ссылку на добавление категории -->
+<button onclick="openModalForAdd()">+ Добавить категорию</button>
+
+<hr>
+
+<!-- Вывод ВСЕХ 4 КАТЕГОРИЙ (ЕСЛИ ОНИ ЕСТЬ) Если их нет, значит, просто будет кнопка добавления категории -->
+
+<div id="categoryModal"
+    style="display: none; border: 1px solid black; padding: 20px; background: white; position: fixed; top: 20%; left: 40%;">
+    <h3 id="modalTitle">Добавить/Изменить</h3>
+
+    <!-- Для отправки данных на сервер -->
+    <form method="POST">
+        {% csrf_token %}
+        <!-- В это поле подставляется айди(анкеты) при редактировании анкеты -->
+        <input type="hidden" name="id" id="form_id">
+
+        <label>Название:</label>
+        <!-- Здесь у меня поле для ввода текста (название) -->
+        <input type="text" name="name" id="form_name" required><br><br>
+
+        <label>Цвет:</label>
+        <!-- Здесь задавание цвета для категории -->
+        <input type="color" name="color" id="form_color" required><br><br>
+
+        <!-- В самом коде у меня в category = self.request.POST.get('category') получается так, что сам 
+        'category' это часть словаря, то есть ключ 'category', а значение = то, что находится в самом
+        <option value="что-то" -->
+        <label>Раздел:</label>
+        <select name="category" id="form_category" required>
+            <option value="in_process">В работе</option>
+            <option value="success">Готовые</option>
+            <option value="deferred">Отложенные</option>
+            <option value="finished">Выданные</option>
+        </select><br><br>
+
+        <!-- Здесь кнопка о сохранении категории заказа -->
+        <button type="submit" name="action" value="save">Сохранить</button>
+
+        <!-- Здесь кнопка о удалении статуса заказа -->
+        <button type="submit" name="action" value="delete" id="deleteBtn"
+            style="background-color: #e74c3c; color: white;"
+            onclick="return confirm('Вы уверены, что хотите удалить эту категорию?');">
+            Удалить
+        </button>
+        <!-- Это именно обычная кнопка, которая НЕ ОТНОСИТСЯ НИКАК К ОТПРАВКЕ ФОРМЫ!!!
+        ПОТОМУ ЧТО ОНА button", А НЕ "submit" -->
+        <button type="button" onclick="closeModal()">Отмена</button>
+    </form>
+</div>
+
+{% if in_process %}
+<h3>В работе:</h3>
+<div>
+    {% for obj in in_process %}
+    <div style="background-color: {{ obj.color }}; padding: 10px; margin: 5px; cursor: pointer;" data-id="{{ obj.id }}"
+        data-name="{{ obj.name }}" data-color="{{ obj.color }}" data-category="{{ obj.category }}"
+        onclick="openModalForEdit(this)">
+        {{ obj.name }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if deferred %}
+<h3>Отложенные:</h3>
+<div>
+    {% for obj in deferred %}
+    <div style="background-color: {{ obj.color }}; padding: 10px; margin: 5px; cursor: pointer;" data-id="{{ obj.id }}"
+        data-name="{{ obj.name }}" data-color="{{ obj.color }}" data-category="{{ obj.category }}"
+        onclick="openModalForEdit(this)">
+        {{ obj.name }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if success %}
+<h3>Готовые:</h3>
+<div>
+    {% for obj in success %}
+    <div style="background-color: {{ obj.color }}; padding: 10px; margin: 5px; cursor: pointer;" data-id="{{ obj.id }}"
+        data-name="{{ obj.name }}" data-color="{{ obj.color }}" data-category="{{ obj.category }}"
+        onclick="openModalForEdit(this)">
+        {{ obj.name }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% if finished %}
+<h3>Выданные:</h3>
+<div>
+    {% for obj in finished %}
+    <div style="background-color: {{ obj.color }}; padding: 10px; margin: 5px; cursor: pointer;" data-id="{{ obj.id }}"
+        data-name="{{ obj.name }}" data-color="{{ obj.color }}" data-category="{{ obj.category }}"
+        onclick="openModalForEdit(this)">
+        {{ obj.name }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<script>
+    // Взаимодействует с id самой категории
+    const modal = document.getElementById('categoryModal');
+
+    // Здесь вставляется текущая категория
+    const inputId = document.getElementById('form_id');
+
+    // Здесь вписывается тот текст, который я задаю в категории
+    const inputName = document.getElementById('form_name');
+
+    // Меняет цвет самого статуса категории
+    const inputColor = document.getElementById('form_color');
+
+    // Позволяет выбрать конкретную категорию которую мы выбрали
+    const selectCategory = document.getElementById('form_category');
+
+    // Он отвечает за оповещения добавления/изменения
+    const modalTitle = document.getElementById('modalTitle');
+
+    // Хранит ссылку на удаление категории
+    const deleteBtn = document.getElementById('deleteBtn');
+
+    // Функция открытия формы для ДОБАВЛЕНИЯ
+    function openModalForAdd() {
+        modalTitle.innerText = "Создать новую категорию";
+        // Так как айдишник еще не был получен, то тогда он ПУСТ
+        inputId.value = "";
+        // Название тоже пустое
+        inputName.value = "";
+        inputColor.value = "#ff0000";
+        selectCategory.value = "in_process";
+
+        // Не показываю кнопку удалить
+        deleteBtn.style.display = "none";
+        // Показываю окно, которое потом, имея в себе кнопку сохранить и метод POST, сохранит
+        // текущую новую категорию
+        modal.style.display = "block";
+    }
+
+    // Функция открытия формы для РЕДАКТИРОВАНИЯ
+    // Если нажимается кнопка вызова функции ИЗМЕНИТЬ, ТО ВЫЗЫВАЕТСЯ openModalForEdit
+    function openModalForEdit(element) {
+        // Показываю заголовок
+        modalTitle.innerText = "Изменить категорию";
+        // Достаю саму ссылку на категорию
+        inputId.value = element.getAttribute('data-id');
+        // Достаю имя
+        inputName.value = element.getAttribute('data-name');
+        // Достаю цвет
+        inputColor.value = element.getAttribute('data-color');
+        // Достаю категорию которую выбрали
+        selectCategory.value = element.getAttribute('data-category');
+
+        // Показываю кнопку удаления
+        deleteBtn.style.display = "inline-block";
+        modal.style.display = "block";
+    }
+
+    // Функция скрытия формы
+    function closeModal() {
+        modal.style.display = "none";
+    }
+</script>
+
+
+{% endblock %}

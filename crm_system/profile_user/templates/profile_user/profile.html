@@ -1,0 +1,30 @@
+{% extends "profile_user/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="div-place">
+    <div class="div-box">
+        <h1>Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</h1>
+        <p>Давайте настроим все так, как вам хочется!</p>
+        <p>Как называется ваш сервисный центр?</p>
+        <div class="form-container div_service_name">
+            <form form method="post" action="#">
+                <div class="field_input_name">
+                    <p>*Тут ввод поля названия сервиса*</p>
+                </div>
+            </form>
+        </div>
+        <p>Пожалуйста, введите адрес вашего сервиса</p>
+        <div class="form-container div_service_adres">
+            <form form method="post" action="#">
+                <div class="field_input_adres">
+                    <p>*Тут ввод поля адреса сервиса*</p>
+                </div>
+            </form>
+        </div>
+
+        <button>Далее</button>
+    </div>
+</div>
+
+{% endblock %}
