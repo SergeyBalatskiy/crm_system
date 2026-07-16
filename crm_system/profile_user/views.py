@@ -8,8 +8,8 @@ from .forms import ServiceInfoForm, WorkersFormSet, DocumentInfoForm
 from .models import WorkersInfo
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
-from .models import StatusCategory
-from tinymce.models import HTMLField 
+from .models import StatusCategory, DocumentInformation
+
 
 # Показывает сам профиль пользователя
 @method_decorator(login_required(), name='dispatch')
@@ -163,20 +163,24 @@ class ShowCategoriesView(TemplateView):
 class ShowDocumentView(TemplateView):
     template_name = 'profile_user/tinymce.html'
 
-    # Функция для сохранения данных формы DocumentInfoForm
-    def form_valid(self, document_info):
-        # Как всегда веселая остановка сохранения для аккуратного сохранения того, что не указано
-        save_document = document_info.save(commit=False)
-        # Запись ссылки на хозяина
-        save_document.user = self.request.user
-        # Сохранение всего остального
-        save_document.name = "Квитанция о приеме"
-        save_document.save()
-                
-        return redirect("tiny_mce")
+    # Передаю в сайт методом GET форму самого tinymce
+    def get(self, request, *args, **kwargs):
+        return render(request, self.template_name)
+    
+# Показывает акт о выдаче
+@method_decorator(login_required(), name='dispatch')
+class ShowIssuancetView(TemplateView):
+    template_name = 'profile_user/issuance_doc.html'
 
-    def post(self, *args, **kwargs):
-        
+    def form_valid(self, document_info):
+        # Сохраняю без принудительной остановки так как нужно только перезаписать то, что
+        # находится в content
+        document_info.save()
+                
+        return redirect("issuance_doc")
+
+    def post(self, request, *args, **kwargs):
+
         # ЛИШНИМ НЕ БУДЕТ!
         # import bleach
 
@@ -197,11 +201,144 @@ class ShowDocumentView(TemplateView):
         if document_info.is_valid():
             # Здесь активируется функция, которая отвечает за главное сохранение
             return self.form_valid(document_info)
-        
-        formset = DocumentInfoForm(self.request.POST)
-        return self.render_to_response({'tiny_mce': formset})
 
-    # Передаю в сайт методом GET форму самого tinymce
-    def get(self, *args, **kwargs):
-        formset = DocumentInfoForm()
-        return self.render_to_response({'tiny_mce' : formset})
+        return render(request, self.template_name, {'tiny_mce': document_info})
+
+    def get(self, request, *args, **kwargs):
+        # Почему я пишу именно .objects.filter вместо удобного get_object or 404?
+        # потому что, если мы обращаемся к обьекту по АЙДИ и по обьектам, метод get_obj...
+        # ОБЯЗАТЕЛЬНО ВЫЗОВЕТ ОШИБКУ в том случае, если у меня есть сразу несколько одинаковых
+        # обьектов!!! Даже несмотря на то, что я отталкиваюсь от названия, USER то у меня
+        # одинаковый у всех! поэтому, метод get_object_or_404 вызовет предсказуемую ошибку!
+        # А object.filter, наоборот, сможет дать нам то что нужно, даже если у нас у 1 обьекта 
+        # переменная схожа с другими переменными, у других обьектов из ЭТОЙ же таблицы.
+        document = DocumentInformation.objects.filter(name='Акт о выдаче', user = self.request.user).first()
+        formset = DocumentInfoForm(instance=document)
+        return render(request, self.template_name, {'tiny_mce': formset})
+    
+# Показывает акт о принятии
+@method_decorator(login_required(), name='dispatch')
+class ShowAdoptionView(TemplateView):
+    template_name = 'profile_user/adoption_doc.html'
+
+    def form_valid(self, document_info):
+        # Сохраняю без принудительной остановки так как нужно только перезаписать то, что
+        # находится в content
+        document_info.save()
+                
+        return redirect("adoption_doc")
+
+    def post(self, request, *args, **kwargs):
+
+        # ЛИШНИМ НЕ БУДЕТ!
+        # import bleach
+
+        # sanitizer = bleach.Sanitizer()
+        # cleaned_body = sanitizer.sanitize(form.cleaned_data['body'])
+        # post.body = cleaned_body
+
+        # Короче, почему стоит именно писать document_info = DocumentInfoForm(self.request.POST) вместо
+        # document_info = self.request.POST.get('context')? ПОТОМУ что все изначально зависит от того, на
+        # сколько у нас тесная связь между Frontend и Backend! Если она представляет из себя обычные взаимо-
+        # действия (Получи и сохрани), то обязательно применять именно document_info = DocumentInfoForm(self.request.POST), 
+        # потому-что основываясь на внесении в переменную форму с полученными данными, я смогу написать потом 
+        # if document_info.is_valid(): , а вот если бы я писал document_info = self.request.POST.get('context'), то
+        # джанго-функция к такому методу ПОЛУЧЕНИЯ информации - НЕ ПРИМЕНИМА! Да и еще это удобнее!
+        # НЕ ЗАБЫВАЮ ПРО document_info.save(commit=False), save_document.name = "Квитанция о приеме", save_document.save() !
+        document_info = DocumentInfoForm(self.request.POST) # Делать так нужно ОБЯЗАТЕЛЬНО!
+        # Проверяю
+        if document_info.is_valid():
+            # Здесь активируется функция, которая отвечает за главное сохранение
+            return self.form_valid(document_info)
+
+        return render(request, self.template_name, {'tiny_mce': document_info})
+
+    def get(self, request, *args, **kwargs):
+        document = DocumentInformation.objects.filter(name='Акт о принятии', user = self.request.user).first()
+        formset = DocumentInfoForm(instance=document)
+        return render(request, self.template_name, {'tiny_mce': formset})
+    
+# Показывает акт о отказе
+@method_decorator(login_required(), name='dispatch')
+class ShowCancellView(TemplateView):
+    template_name = 'profile_user/cancell_doc.html'
+
+    def form_valid(self, document_info):
+        # Сохраняю без принудительной остановки так как нужно только перезаписать то, что
+        # находится в content
+        document_info.save()
+                
+        return redirect("cancell_doc")
+
+    def post(self, request, *args, **kwargs):
+
+        # ЛИШНИМ НЕ БУДЕТ!
+        # import bleach
+
+        # sanitizer = bleach.Sanitizer()
+        # cleaned_body = sanitizer.sanitize(form.cleaned_data['body'])
+        # post.body = cleaned_body
+
+        # Короче, почему стоит именно писать document_info = DocumentInfoForm(self.request.POST) вместо
+        # document_info = self.request.POST.get('context')? ПОТОМУ что все изначально зависит от того, на
+        # сколько у нас тесная связь между Frontend и Backend! Если она представляет из себя обычные взаимо-
+        # действия (Получи и сохрани), то обязательно применять именно document_info = DocumentInfoForm(self.request.POST), 
+        # потому-что основываясь на внесении в переменную форму с полученными данными, я смогу написать потом 
+        # if document_info.is_valid(): , а вот если бы я писал document_info = self.request.POST.get('context'), то
+        # джанго-функция к такому методу ПОЛУЧЕНИЯ информации - НЕ ПРИМЕНИМА! Да и еще это удобнее!
+        # НЕ ЗАБЫВАЮ ПРО document_info.save(commit=False), save_document.name = "Квитанция о приеме", save_document.save() !
+        document_info = DocumentInfoForm(self.request.POST) # Делать так нужно ОБЯЗАТЕЛЬНО!
+        # Проверяю
+        if document_info.is_valid():
+            # Здесь активируется функция, которая отвечает за главное сохранение
+            return self.form_valid(document_info)
+
+        return render(request, self.template_name, {'tiny_mce': document_info})
+
+    def get(self, request, *args, **kwargs):
+        document = DocumentInformation.objects.filter(name='Акт о отказе', user = self.request.user).first()
+        formset = DocumentInfoForm(instance=document)
+        return render(request, self.template_name, {'tiny_mce': formset})
+    
+# Показывает акт о выполненных работах
+@method_decorator(login_required(), name='dispatch')
+class ShowCompleteView(TemplateView):
+    template_name = 'profile_user/complete_doc.html'
+
+    def form_valid(self, document_info):
+        # Сохраняю без принудительной остановки так как нужно только перезаписать то, что
+        # находится в content
+        document_info.save()
+                
+        return redirect("complete_doc")
+
+    def post(self, request, *args, **kwargs):
+
+        # ЛИШНИМ НЕ БУДЕТ!
+        # import bleach
+
+        # sanitizer = bleach.Sanitizer()
+        # cleaned_body = sanitizer.sanitize(form.cleaned_data['body'])
+        # post.body = cleaned_body
+
+        # Короче, почему стоит именно писать document_info = DocumentInfoForm(self.request.POST) вместо
+        # document_info = self.request.POST.get('context')? ПОТОМУ что все изначально зависит от того, на
+        # сколько у нас тесная связь между Frontend и Backend! Если она представляет из себя обычные взаимо-
+        # действия (Получи и сохрани), то обязательно применять именно document_info = DocumentInfoForm(self.request.POST), 
+        # потому-что основываясь на внесении в переменную форму с полученными данными, я смогу написать потом 
+        # if document_info.is_valid(): , а вот если бы я писал document_info = self.request.POST.get('context'), то
+        # джанго-функция к такому методу ПОЛУЧЕНИЯ информации - НЕ ПРИМЕНИМА! Да и еще это удобнее!
+        # НЕ ЗАБЫВАЮ ПРО document_info.save(commit=False), save_document.name = "Квитанция о приеме", save_document.save() !
+        document_info = DocumentInfoForm(self.request.POST) # Делать так нужно ОБЯЗАТЕЛЬНО!
+        # Проверяю
+        if document_info.is_valid():
+            # Здесь активируется функция, которая отвечает за главное сохранение
+            return self.form_valid(document_info)
+
+        return render(request, self.template, {'tiny_mce': document_info})
+
+    def get(self, request, *args, **kwargs):
+        document = DocumentInformation.objects.filter(name='Акт о выполненных работах', user = self.request.user).first()
+        formset = DocumentInfoForm(instance=document)
+        return render(request, self.template_name, {'tiny_mce': formset})
+    

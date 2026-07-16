@@ -8,7 +8,7 @@
         <p>Давайте настроим все так, как вам хочется!</p>
         <p>Как называется ваш сервисный центр?</p>
         <div class="form-container div_service_name">
-            <form form method="post" action="{% url 'confirm_conf' %}">
+            <form method="post" action="{% url 'confirm_conf' %}">
                 <div class="field_input_name">
                     {% csrf_token %}
                     {{ service_info.name_service }}

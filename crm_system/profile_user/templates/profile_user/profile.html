@@ -7,6 +7,10 @@
         <h1>Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</h1>
         <p>Давайте настроим все так, как вам хочется!</p>
         <p>Как называется ваш сервисный центр?</p>
+        <form method="post" action="{% url 'logout' %}">
+        {% csrf_token %}
+        <button type="submit">Logout</button>
+        </form>
         <div class="form-container div_service_name">
             <form form method="post" action="#">
                 <div class="field_input_name">

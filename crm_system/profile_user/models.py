@@ -42,7 +42,7 @@ class StatusCategory(models.Model):
     
 class DocumentInformation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='document_info')
-    content = HTMLField(default='Тут будет текст для документов')
+    content = HTMLField()
     name = models.CharField(max_length=110, null=False, blank=False)
 
     def __str__(self):

@@ -18,3 +18,15 @@
 </select>
 
 </form>
+
+<form action="" method="post">
+    {% csrf_token %}
+
+    {{ tiny_mce.media }}
+
+    {{ tiny_mce.as_p }}
+
+    <button type="submit">Сохранить документ</button>
+
+</form>
+{% endblock %}

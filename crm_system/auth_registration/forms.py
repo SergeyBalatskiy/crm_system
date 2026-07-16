@@ -12,7 +12,7 @@ class CustomUserCreationForm(forms.ModelForm):
     first_name = forms.CharField(label=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя'}))
     last_name = forms.CharField(label=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Фамилия'}))
     phone_number = forms.CharField(label=False, max_length=30, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Номер телефона'}))
-    email = forms.EmailField(label=False, max_length=255, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'почта'}))
+    email = forms.EmailField(label=False, max_length=255, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Почта'}))
     password1 = forms.CharField(label=False, widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Пароль'}))
     password2 = forms.CharField(label=False, widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Подтверждение пароля'}))
     

@@ -5,7 +5,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic import TemplateView
 from django.contrib import messages
-from profile_user.models import StatusCategory
+from profile_user.models import StatusCategory, DocumentInformation
 
 # Create your views here.
 # Креате вью отвечает за создание нового обьекта на в связке с формой
@@ -39,34 +39,62 @@ class RegisterView(CreateView):
         
         # Возвращаю "ничего" потому что могу себе позволить!
         return None
+    
+    # Вызываю функцию которая отвечает за создание 4 дефолтных документов при регистрации
+    def create_default_documents(self, user):
+
+        default_categories = [
+            {"name": "Акт о выдаче", "content": "Акт о выдаче тут типо написан"},
+            {"name": "Акт о принятии", "content": "Акт о принятии типо тут написан"},
+            {"name": "Акт о отказе", "content": "Акт о отказе тут написан"},
+            {"name": "Акт о выполненных работах", "content": "Акт о выполненных работах тут написан"}
+
+        ]
+        for element in default_categories:
+            create_document = DocumentInformation.objects.create(name=element["name"], content=element["content"], user=user)
+        return None
 
     # Непосредственно отвечает за валидацию и принятие формы и ее сохранение
     def form_valid(self, form):
         user = form.save(commit=False)
         user.username = user.email  
         user.save() 
+        print('Сохранил:', user.username)
+        print('Сохранил:', user.email)
         # После сохранения я вызываю функцию которая задает дефолт статусы заказов
         self.create_default_categories(user)
-        return login(self.request, user)
+        # После сохранения статусов заказов я вызываю функцию которая задает дефолт документы
+        self.create_default_documents(user)
+        login(self.request, user)
+
+        return redirect('profile')
     
 class CustomLoginView(LoginView):
     form_class = LoginForm
     template_name = 'auth_registration/auth.html'
     
+    # Очень важное уточнение ЗДЕСЬ! ТАК как я использую LoginView, то
+    # важно его писать именно обращаясь к классу с унаследованием функции супер
+    # form_valid! Так как если этого не делать, то из за того, что ты напишешь так:
+    #
+    #    def form_valid(self, form):
+    #    return redirect('profile')
+    #
+    # Получится так, что ты в текущей функции ПЕРЕЗАПИШЕШЬ ВСЮ ТУ МЕХАНИКУ, КОТОРАЯ
+    # ПО дефолту реализована была уже!
+
+    def form_valid(self, form):
+        # Обязательно сначала "наследуюсь от супер функции form_valid"
+        super().form_valid(form)
+        return redirect('profile')
+
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             return redirect('profile')
         return super().dispatch(request, *args, **kwargs)
 
-    # В случае входа делаю редирект
-    def form_valid(self, request):
-        # ОЧЕНЬ СОМНЕВАЮСЬ В ЦЕЛЕСООБРАЗНОСТИ ДАННОГО РЕДИРЕКТА
-        if request.user.service_info.name_service and request.user.service_info.name_service.address:
-            return redirect('profile')
-        return redirect('make_config')
-
     def form_invalid(self, form):
-        return self.render_to_response(self.get_context_data(login_form=form,registration_form=CustomUserCreationForm()))
+        return self.render_to_response({'login_form':form, 'registration_form': CustomUserCreationForm()})
 
 # Темплейт вью отвечает за отображение всех элементов на сайте
 class ShowForm(TemplateView):
