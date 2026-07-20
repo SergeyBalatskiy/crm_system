@@ -15,12 +15,4 @@ urlpatterns = [
     path('categories', ShowCategoriesView.as_view(), name='categories'),
     # Указываю на путь к редактированию документов
     path('documents', ShowDocumentView.as_view(), name='tiny_mce'),
-    # Указываю путь к показу и редактированию именно АКТА О гарантии
-    path('document1', ShowGarantyView.as_view(), name = 'garanty_doc'),
-    # Указываю путь к показу и редактированию именно АКТА О ПРИНЯТИИ
-    path('document2', ShowAdoptionView.as_view(), name = 'adoption_doc'),
-    # Указываю путь к показу и редактированию именно АКТА О ОТКАЗЕ
-    path('document3', ShowCancellView.as_view(), name = 'cancell_doc'),
-    # Указываю путь к показу и редактированию именно АКТ О ВЫПОЛНЕННЫХ РАБОТАХ
-    path('document4', ShowCompleteView.as_view(), name = 'complete_doc'),
 ]

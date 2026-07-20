@@ -15,9 +15,11 @@ class ShowCompleteView(TemplateView):
     template_name = 'profile_user/complete_doc.html'
 
     def form_valid(self, document_info):
-        # Сохраняю без принудительной остановки так как нужно только перезаписать то, что
-        # находится в content
-        document_info.save()
+        upd_complete = DocumentInformation.objects.get(user = self.request.user, name = 'Акт о выполненных работах')
+        upd_complete.content = document_info.cleaned_data["content"]
+        
+        upd_complete.save()
+        print(upd_complete.content)
                 
         return redirect("complete_doc")
 
@@ -48,6 +50,7 @@ class ShowCompleteView(TemplateView):
 
     def get(self, request, *args, **kwargs):
         document = DocumentInformation.objects.filter(name='Акт о выполненных работах', user = self.request.user).first()
+        print(document)
         formset = DocumentInfoForm(instance=document)
         return render(request, self.template_name, {'tiny_mce': formset})
     
