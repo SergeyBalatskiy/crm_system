@@ -1,5 +1,5 @@
 from django.urls import path
-from profile_user.views import UserProfileView, ShowAdoptionView, ShowCancellView, ShowCompleteView, ServiceSetupView, ShowIssuancetView, WorkersAddView, CreateServiceInfoView, ShowCategoriesView, ShowDocumentView
+from .views import *
 from django.contrib.auth.views import LogoutView
 
 # Веселые маршруты... как я на них навернулся...
@@ -7,18 +7,16 @@ urlpatterns = [
     path('', UserProfileView.as_view(), name='profile'),
     # Выход пользователя из авторизации
     path('logout', LogoutView.as_view(next_page="auth"), name='logout'),
-    # Отображение непосредственно ФОРМЫ для ввода данных
-    path('make_configuration', ServiceSetupView.as_view(), name='make_config'),
-    # А здесь уже СОХРАНЕНИЕ введенной формы 
-    path('confirm_conf', CreateServiceInfoView.as_view(), name='confirm_conf'),
+    # Отображение сайта для настройки данных сервиса
+    path('service_info', ServiceInfoView.as_view(), name = 'service_info'),
     # Отображение формы для ввода данных сотрудников
-    path('create_workers', WorkersAddView.as_view(), name='create_workers'),
+    path('workers_info', WorkersAddView.as_view(), name='workers_info'),
     # Показ категорий для заказов
     path('categories', ShowCategoriesView.as_view(), name='categories'),
     # Указываю на путь к редактированию документов
     path('documents', ShowDocumentView.as_view(), name='tiny_mce'),
-    # Указываю путь к показу и редактированию именно АКТА О ВЫДАЧЕ
-    path('document1', ShowIssuancetView.as_view(), name = 'issuance_doc'),
+    # Указываю путь к показу и редактированию именно АКТА О гарантии
+    path('document1', ShowGarantyView.as_view(), name = 'garanty_doc'),
     # Указываю путь к показу и редактированию именно АКТА О ПРИНЯТИИ
     path('document2', ShowAdoptionView.as_view(), name = 'adoption_doc'),
     # Указываю путь к показу и редактированию именно АКТА О ОТКАЗЕ

@@ -44,7 +44,7 @@ class RegisterView(CreateView):
     def create_default_documents(self, user):
 
         default_categories = [
-            {"name": "Акт о выдаче", "content": "Акт о выдаче тут типо написан"},
+            {"name": "Акт о гарантии", "content": "Акт о гарантии тут типо написан"},
             {"name": "Акт о принятии", "content": "Акт о принятии типо тут написан"},
             {"name": "Акт о отказе", "content": "Акт о отказе тут написан"},
             {"name": "Акт о выполненных работах", "content": "Акт о выполненных работах тут написан"}

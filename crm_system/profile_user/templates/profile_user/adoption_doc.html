@@ -2,13 +2,12 @@
 {% load static %}
 
 {% block content %}
-<!-- <form method="get" class="navigation-select" action="{% url 'confirm_conf' %}"></form> -->
 <form method="get" class="navigation-select">
     <label for="page-select">Выберите документ</label>
     <select id="page-select" onchange="location.href=this.value;">
         <option value="" disabled selected>Перейти к...</option>
         <!-- # Отвечает за показ АКТА О ВЫДАЧЕ -->
-        <option value="{% url 'issuance_doc' %}" disabled selected>Акт о выдаче</option>
+        <option value="{% url 'garanty_doc' %}" disabled selected>Акт о выдаче</option>
         <!-- # Отвечает за показ АКТА О ПРИНЯТИИ -->
         <option value="{% url 'adoption_doc' %}" disabled selected>Акт о принятии</option>
         <!-- # Отвечает за показ АКТА О ОТКАЗЕ -->
