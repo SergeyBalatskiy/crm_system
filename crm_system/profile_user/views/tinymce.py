@@ -7,87 +7,68 @@ from django.urls import path
 from profile_user.forms import ServiceInfoForm, WorkersFormSet, DocumentInfoForm
 from django.views.generic.edit import CreateView
 from django.urls import reverse_lazy
+from django.contrib import messages
 from profile_user.models import StatusCategory, DocumentInformation, WorkersInfo
-
+from django.http import HttpResponse
 
 
 # Данный класс отвечает за отображение tinymce (GET запрос) и принятие из формы в метод POST (POST запрос)
 @method_decorator(login_required(), name='dispatch')
 class ShowDocumentView(TemplateView):
+    documents_form = 'profile_user/documents_form/document.html'
     template_name = 'profile_user/tinymce.html'
 
     def form_valid(self, document_info, name):
         upd_doc = DocumentInformation.objects.get(user = self.request.user, name = name)
         upd_doc.content = document_info.cleaned_data["content"]
         upd_doc.save()
-        return None
+        return HttpResponse(status=204)
 
     def post(self, request, *args, **kwargs):
-        cur_doc = request.POST.get('name')
+        cur_doc = request.POST.get('document')
 
-        if cur_doc == 'garanty_doc':
-            document_info = DocumentInfoForm(self.request.POST) # Делать так нужно ОБЯЗАТЕЛЬНО!
-            # Проверяю
-            if document_info.is_valid():
-                name = 'Акт о гарантии'
-                # Здесь активируется функция, которая отвечает за главное сохранение
-                return self.form_valid(document_info, name)
+        document_names = {
+            'garanty_doc': 'Акт о гарантии',
+            'adoption_doc': 'Акт о принятии',
+            'cancell_doc': 'Акт о отказе',
+            'complete_doc': 'Акт о выполненных работах'
+        }
 
-        if cur_doc == 'adoption_doc':
-            document_info = DocumentInfoForm(self.request.POST) # Делать так нужно ОБЯЗАТЕЛЬНО!
-            # Проверяю
-            if document_info.is_valid():
-                name = 'Акт о принятии'
+        name = document_names.get(cur_doc)
+        document_info = DocumentInfoForm(self.request.POST)
+        if document_info.is_valid():
                 # Здесь активируется функция, которая отвечает за главное сохранение
-                return self.form_valid(document_info, name)
-
-        if cur_doc == 'cancell_doc':
-            document_info = DocumentInfoForm(self.request.POST) # Делать так нужно ОБЯЗАТЕЛЬНО!
-            # Проверяю
-            if document_info.is_valid():
-                name = 'Акт о отказе'
-                # Здесь активируется функция, которая отвечает за главное сохранение
-                return self.form_valid(document_info, name)
-
-        if cur_doc == 'complete_doc':
-            document_info = DocumentInfoForm(self.request.POST)
-            # Проверяю
-            if document_info.is_valid():
-                # Здесь активируется функция, которая отвечает за главное сохранение
-                name = 'Акт о выполненных работах'
                 return self.form_valid(document_info, name)
 
     # Передаю в сайт методом GET форму самого tinymce
     def get(self, request, *args, **kwargs):
         
+        # Проверяю, что за метод получения информации с сайта?
+        # Если он сделан через HTMX, то:
         if request.headers.get('HX-Request') == 'true':
-            document_selected = request.GET.get('name')
+            # Используя name="documents" value="" я получаю то, какой документ нужен из формы GET запроса
+            document_selected = request.GET.get('documents')
 
-            if document_selected == 'garanty_doc':
-                document = DocumentInformation.objects.filter(name='Акт о гарантии', user = self.request.user).first()
-                formset = DocumentInfoForm(instance=document)
-                button_content = '<button type="submit">Сохранить документ</button>'
-                return render(request, self.template_name, {'tiny_mce': formset, 'button': button_content, 'cur_doc' : 'garanty_doc'})
+            document_names = {
+            'garanty_doc': 'Акт о гарантии',
+            'adoption_doc': 'Акт о принятии',
+            'cancell_doc': 'Акт о отказе',
+            'complete_doc': 'Акт о выполненных работах'
+        }
+            # По ключу получаю то, что запрашивают
+            name = document_names.get(document_selected)
 
-            if document_selected == 'adoption_doc':
-                document = DocumentInformation.objects.filter(name='Акт о принятии', user = self.request.user).first()
-                formset = DocumentInfoForm(instance=document)
-                button_content = '<button type="submit">Сохранить документ</button>'
-                return render(request, self.template_name, {'tiny_mce': formset, 'button': button_content, 'cur_doc' : 'adoption_doc'})
+            if name:
+                # Получаю обьект (ВЕСЬ)
+                document = DocumentInformation.objects.filter(name=name, user = self.request.user).first()
+                # У этого ОБЬЕКТА беру только content
+                content = document.content
 
-            if document_selected == 'cancell_doc':
-                document = DocumentInformation.objects.filter(name='Акт о отказе', user = self.request.user).first()
-                formset = DocumentInfoForm(instance=document)
-                button_content = '<button type="submit">Сохранить документ</button>'
-                return render(request, self.template_name, {'tiny_mce': formset, 'button': button_content, 'cur_doc' : 'cancell_doc'})
-    
-            if document_selected == 'complete_doc':
-                document = DocumentInformation.objects.filter(name='Акт о выполненных работах', user = self.request.user).first()
-                formset = DocumentInfoForm(instance=document)
-                button_content = '<button type="submit">Сохранить документ</button>'
-                return render(request, self.template_name, {'tiny_mce': formset, 'button': button_content, 'cur_doc' : 'complete_doc'})
-        
-        else:
-            html_fragment = "Пока что вы не выбрали ни одну форму"
-            return render(request, self.template_name, {'message': html_fragment} )
-
+                # ОТДАЮ И название, и текст
+                return render(request, 'profile_user/documents_form/document.html', {'content': content, 'cur_doc': document_selected})
+            
+        # Если метод получения информации без HTMX, то сначала необходимо загрузить форму (только 1 раз)
+        # потом отобразить текст и скрыто передать форму для "фальстарта"
+        form = DocumentInfoForm()
+        html_fragment = "Пока что вы не выбрали ни одну форму"
+        return render(request, self.template_name, {'message': html_fragment, 'tiny_mce': form } )

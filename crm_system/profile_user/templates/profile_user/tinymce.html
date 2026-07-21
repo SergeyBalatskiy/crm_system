@@ -1,13 +1,16 @@
 {% extends "profile_user/base.html" %}
 {% load static %}
-<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.js" integrity="sha384-Q+Dky3iHVJOr6wUjQ4ulh6uQ76an/t+ak1+PjMVaxRjbZamFLAG+u9InkfjbsEQf" crossorigin="anonymous"></script>
 {% block content %}
+
+<!-- Подгрузка HTMX -->
+<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.js"
+    integrity="sha384-Q+Dky3iHVJOr6wUjQ4ulh6uQ76an/t+ak1+PjMVaxRjbZamFLAG+u9InkfjbsEQf"
+    crossorigin="anonymous"></script>
 
 <form method="get" class="navigation-select">
     <label for="page-select">Выберите документ</label>
-    <select class = "custom-select mb-4" name="documents" hx-get="{% url 'tiny_mce' %}" hx-target = '#document'
-        <option selected>Перейти к...</option>
-        <!-- # Отвечает за показ АКТА О ВЫДАЧЕ -->
+    <select class="custom-select mb-4" name="documents" hx-trigger="change" hx-target="#hidden-data-container"
+        hx-get="{% url 'tiny_mce' %}" hx-swap="innerHTML">
         <option value="garanty_doc">Акт о гарантии</option>
         <!-- # Отвечает за показ АКТА О ПРИНЯТИИ -->
         <option value="adoption_doc">Акт о принятии</option>
@@ -15,19 +18,70 @@
         <option value="cancell_doc">Акт о отказе</option>
         <!-- # Отвечает за показ АКТА О ВЫПОЛНЕННЫХ РАБОТАХ -->
         <option value="complete_doc">Акт о выполненных работах</option>
-</select>
+    </select>
 
-<div id="document">
-    {{ message|safe }}
-    <form action="" method="post" name = '{{ cur_doc }}'>
-    {% csrf_token %}
+    <!-- Говорит, чтобы следил за любым изменением в форме 
+    hx-trigger="change" 
+    Место, куда вставляется динамически-измененный обьект
+    hx-target="#hidden-data-container"
+    Место, куда адресация идет при гет запросе
+    hx-get="{% url 'tiny_mce' %}"
+    Условие, которое говорит что нужно заменять весь код в этой области
+    hx-swap="innerHTML"> -->
 
-    {{ tiny_mce.media }}
-    {{ tiny_mce.as_p|safe }}
-    {{ button }}
+</form>
 
+<!-- Просто приветственное сообщение (по дефолту отображается) -->
+<div id="welcome-message">
+    <h3>{{ message }}</h3>
+</div>
+
+<!-- Место с POST запросом, С ГОТОВОЙ И УЖЕ ЗАГРУЖЕННОЙ, НО НЕ ГОТОВОЙ К ОТОБРАЖЕНИЮ
+ФОРМОЙ, которая будет показана после того, как выберут любой обьект, вставляется в  -->
+<div id="editor-container" style="display: none;">
+    <form method="post" action="">
+        {% csrf_token %}
+        <!-- Value = "" будет обьявлен вручную благодаря ('current-document-input').value = fetchedDocType.value -->
+        <input type="hidden" name="document" id="current-document-input" value="">
+        <!-- Показывается форма -->
+        {{ tiny_mce.media }}
+        {{ tiny_mce.as_p }}
+
+        <button type="submit">Сохранить документ</button>
     </form>
 </div>
 
-</form>
+<!-- Место, где будет показа сама форма, НО ТОЛЬКО при случае, если ('welcome-message').style.display = 'none';
+('editor-container').style.display = 'block' -->
+<div id="hidden-data-container" style="display: none;"></div>
+
+<!-- Если говорить коротко, то он просто "слушает", когда обратятся к div id="hidden-data-container" и
+в свою очередь начинает вставлять в форму данные -->
+<script>
+    // Слушает
+    document.body.addEventListener('htmx:afterSwap', function (event) {
+        if (event.detail.target.id === 'hidden-data-container') {
+            // Записывает в переменные важные данные о документе и тексте
+            const fetchedContent = document.getElementById('fetched-content');
+            const fetchedDocType = document.getElementById('fetched-doc-type');
+
+            // Включение в работу только при данных и активации формы
+            if (fetchedContent && tinymce.activeEditor) {
+
+                // Очень важная функция, которая отвечает за ВСТАВКУ html текста в div "hidden-data-container"
+                // с помощью innerHTML
+                tinymce.activeEditor.setContent(fetchedContent.innerHTML);
+
+                // Получаю информацию о типе документа исходя из fetchedDocType и вставляю его в 
+                // value у id="current-document-input" 
+                document.getElementById('current-document-input').value = fetchedDocType.value;
+
+                // Скрываю приветствие и показываю форму
+                document.getElementById('welcome-message').style.display = 'none';
+                document.getElementById('editor-container').style.display = 'block';
+            }
+        }
+    });
+</script>
+
 {% endblock %}
