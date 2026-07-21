@@ -53,6 +53,7 @@
 
 <!-- Место, где будет показа сама форма, НО ТОЛЬКО при случае, если ('welcome-message').style.display = 'none';
 ('editor-container').style.display = 'block' -->
+<!-- ОТВЕЧАЕТ ТОЛЬКО ЗА ХРАНЕНИЕ ТЕКСТА -->
 <div id="hidden-data-container" style="display: none;"></div>
 
 <!-- Если говорить коротко, то он просто "слушает", когда обратятся к div id="hidden-data-container" и
@@ -68,8 +69,8 @@
             // Включение в работу только при данных и активации формы
             if (fetchedContent && tinymce.activeEditor) {
 
-                // Очень важная функция, которая отвечает за ВСТАВКУ html текста в div "hidden-data-container"
-                // с помощью innerHTML
+                // Строка tinymce.activeEditor.setContent(fetchedContent.innerHTML) берет текст ИЗ 
+                // hidden-data-container и переносит его В TinyMCE (который находится внутри #editor-container)
                 tinymce.activeEditor.setContent(fetchedContent.innerHTML);
 
                 // Получаю информацию о типе документа исходя из fetchedDocType и вставляю его в 
