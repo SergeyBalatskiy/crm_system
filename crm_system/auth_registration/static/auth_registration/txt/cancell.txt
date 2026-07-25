@@ -1,0 +1,75 @@
+<p><span style="font-size: 18pt;"><strong>Отказной лист № &lt;Номер документа&gt; от &lt;Дата отказа&gt;</strong></span></p>
+<hr>
+<table style="border-collapse: collapse; width: 100%; height: 153.094px; border-width: 1px; border-color: rgb(255, 255, 255);" border="1"><colgroup><col style="width: 15.1633%;"><col style="width: 84.8367%;"></colgroup>
+<tbody>
+<tr style="height: 26.1406px;">
+<td style="height: 26.1406px; text-align: left; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;"><strong>Исполнитель:</strong></span></td>
+<td style="height: 26.1406px; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;">&lt;Название сервиса&gt;</span></td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="height: 26.1406px; text-align: left; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;"><strong>Адрес:</strong></span></td>
+<td style="height: 26.1406px; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;">&lt;Адрес сервиса&gt;</span></td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="height: 26.1406px; text-align: left; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;"><strong>Телефон:</strong></span></td>
+<td style="height: 26.1406px; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;">&lt;Номер телефона сервиса&gt;</span></td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; text-align: left; border-color: rgb(255, 255, 255);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&nbsp;</td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="height: 26.1406px; text-align: left; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;"><strong>Заказчик:</strong></span></td>
+<td style="height: 26.1406px; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;">&lt;Контрагент&gt;</span></td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="height: 26.1406px; text-align: left; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;"><strong>Марка/Модель:</strong></span></td>
+<td style="height: 26.1406px; border-color: rgb(255, 255, 255);"><span style="font-size: 14pt;">&lt;Марка&gt; &lt; Модель&gt;</span></td>
+</tr>
+</tbody>
+</table>
+<p>&nbsp;</p>
+<table style="border-collapse: collapse; width: 100%; height: 123.437px; border-width: 1px; border-color: rgb(0, 0, 0);" border="1"><colgroup><col style="width: 2.97984%;"><col style="width: 5.25855%;"><col style="width: 42.5942%;"><col style="width: 11.9194%;"><col style="width: 10.6047%;"><col style="width: 12.7082%;"><col style="width: 13.9351%;"></colgroup>
+<tbody>
+<tr style="height: 22.3906px;">
+<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>№</strong></span></td>
+<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Код</strong></span></td>
+<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Наименование товаров и услуг</strong></span></td>
+<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Гар-тия</strong></span></td>
+<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Кол-во</strong></span></td>
+<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Цена</strong></span></td>
+<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Сумма</strong></span></td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+</tr>
+<tr style="height: 26.375px;">
+<td style="height: 78.6562px; border-color: rgb(0, 0, 0);" colspan="4" rowspan="3">&nbsp;</td>
+<td style="height: 26.375px; border-color: rgb(0, 0, 0); text-align: right;" colspan="2"><span style="font-size: 14pt;"><strong>Сумма чека:</strong></span></td>
+<td style="height: 26.375px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="height: 26.1406px; border-color: rgb(0, 0, 0); text-align: right;" colspan="2"><span style="font-size: 14pt;"><strong>Скидка:</strong></span></td>
+<td style="height: 26.1406px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="height: 26.1406px; border-color: rgb(0, 0, 0); text-align: right;" colspan="2"><span style="font-size: 14pt;"><strong>Итого:</strong></span></td>
+<td style="height: 26.1406px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p style="line-height: 1;"><span style="font-size: 14pt;">Причина отказа в ремонте: &lt;Причина отказа&gt;</span></p>
+<p style="line-height: 1;"><span style="font-size: 14pt;">Всего наименований: &lt;кол-во номеров №&gt;, на сумму &lt;Итого&gt;</span></p>
+<p style="line-height: 1;"><strong><span style="font-size: 14pt;">&lt;Число текстом со склонением&gt;</span></strong></p>
+<p style="line-height: 1;"><span style="font-size: 14pt;">1. При отказе от ремонта Заказчик обязуется оплатить оказанные услуги и установленные Исполнителем товары до момента наступления такого отказа.</span></p>
+<p style="line-height: 1;"><span style="font-size: 14pt;">2. Перечень оказанных услуг и установленных товаров указан в таблице выше.</span></p>
+<hr>
+<p style="line-height: 1;"><span style="font-size: 14pt;">Исполнитель: _______________________ / &lt;Менеджер&gt;&nbsp;</span></p>
+<p style="line-height: 1;"><span style="font-size: 14pt;">Заказчик: _______________________ / &lt;Контрагент&gt;</span></p>
+<p style="line-height: 1.1;">&nbsp;</p>

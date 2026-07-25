@@ -1,0 +1,73 @@
+<h3 style="line-height: 1.3;" data-pm-slice="1 1 []"><span style="font-size: 18pt;">Акт сдачи-приемки выполненных работ (оказанных услуг)</span><br><span style="font-size: 18pt;">№ &lt;НомерДокумента&gt; от &lt;ДатаВыдачи&gt;</span></h3>
+<hr>
+<table style="border-collapse: collapse; width: 100%; border-width: 1px; border-color: rgb(255, 255, 255); height: 153.094px;" border="1"><colgroup><col style="width: 17.7156%;"><col style="width: 82.3707%;"></colgroup>
+<tbody>
+<tr style="height: 26.1406px;">
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;"><strong>Исполнитель:</strong></span></td>
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;">&lt;Название организации&gt;</span></td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;"><strong>Адрес:</strong></span></td>
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;">&lt;Адрес организации&gt;</span></td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;"><strong>Телефон:</strong></span></td>
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;">&lt;Номер владельца&gt;</span></td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="border-color: rgb(255, 255, 255); height: 22.3906px;">&nbsp;</td>
+<td style="border-color: rgb(255, 255, 255); height: 22.3906px;">&nbsp;</td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;"><strong>Заказчик:</strong></span></td>
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;">&lt;контрагент&gt;</span></td>
+</tr>
+<tr style="height: 26.1406px;">
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;"><strong>Номер телефона:</strong></span></td>
+<td style="border-color: rgb(255, 255, 255); height: 26.1406px;"><span style="font-size: 14pt;">&lt;Номер контрагента&gt;</span></td>
+</tr>
+</tbody>
+</table>
+<p style="line-height: 1;">&nbsp;</p>
+<table style="border-collapse: collapse; width: 100%; height: 113.312px; border-width: 1px; border-color: rgb(0, 0, 0);" border="1"><colgroup><col style="width: 4.40035%;"><col style="width: 7.24763%;"><col style="width: 44.5211%;"><col style="width: 7.8516%;"><col style="width: 12.3382%;"><col style="width: 11.9931%;"><col style="width: 11.648%;"></colgroup>
+<tbody>
+<tr style="height: 23.75px;">
+<td style="text-align: center; height: 23.75px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>№</strong></span></td>
+<td style="text-align: center; height: 23.75px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Код</strong></span></td>
+<td style="text-align: center; height: 23.75px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Наименование товаров и услуг</strong></span></td>
+<td style="text-align: center; height: 23.75px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Гар-тия</strong></span></td>
+<td style="text-align: center; height: 23.75px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Кол-во</strong></span></td>
+<td style="text-align: center; height: 23.75px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Цена</strong></span></td>
+<td style="text-align: center; height: 23.75px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Сумма</strong></span></td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="border-color: rgb(0, 0, 0); height: 67.1718px;" colspan="4" rowspan="3">&nbsp;</td>
+<td style="border-color: rgb(0, 0, 0); height: 22.3906px; text-align: right;" colspan="2"><span style="font-size: 14pt;">Сумма чека</span></td>
+<td style="border-color: rgb(0, 0, 0); height: 22.3906px;">&nbsp;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="border-color: rgb(0, 0, 0); height: 22.3906px; text-align: right;" colspan="2"><span style="font-size: 14pt;">Скидка:</span></td>
+<td style="border-color: rgb(0, 0, 0); height: 22.3906px;">&nbsp;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="border-color: rgb(0, 0, 0); height: 22.3906px; text-align: right;" colspan="2"><span style="font-size: 14pt;">Итого:</span></td>
+<td style="border-color: rgb(0, 0, 0); height: 22.3906px;">&nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p><span style="font-size: 14pt;">Всего наименований &lt;ВсегоПозиций&gt;, на сумму &lt;Итого(#.##)&gt; &lt;Влт&gt;</span></p>
+<p><span style="font-size: 14pt;"><strong>&lt;ИтогоПрописью&gt;</strong></span></p>
+<p><span style="font-size: 14pt;">Вердикт: &lt;Рекомендации&gt;</span></p>
+<p><span style="font-size: 14pt;">Вышеперечисленные услуги выполнены полностью и в срок.</span></p>
+<p><span style="font-size: 14pt;">Заказчик претензий по объему, качеству и срокам оказания услуг не имеет.</span></p>
+<hr>
+<p><span style="font-size: 14pt;">Исполнитель: __________________________ / &lt;фио менеджера&gt;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ___________________________ / &lt;Контрагент&gt;</span></p>

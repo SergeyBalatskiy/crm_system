@@ -1,0 +1,91 @@
+<p style="line-height: 1;"><span style="font-size: 18pt;"><strong>Квитанция № &lt;Номер квитанции&gt; от &lt;Дата выдачи&gt;</strong></span></p>
+<hr>
+<table style="border-collapse: collapse; width: 100%; height: 111.953px; border-width: 1px; border-color: rgb(255, 255, 255);" border="1"><colgroup><col style="width: 13.6745%;"><col style="width: 86.3255%;"></colgroup>
+<tbody>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Исполнитель:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Название филиала&gt;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Адрес:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Адрес филиала&gt;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Телефон:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Телефон сервиса&gt;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Заказчик:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Контрагент&gt;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Телефон:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Телефон контрагента&gt;</td>
+</tr>
+</tbody>
+</table>
+<p style="line-height: 1;"><strong>Марка/Модель: </strong>&lt;Марка&gt; &lt;Модель&gt;</p>
+<p style="line-height: 1;"><strong>Комплектация:</strong> &lt;Комплектация&gt;</p>
+<p style="line-height: 1;"><strong>Внешний вид: </strong>&lt;Внешний вид&gt;</p>
+<p style="line-height: 1;"><strong>Причина ремонта со слов заказчика: </strong>&lt;Причина ремонта&gt;</p>
+<p style="line-height: 1;"><strong>Предоплата:&nbsp; </strong>&lt;Предоплата&gt;</p>
+<p style="line-height: 1;"><strong>Ориентировочная стоимость ремонта:</strong> &lt;Ориентировочная стоимость ремонта&gt;</p>
+<p style="line-height: 1;"><strong>Ориентировочная дата готовности:</strong> &lt;Дата готовности ориентировочная&gt;</p>
+<p style="line-height: 1;"><strong>Примечание:</strong> &lt;Примечание&gt;</p>
+<ol>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">Технический центр не несет ответственности за возможную потерю данных в памяти устройства, связанную с заменой плат, установкой програмного обеспечения, заменой носителя информации.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">Заказчик принимает на себя риск возможной полной или частичной утраты работоспособности устройства в процессе ремонта (тепловой обработки), в случае грубых нарушений пользователем условий эксплуатации, наличия следа попадания токопроводящей жидкости (коррозии), либо механических повреждений.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">На восстановленные после попадания жидкости на устройство гарантия не распространяется и не продлевается.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">Срок бесплатного хранения устройства составляет 30 дней с момента приема его в ремонт. В случае, если по истечении указанного срока клиентом не заявлено требование о выдаче устройства, оно принимается на ответственное хранение. Стоимость услуг по ответственному хранению составляет ____ руб. в сутки. Максимальный срок ответственного хранения составляет 30 дней. В случае, если в течение указанного срока Клиент не потребует возврата устройства, устройство утилизируется без компенсации его стоимости клиенту.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">В случае отказа заказчика от ремонта устройства стоимость диагностики неисправности платная.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">В случае утери квитанциии, устройство выдается по предъявлению пасспорта на имя заказчика.</span></li>
+</ol>
+<p>&nbsp;</p>
+<p style="text-align: right;">Исполнитель: _____________________ / &lt;Имя владельца сервиса&gt;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _______________________ / &lt;Контрагент&gt; /</p>
+<p style="text-align: right;">&nbsp;с условием гарантии ознакомлен и согласен</p>
+<hr>
+<p style="line-height: 1;"><span style="font-size: 18pt;"><strong>Квитанция № &lt;Номер квитанции&gt; от &lt;Дата выдачи&gt;</strong></span></p>
+<hr>
+<table style="border-collapse: collapse; width: 100%; height: 111.953px; border-width: 1px; border-color: rgb(255, 255, 255);" border="1"><colgroup><col style="width: 13.6745%;"><col style="width: 86.3255%;"></colgroup>
+<tbody>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Исполнитель:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Название филиала&gt;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Адрес:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Адрес филиала&gt;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Телефон:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Телефон сервиса&gt;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Заказчик:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Контрагент&gt;</td>
+</tr>
+<tr style="height: 22.3906px;">
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);"><strong>Телефон:</strong></td>
+<td style="height: 22.3906px; border-color: rgb(255, 255, 255);">&lt;Телефон контрагента&gt;</td>
+</tr>
+</tbody>
+</table>
+<p style="line-height: 1;"><strong>Марка/Модель: </strong>&lt;Марка&gt; &lt;Модель&gt;</p>
+<p style="line-height: 1;"><strong>Комплектация:</strong> &lt;Комплектация&gt;</p>
+<p style="line-height: 1;"><strong>Внешний вид: </strong>&lt;Внешний вид&gt;</p>
+<p style="line-height: 1;"><strong>Причина ремонта со слов заказчика: </strong>&lt;Причина ремонта&gt;</p>
+<p style="line-height: 1;"><strong>Предоплата:&nbsp; </strong>&lt;Предоплата&gt;</p>
+<p style="line-height: 1;"><strong>Ориентировочная стоимость ремонта:</strong> &lt;Ориентировочная стоимость ремонта&gt;</p>
+<p style="line-height: 1;"><strong>Ориентировочная дата готовности:</strong> &lt;Дата готовности ориентировочная&gt;</p>
+<p style="line-height: 1;"><strong>Примечание:</strong> &lt;Примечание&gt;</p>
+<ol>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">Технический центр не несет ответственности за возможную потерю данных в памяти устройства, связанную с заменой плат, установкой програмного обеспечения, заменой носителя информации.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">Заказчик принимает на себя риск возможной полной или частичной утраты работоспособности устройства в процессе ремонта (тепловой обработки), в случае грубых нарушений пользователем условий эксплуатации, наличия следа попадания токопроводящей жидкости (коррозии), либо механических повреждений.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">На восстановленные после попадания жидкости на устройство гарантия не распространяется и не продлевается.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">Срок бесплатного хранения устройства составляет 30 дней с момента приема его в ремонт. В случае, если по истечении указанного срока клиентом не заявлено требование о выдаче устройства, оно принимается на ответственное хранение. Стоимость услуг по ответственному хранению составляет ____ руб. в сутки. Максимальный срок ответственного хранения составляет 30 дней. В случае, если в течение указанного срока Клиент не потребует возврата устройства, устройство утилизируется без компенсации его стоимости клиенту.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">В случае отказа заказчика от ремонта устройства стоимость диагностики неисправности платная.</span></li>
+<li style="font-size: 12pt;"><span style="font-size: 12pt;">В случае утери квитанциии, устройство выдается по предъявлению пасспорта на имя заказчика.</span></li>
+</ol>
+<p>&nbsp;</p>
+<p style="text-align: right;">Исполнитель: _____________________ / &lt;Имя владельца сервиса&gt;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; _______________________ / &lt;Контрагент&gt; /</p>
+<p style="text-align: right;">&nbsp;с условием гарантии ознакомлен и согласен</p>

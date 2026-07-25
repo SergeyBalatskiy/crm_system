@@ -6,6 +6,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.views.generic import TemplateView
 from django.contrib import messages
 from profile_user.models import StatusCategory, DocumentInformation
+import csv
+from django.contrib.staticfiles import finders
+from django.conf import settings
+from pathlib import Path
 
 # Create your views here.
 # Креате вью отвечает за создание нового обьекта на в связке с формой
@@ -43,15 +47,36 @@ class RegisterView(CreateView):
     # Вызываю функцию которая отвечает за создание 4 дефолтных документов при регистрации
     def create_default_documents(self, user):
 
-        default_categories = [
-            {"name": "Акт о гарантии", "content": "Акт о гарантии тут типо написан"},
-            {"name": "Акт о принятии", "content": "Акт о принятии типо тут написан"},
-            {"name": "Акт о отказе", "content": "Акт о отказе тут написан"},
-            {"name": "Акт о выполненных работах", "content": "Акт о выполненных работах тут написан"}
+        # Создаю 2 списка, каждый будет связан с другим по названию и названию документа (для zip(documents, names))
+        documents = ['addoption.txt', 'cancell.txt', 'complete.txt', 'garanty.txt']
+        names = ['Акт о принятии', 'Акт о отказе', 'Акт о выполненных работах',  'Акт о гарантии']
+        docs_waiting_to_create = []
 
-        ]
-        for element in default_categories:
-            create_document = DocumentInformation.objects.create(name=element["name"], content=element["content"], user=user)
+        # Указываю путь до самого проекта
+        # Короче, лучше уж использовать такую тактику с путями, как:
+        # BASE_DIR = Path(__file__).resolve().parent.parent    + 
+        # flie_path = BASE_DIR / 'auth_registration' / 'static' / 'auth_registration' / 'txt' / document
+        # потому что это самый доступный способ для меня
+        BASE_DIR = Path(__file__).resolve().parent.parent
+
+        # Беру документ.txt и связанное с ним название
+        for document, name in zip(documents, names):          
+
+            # Указываю путь к каждому из 4 документов
+            flie_path = BASE_DIR / 'auth_registration' / 'static' / 'auth_registration' / 'txt' / document
+
+            # Открываю каждый файл отдельно, читаю что там, упаковываю в переменную
+            with open(flie_path, 'r', encoding='utf-8') as file:
+                write_content = file.read()
+                
+                # Здесь достаточно забавная механика, о которой я раньше не слышал, не знал, и при этом
+                # эта механика весьма удобна и проста! можно не создавать отлельных N запроса, а всего лишь
+                # создать словарь docs_waiting_to_create = [], потом добавлять туда каждый раз ссылку на саму БД с
+                # аргументами на то что записывается внутри, и потом используя ссылку на саму БД.objects.bulk_create(docs_waiting_to_create)
+                # можно таким образом за 1 действие записать 4 обьекта! Ну разве не сказка, а?
+                docs_waiting_to_create.append(DocumentInformation(name=name, content=write_content, user=user))
+        
+        DocumentInformation.objects.bulk_create(docs_waiting_to_create)
         return None
 
     # Непосредственно отвечает за валидацию и принятие формы и ее сохранение
@@ -59,8 +84,7 @@ class RegisterView(CreateView):
         user = form.save(commit=False)
         user.username = user.email  
         user.save() 
-        print('Сохранил:', user.username)
-        print('Сохранил:', user.email)
+
         # После сохранения я вызываю функцию которая задает дефолт статусы заказов
         self.create_default_categories(user)
         # После сохранения статусов заказов я вызываю функцию которая задает дефолт документы
