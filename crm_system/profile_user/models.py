@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import User
 from tinymce.models import HTMLField 
 
+
 # Делаем ссылку на классовую модель пользователя (Текущего)
 User = get_user_model()
 
@@ -31,6 +32,7 @@ class WorkersInfo(models.Model):
     def __str__(self):
         return f'Cотрудник: {self.name} {self.surname}, связан с {self.user.get_full_name()}'
 
+# Создаю статус категорий
 class StatusCategory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='status_info')
     name = models.CharField(max_length=100, null=True)
@@ -39,7 +41,8 @@ class StatusCategory(models.Model):
     
     def __str__(self):
         return f'Цвет: {self.color}, Название: {self.name}, Категория: {self.category}, Владелец: {self.user}'
-    
+
+# Создаю информацию о дефолтной форме (уже заполненной в static/txt/.txt)
 class DocumentInformation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='document_info')
     content = HTMLField()
@@ -47,6 +50,99 @@ class DocumentInformation(models.Model):
 
     def __str__(self):
         return f'Название: {self.name}, Владелец: {self.user}, текст: {self.content}'
-    
-    
+
+# Функция для внесения дефолтного словаря в поле json_forms
+def get_dict_for_json_forms():
+    return {
+    'sections':[
+        {
+         'id':'client_info', 
+         'title' : 'Клиент',
+         'order' : 1,
+         'fields' : [{
+             'field_key' : 'name',
+             'label' : 'Имя клиента',
+             'is_required' : True,
+             'order' : 1
+         },
+         {
+            'field_key' : 'phone',
+             'label' : 'Телефон',
+             'is_required' : True,
+             'order' : 2
+         },
+         {
+             'field_key' : 'telegram',
+             'label' : 'Телеграм',
+             'is_required' : False,
+             'order' : 3
+         }
+        ]
+    },
+    {
+        'id':'device_info', 
+        'title' : 'Устройство и неисправности',
+        'order' : 2,
+        'fields' : [{
+            'field_key' : 'serial_number',
+            'label' : 'Серийный номер',
+            'is_required' : False,
+            'order' : 1
+         },
+         {
+            'field_key' : 'type_of_device',
+            'label' : 'Тип устройства',
+            'is_required' : False,
+            'order' : 2
+         },
+         {
+            'field_key' : 'device_company',
+            'label' : 'Марка',
+            'is_required' : False,
+            'order' : 3
+         },
+         {
+            'field_key' : 'color',
+            'label' : 'Цвет',
+            'is_required' : False,
+            'order' : 4
+         }
+        ]
+    },
+    {
+        'id':'bonus_iformation', 
+        'title' : 'Дополнительная информация',
+        'order' : 3,
+        'fields' : [{
+            'field_key' : 'target_price',
+            'label' : 'Ориентировочная цена',
+            'is_required' : False,
+            'order' : 1
+         },
+         {
+            'field_key' : 'master',
+            'label' : 'Мастер',
+            'is_required' : False,
+            'order' : 2
+         },
+         {
+            'field_key' : 'manager',
+            'label' : 'Менеджер',
+            'is_required' : False,
+            'order' : 3
+         },
+         {
+            'field_key' : 'comment_of_order',
+            'label' : 'Комментарий приемщика',
+            'is_required' : False,
+            'order' : 4
+         }
+        ]
+    }
+    ]}
+
+class FormsForOrder(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='forms_for_order')
+    type_of_order = models.CharField(max_length=100, null=True)
+    json_forms = models.JSONField(default=get_dict_for_json_forms)        
     

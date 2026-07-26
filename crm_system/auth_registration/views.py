@@ -5,7 +5,7 @@ from django.contrib.auth.views import LoginView
 from django.contrib.auth import authenticate, login, logout
 from django.views.generic import TemplateView
 from django.contrib import messages
-from profile_user.models import StatusCategory, DocumentInformation
+from profile_user.models import StatusCategory, DocumentInformation, FormsForOrder
 import csv
 from django.contrib.staticfiles import finders
 from django.conf import settings
@@ -79,6 +79,17 @@ class RegisterView(CreateView):
         DocumentInformation.objects.bulk_create(docs_waiting_to_create)
         return None
 
+    # Вызываю функцию которая отвечает за создание 2 дефолт форм отдельных для заказов
+    def create_default_forms(self, user):
+        types_of_orders = ['paid', 'warranty']
+        forms_order_waiting = []
+
+        for type_order in types_of_orders:
+            forms_order_waiting.append(FormsForOrder(type_of_order = type_order, user = user))
+        
+        FormsForOrder.objects.bulk_create(forms_order_waiting)
+        return None
+    
     # Непосредственно отвечает за валидацию и принятие формы и ее сохранение
     def form_valid(self, form):
         user = form.save(commit=False)
@@ -87,8 +98,14 @@ class RegisterView(CreateView):
 
         # После сохранения я вызываю функцию которая задает дефолт статусы заказов
         self.create_default_categories(user)
+
         # После сохранения статусов заказов я вызываю функцию которая задает дефолт документы
         self.create_default_documents(user)
+
+        # После сохранения 4 документов я вызываю функцию которая делает мне дефолт 
+        # форму для заполнения информациизаказов
+        self.create_default_forms(user)
+
         login(self.request, user)
 
         return redirect('profile')
