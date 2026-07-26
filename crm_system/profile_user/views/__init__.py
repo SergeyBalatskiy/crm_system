@@ -7,3 +7,4 @@ from .profile import UserProfileView
 from .service_info import ServiceInfoView
 from .tinymce import ShowDocumentView
 from .workers_info import WorkersAddView
+from .forms_for_orders import FormsForOrdersEdit

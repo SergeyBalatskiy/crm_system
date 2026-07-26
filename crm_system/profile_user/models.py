@@ -62,18 +62,21 @@ def get_dict_for_json_forms():
          'fields' : [{
              'field_key' : 'name',
              'label' : 'Имя клиента',
+             'type' : 'text',
              'is_required' : True,
              'order' : 1
          },
          {
             'field_key' : 'phone',
              'label' : 'Телефон',
+             'type' : 'phone',
              'is_required' : True,
              'order' : 2
          },
          {
              'field_key' : 'telegram',
              'label' : 'Телеграм',
+             'type' : 'text',
              'is_required' : False,
              'order' : 3
          }
@@ -86,24 +89,28 @@ def get_dict_for_json_forms():
         'fields' : [{
             'field_key' : 'serial_number',
             'label' : 'Серийный номер',
+            'type' : 'text',
             'is_required' : False,
             'order' : 1
          },
          {
             'field_key' : 'type_of_device',
             'label' : 'Тип устройства',
+            'type' : 'select',
             'is_required' : False,
             'order' : 2
          },
          {
             'field_key' : 'device_company',
             'label' : 'Марка',
+            'type' : 'select',
             'is_required' : False,
             'order' : 3
          },
          {
             'field_key' : 'color',
             'label' : 'Цвет',
+            'type' : 'select',
             'is_required' : False,
             'order' : 4
          }
@@ -116,24 +123,28 @@ def get_dict_for_json_forms():
         'fields' : [{
             'field_key' : 'target_price',
             'label' : 'Ориентировочная цена',
+            'type' : 'number',
             'is_required' : False,
             'order' : 1
          },
          {
             'field_key' : 'master',
             'label' : 'Мастер',
+            'type' : 'select',
             'is_required' : False,
             'order' : 2
          },
          {
             'field_key' : 'manager',
             'label' : 'Менеджер',
+            'type' : 'select',
             'is_required' : False,
             'order' : 3
          },
          {
             'field_key' : 'comment_of_order',
             'label' : 'Комментарий приемщика',
+            'type' : 'textarea',
             'is_required' : False,
             'order' : 4
          }
@@ -146,3 +157,5 @@ class FormsForOrder(models.Model):
     type_of_order = models.CharField(max_length=100, null=True)
     json_forms = models.JSONField(default=get_dict_for_json_forms)        
     
+    def __str__(self):
+        return f'Название формы заказа: {self.type_of_order}, Владелец: {self.user}'

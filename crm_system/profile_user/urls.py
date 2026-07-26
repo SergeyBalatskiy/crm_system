@@ -15,4 +15,6 @@ urlpatterns = [
     path('categories', ShowCategoriesView.as_view(), name='categories'),
     # Указываю на путь к редактированию документов
     path('documents', ShowDocumentView.as_view(), name='tiny_mce'),
+    # Указываю на путь к редактированию форм для заказа
+    path('form-editor', FormsForOrdersEdit.as_view(), name='form-editor'),
 ]

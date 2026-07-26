@@ -65,7 +65,7 @@ class ShowDocumentView(TemplateView):
                 content = document.content
 
                 # ОТДАЮ И название, и текст
-                return render(request, 'profile_user/documents_form/document.html', {'content': content, 'cur_doc': document_selected})
+                return render(request, self.documents_form, {'content': content, 'cur_doc': document_selected})
             
         # Если метод получения информации без HTMX, то сначала необходимо загрузить форму (только 1 раз)
         # потом отобразить текст и скрыто передать форму для "фальстарта"
