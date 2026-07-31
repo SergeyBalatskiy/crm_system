@@ -1,0 +1,118 @@
+<!-- Отображает сами задействованные формы -->
+
+{% for section, values in form_order.json_forms.items %}
+{% for objects_show in values %}
+
+<div class="section-card" id="{{ objects_show.id }}">
+    <div class="section-header">
+        <h2>
+            <span class="section-number">{{ objects_show.order }}</span>
+            {{ objects_show.title }}
+        </h2>
+    </div>
+
+    <!-- Поля секции (Сетка 2 колонки + Drag&Drop) -->
+    <div class="fields-sortable-list" id="sortable-{{ objects_show.id }}">
+        {% for obj in objects_show.fields %}
+        <div class="field-pill" data-key="{{ obj.field_key }}">
+            <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
+
+            <!-- Тут у меня кнопка внутри кнопки, суть заключается в том, чтобы при наведении на главную кнопку, у меня эффектом ховера появлялась унопка удаления -->
+            <div class="outer-wrapper">
+                <span class="field-name">{{ obj.label }}</span>
+                <!-- Вот эта кнопка передает в джава скрипт тот самый обьект на удаление в сохранение -->
+                <!-- obj отвечает за несение важного элемента на удаление (словарь)-->
+                <!-- а objects_show.id отвечает за показ самой категории где сделали удаление -->
+                <button data='{"id": "{{ objects_show.id }}", "obj": "{{ obj }}"}' onclick="handleClick(this)">
+                    <input type="hidden" id="type_of_order_selected" value="{{ form_order.type_of_order }}">
+
+                    <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
+                </button>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty-section-placeholder">В этой секции пока нет активных полей</div>
+        {% endfor %}
+    </div>
+
+    <!-- Кнопка "+" -->
+    <div class="add-btn-wrapper">
+        <div class="add-btn-container">
+            <button type="button" class="btn-plus left"
+                hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=left&type_of_order_selected={{ form_order.type_of_order }}"
+                hx-target="#right-sidebar-content" onclick="openSidebar()" title="Добавить поле слева">
+                +
+            </button>
+
+            <button type="button" class="btn-plus center"
+                hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=full&type_of_order_selected={{ form_order.type_of_order }}"
+                hx-target="#right-sidebar-content" onclick="openSidebar()" title="Добавить поле на всю строку">
+                +
+            </button>
+
+            <button type="button" class="btn-plus right"
+                hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=right&type_of_order_selected={{ form_order.type_of_order }}"
+                hx-target="#right-sidebar-content" onclick="openSidebar()" title="Добавить поле справа">
+                +
+            </button>
+        </div>
+    </div>
+</div>
+
+{% endfor %}
+{% endfor %}
+
+<script>
+
+    function openSidebar() {
+        const sidebar = document.getElementById('right-sidebar');
+        sidebar.classList.remove('hidden');
+
+        // Также сразу показываем нижнюю плашку "Форма была изменена"
+        showSaveBar();
+    }
+
+    // Закрытие боковой панели
+    function closeSidebar() {
+        const sidebar = document.getElementById('right-sidebar');
+        sidebar.classList.add('hidden');
+    }
+
+    // Показ плашки сохранения
+    function showSaveBar() {
+        const saveBar = document.getElementById('bottom-save-bar');
+        saveBar.classList.remove('hidden');
+    }
+
+    // Указываем, за каким предметом нужно следить при изменении
+    document.querySelectorAll('.fields-sortable-list').forEach(function (element) {
+        new Sortable(element, {
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+
+            onEnd: function (evt) {
+                // Отвечает за показ той секции, где произошли изменения
+                const sectionCard = evt.to.closest('.section-card');
+                const sectionId = sectionCard.id;
+
+                // Отвечает за подсчет нового порядка
+                const orderedKeys = Array.from(evt.to.querySelectorAll('.field-pill'))
+                    .map(item => item.getAttribute('data-key'));
+
+                // Отправляется POST запрос в функцию _save_fields_order
+                htmx.ajax('POST', '{% url "form-editor" %}', {
+                    swap: 'none',
+                    values: {
+                        // Новый порядок
+                        'ordered_keys': orderedKeys,
+                        // Место, где произошли изменения
+                        'section_id': sectionId,
+                        'type_of_order_selected': '{{ form_order.type_of_order }}',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    }
+                });
+            }
+        });
+    });
+</script>

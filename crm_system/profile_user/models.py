@@ -117,7 +117,7 @@ def get_dict_for_json_forms():
         ]
     },
     {
-        'id':'bonus_iformation', 
+        'id':'bonus_information', 
         'title' : 'Дополнительная информация',
         'order' : 3,
         'fields' : [{

@@ -2,11 +2,6 @@
 {% load static %}
 {% block content %}
 
-<!-- Подгрузка HTMX -->
-<script src="https://cdn.jsdelivr.net/npm/htmx.org@2.0.10/dist/htmx.js"
-    integrity="sha384-Q+Dky3iHVJOr6wUjQ4ulh6uQ76an/t+ak1+PjMVaxRjbZamFLAG+u9InkfjbsEQf"
-    crossorigin="anonymous"></script>
-
 <form method="get" class="navigation-select">
     <label for="page-select">Выберите документ</label>
     <select class="custom-select mb-4" name="documents" hx-trigger="change" hx-target="#hidden-data-container"

@@ -1,0 +1,467 @@
+{% extends "profile_user/base.html" %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<style>
+    .editor-page-wrapper {
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .navigation-form-select {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+    }
+
+    .custom-select {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+        background-color: #ffffff;
+        font-size: 0.95rem;
+        outline: none;
+    }
+
+    /* Двухколоночный макет */
+    .editor-page-layout {
+        display: flex;
+        gap: 24px;
+        align-items: flex-start;
+        margin-top: 20px;
+    }
+
+    .builder-main-content {
+        flex: 1;
+        width: 100%;
+    }
+
+    .builder-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* Секции / Карточки */
+    .section-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    }
+
+    .section-header h2 {
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin: 0 0 16px 0;
+        color: #1e293b;
+    }
+
+    .section-number {
+        background: #e0e7ff;
+        color: #4338ca;
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        margin-right: 8px;
+    }
+
+    /* Поля внутри секции (Сетка) */
+    .fields-sortable-list {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        min-height: 40px;
+    }
+
+    .field-pill {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        padding: 10px 14px;
+        border-radius: 8px;
+        transition: all 0.2s;
+    }
+
+    .field-pill:hover {
+        border-color: #94a3b8;
+        background: #f8fafc;
+    }
+
+    .drag-handle {
+        cursor: grab;
+        color: #94a3b8;
+        font-size: 1.1rem;
+        user-select: none;
+    }
+
+    .empty-section-placeholder {
+        grid-column: span 2;
+        text-align: center;
+        color: #94a3b8;
+        padding: 15px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+    }
+
+    /* Раздвигающаяся кнопка + */
+    .add-btn-wrapper {
+        margin-top: 16px;
+    }
+
+    .add-btn-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #f8fafc;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        height: 38px;
+        transition: all 0.25s ease;
+    }
+
+    .add-btn-container:hover {
+        background-color: #f1f5f9;
+        justify-content: space-between;
+        padding: 0 20px;
+        border-style: solid;
+    }
+
+    .btn-plus {
+        background: transparent;
+        border: none;
+        font-size: 18px;
+        font-weight: bold;
+        color: #64748b;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .btn-plus.left,
+    .btn-plus.right {
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    .add-btn-container:hover .btn-plus.left,
+    .add-btn-container:hover .btn-plus.right {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .btn-plus:hover {
+        color: #4f46e5;
+        transform: scale(1.3);
+    }
+
+    /* Боковая панель справа */
+    .right-sidebar {
+        width: 320px;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        position: sticky;
+        top: 20px;
+    }
+
+    .right-sidebar.hidden {
+        display: none;
+    }
+
+    .sidebar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 16px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f1f5f9;
+    }
+
+    .sidebar-header h3 {
+        margin: 0;
+        font-size: 1rem;
+        color: #1e293b;
+    }
+
+    .btn-close-sidebar {
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        color: #64748b;
+        cursor: pointer;
+    }
+
+    .placeholder-text {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    /* Нижняя фиксированная плашка */
+    .bottom-save-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        padding: 12px 24px;
+        z-index: 1000;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .bottom-save-bar.hidden {
+        display: none;
+    }
+
+    .save-bar-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .save-bar-text {
+        color: #475569;
+        font-weight: 500;
+        margin-left: 8px;
+    }
+
+    /* Общие кнопки */
+    .btn {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        border: none;
+        transition: 0.2s;
+    }
+
+    .btn-primary {
+        background: #4f46e5;
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: #4338ca;
+    }
+
+    .btn-danger {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-danger:hover {
+        background: #dc2626;
+    }
+</style>
+
+<div class="editor-page-wrapper">
+
+    <form method="get" class="navigation-form-select">
+        <label for="page-select">Тип формы заказов:</label>
+        <select class="custom-select" name="type_of_order_selected" hx-trigger="change" hx-target="#show-data-forms"
+            hx-get="{% url 'form-editor' %}" hx-swap="innerHTML">
+            <option value="" disabled selected hidden>Выберите тип заказа...</option>
+            <option value="paid">Платный ремонт</option>
+            <option value="warranty">Гарантийный ремонт</option>
+        </select>
+    </form>
+
+    <div id="welcome-message">
+        {% if message %}
+        <div class="info-alert">{{ message }}</div>
+        {% endif %}
+    </div>
+
+    <div class="editor-page-layout">
+
+        <div class="builder-main-content">
+            <div id="show-data-forms" class="builder-container">
+                {% include "profile_user/current_forms/form_show.html" %}
+            </div>
+        </div>
+
+        <aside id="right-sidebar" class="right-sidebar hidden">
+            <div class="sidebar-header">
+                <h3>Доступные поля</h3>
+                <button type="button" class="btn-close-sidebar" onclick="closeSidebar()">✕</button>
+            </div>
+
+            <div id="right-sidebar-content">
+                <p class="placeholder-text">Нажмите «+» в нужной секции, чтобы выбрать поле.</p>
+            </div>
+        </aside>
+
+    </div>
+
+</div>
+
+<div id="bottom-save-bar" class="bottom-save-bar hidden">
+    <div class="save-bar-content">
+        <button class="btn btn-primary" onclick="saveChanges()">Сохранить</button>
+
+        <button type="button" class="btn btn-danger" hx-get="{% url 'form-editor' %}"
+            hx-include="[name='type_of_order_selected']" hx-target="#show-data-forms"
+            onclick="hideSaveBar(); closeSidebar();">
+            Отмена
+        </button>
+        <span class="save-bar-text">Форма была изменена.</span>
+    </div>
+</div>
+
+<script>
+
+    function openSidebar() {
+        document.getElementById('right-sidebar').classList.remove('hidden');
+        showSaveBar();
+    }
+
+    function closeSidebar() {
+        document.getElementById('right-sidebar').classList.add('hidden');
+    }
+
+    function showSaveBar() {
+        document.getElementById('bottom-save-bar').classList.remove('hidden');
+    }
+
+    function cancelChanges() {
+        location.reload();
+    }
+
+    function hideSaveBar() { document.getElementById('bottom-save-bar').classList.add('hidden'); }
+
+
+    // Словарь, который удобно сортирует каждый {{ obj }} в зависимости от {{ objects_show.id }}
+    const map = new Map();
+
+    // Функция отвечает за слушание события, когда нажимают на кнопку для удаления категории
+    // onclick="handleClick(this)
+    function handleClick(element) {
+
+        // Говорю, что в переменную one_object_to_delete записывается то, что находится внутри data (у HTML): button data={{ obj }} и {{ objects_show.id }}
+        // Распарсиваю и вношу в переменную oneObjectToDelete
+        // Сама структура выглядела так: { "id": "{{ objects_show.id }}", "obj": "{{ obj }}" }
+        const oneObjectToDelete = JSON.parse(element.getAttribute('data'));
+        // а теперь выглядит так: { id: '1', obj: 'что-то' }
+
+        // В id хранится именно категория (objects_show.id)
+        const id = oneObjectToDelete.id;
+
+        // В obj хранится именно конкретная форма (obj)
+        const obj = oneObjectToDelete.obj;
+
+        // Если КАТЕГОРИЯ (id) уже имеется в словаре (map) 
+        if (map.has(id)) {
+
+            // Обьявляю "переменную" которая хранит в себе ключ с значениями (просто беру тот обьект, который хранит
+            // в себе именно ту категорию, которая нужна для дальнейшего добавления)
+            // { '1': ... }
+            const existingArray = map.get(id);
+
+            // К этой переменной добавляю новый элемент (к ключу добавляю еще одно значение)
+            // { '1': ['объект А', 'объект Б' ... ]
+            existingArray.push(obj);
+
+            // Если категории такой нету, то создаю ее и вношу туда значение
+        } else {
+
+            // { '2': ['объект Д']}
+            map.set(id, [obj])
+        }
+
+    }
+
+    // Функция с заявкой на удаление выбранных форм
+    function saveChanges() {
+
+        // Из "специального словаря" я преобразую map В обычный обьект
+        const mapAsObject = Object.fromEntries(map)
+
+        // Переменная, которая принимает тип заказа (Обращается к УНИКАЛЬНОМУ ИДЕНТИФИКАТОРУ в HTML)
+        const currentTypeOfOrder = document.getElementById('type_of_order_selected').value;
+
+        // Асинхронный запрос на сервер с методом POST
+        // AJAX  — это подход в веб-разработке, который позволяет обмениваться данными между браузером и сервером без полной перезагрузки страницы.
+
+        console.log("🤑", currentTypeOfOrder);
+
+        htmx.ajax('POST', '{% url "form-editor" %}', {
+
+            // swap: 'none' - обновление страницы после ответа сервера НЕ требуется
+            swap: 'none',
+
+            // Обычные данные которые отправляются "как буд-то" из обычного HTML
+            values: {
+                // Тип заказа
+                'type_of_order_selected': currentTypeOfOrder,
+
+                // Отдаем JSON-СПИСОК (в виде строки) JSON.stringify(mapAsObject)
+                // чтобы потом в функции его правильно распаковать
+
+                // Обьект mapAsObject преобразуется в JSON (string) потому, что по интернету категорически НЕЛЬЗЯ никак отправить переменную! 
+                // ТОЛЬКО JSON (в моем случае)
+
+                // НЕЛЬЗЯ сделать так передачу данных: 
+                //  'list_deleted_forms': mapAsObject
+
+                // Исключительно так:
+                'list_deleted_forms': JSON.stringify(mapAsObject),
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            }
+
+            // После отправки запроса, очищаю список (на всякий случай)
+        }).then(() => {
+            map.clear()
+        });
+    }
+
+
+    function initSortables() {
+        document.querySelectorAll('.fields-sortable-list').forEach(function (element) {
+            new Sortable(element, {
+                animation: 150,
+                handle: '.drag-handle',
+                ghostClass: 'sortable-ghost',
+                onEnd: function (evt) {
+                    showSaveBar();
+                    const sectionCard = evt.to.closest('.section-card');
+                    const sectionId = sectionCard.id;
+
+                    const orderedKeys = Array.from(evt.to.querySelectorAll('.field-pill'))
+                        .map(item => item.getAttribute('data-key'));
+
+                    htmx.ajax('POST', '{% url "form-editor" %}', {
+                        swap: 'none',
+                        values: {
+                            'ordered_keys': orderedKeys,
+                            'section_id': sectionId,
+                            'type_of_order_selected': '{{ form_order.type_of_order }}',
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        }
+                    });
+                }
+            });
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', initSortables);
+
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target.id === 'show-data-forms') {
+            initSortables();
+        }
+    });
+</script>
+{% endblock %}
