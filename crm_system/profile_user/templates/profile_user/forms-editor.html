@@ -381,6 +381,32 @@
             map.set(id, [obj])
         }
 
+        // Нахожу само поле <div class="field-pill" data-key="{{ obj.field_key }}">
+        const fieldPillChange = element.closest('.field-pill')
+
+        // Создаю вместо старого div новый div и записываю в переменную placeholder
+        const placeholder = document.createElement('div')
+
+        // Задаю имя этому блоку div = field-placeholder-dotted
+        placeholder.className = 'field-placeholder-dotted'
+
+        // Записываю в dataset сам обьект (на случай, если человек захочет вернуть его назад) - это
+        // сделано только для восстановления
+        placeholder.dataset.removedKey = obj.field_key || 'unknown_field_key'
+
+        // Записываю сюда саму ссылку на обьект
+        placeholder.dataset.categoryid = id
+
+        // Добавляю span (элемент) в удаленное поле используя разметку <button>...</button>
+        const textButton = document.createElement('button')
+
+        // Устанавливаю сам текст в мой добавленный <button>
+        textButton.textContent = 'Добавить поле + '
+
+        // Добавляю само поле <button> с текстом внутри (Появится оно вместе с новым div='field-placeholder-dotted')
+        placeholder.appendChild(textButton)
+
+        fieldPillChange.replaceWith(placeholder)
     }
 
     // Функция с заявкой на удаление выбранных форм
@@ -394,8 +420,6 @@
 
         // Асинхронный запрос на сервер с методом POST
         // AJAX  — это подход в веб-разработке, который позволяет обмениваться данными между браузером и сервером без полной перезагрузки страницы.
-
-        console.log("🤑", currentTypeOfOrder);
 
         htmx.ajax('POST', '{% url "form-editor" %}', {
 
