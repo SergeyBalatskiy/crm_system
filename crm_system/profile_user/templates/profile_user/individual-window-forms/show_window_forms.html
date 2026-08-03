@@ -1,24 +1,14 @@
 {% if irrelevant_forms %}
-<form hx-post="{% url 'form-editor' %}" hx-target="#show-data-forms" hx-swap="innerHTML">
-    {% csrf_token %}
-
-    <!-- Передаем id секции и тип заказа дальше в POST -->
-    <input type="hidden" name="objects_show" value="{{ objects_show }}">
-    <input type="hidden" name="type_of_order_selected" value="{{ type_of_order_selected }}">
-
-    <div class="fields-selection-grid">
-        {% for form in irrelevant_forms %}
-        <label class="field-checkbox-card">
-            <input type="checkbox" name="selected_forms" value="{{ form.field_key }}">
-            <span class="field-label">{{ form.label }}</span>
-        </label>
-        {% endfor %}
+<div class="fields-selection-grid">
+    {% for form in irrelevant_forms %}
+    <!-- Вызываем JS функцию при клике по карточке -->
+    <div class="field-checkbox-card"
+        style="cursor: pointer; padding: 10px; border: 1px solid #ccc; margin-bottom: 8px; border-radius: 6px;"
+        onclick="insertFieldIntoSlot('{{ objects_show }}', '{{ form.field_key }}', '{{ form.label }}')">
+        <span class="field-label">{{ form.label }}</span>
     </div>
-
-    <div class="sidebar-footer">
-        <button type="submit" class="btn btn-primary btn-full-width">+ Добавить выбранные</button>
-    </div>
-</form>
+    {% endfor %}
+</div>
 {% else %}
 <p class="placeholder-text">Все доступные поля уже добавлены в эту секцию.</p>
 {% endif %}

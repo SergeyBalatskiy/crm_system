@@ -265,6 +265,28 @@
     .btn-danger:hover {
         background: #dc2626;
     }
+
+    .placeholder-slot {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px dashed #cbd5e1;
+        background-color: #f8fafc;
+        border-radius: 8px;
+        padding: 10px 14px;
+        min-height: 44px;
+        color: #64748b;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .placeholder-slot:hover {
+        border-color: #4f46e5;
+        color: #4f46e5;
+        background-color: #f0fdf4;
+    }
 </style>
 
 <div class="editor-page-wrapper">
@@ -346,6 +368,7 @@
     // Словарь, который удобно сортирует каждый {{ obj }} в зависимости от {{ objects_show.id }}
     const map = new Map();
 
+    let activeSlotId = null;
     // Функция отвечает за слушание события, когда нажимают на кнопку для удаления категории
     // onclick="handleClick(this)
     function handleClick(element) {
@@ -381,6 +404,92 @@
             map.set(id, [obj])
         }
 
+        // --- НОВАЯ ВИЗУАЛЬНАЯ ЛОГИКА ---
+        // 1. Находим саму карточку поля, внутри которой нажали на корзину
+        const pill = element.closest('.field-pill');
+
+        // 2. Генерируем уникальный ID для нового слота (чтобы знать куда вставлять обратно)
+        const placeholderId = 'slot-' + Math.random().toString(36).substr(2, 9);
+
+        // 3. Создаем HTML пунктирного прямоугольника. При клике он вызовет openSidebarForSlot
+        const placeholderHTML = `
+        <div id="${placeholderId}" class="placeholder-slot" onclick="openSidebarForSlot('${id}', '${placeholderId}')">
+            + Добавить поле
+        </div>
+    `;
+
+        // 4. Мгновенно заменяем карточку поля на пунктир
+        pill.outerHTML = placeholderHTML;
+
+        // 5. Показываем нижнюю плашку сохранения
+        showSaveBar();
+
+    }
+
+    // Функция клика по пунктирному слоту
+    function openSidebarForSlot(categoryId, placeholderId) {
+        // Запоминаем, куда потом будем вставлять выбранное поле
+        activeSlotId = placeholderId;
+
+        const currentTypeOfOrder = document.getElementById('type_of_order_selected').value;
+
+        // Достаем из нашего map удаленные формы именно для этой категории
+        // Если ничего не удаляли, передаем пустой список []
+        const deletedFormsForCategory = map.has(categoryId) ? map.get(categoryId) : [];
+
+        // Открываем сайдбар визуально
+        openSidebar();
+        document.getElementById('right-sidebar-content').innerHTML = '<p class="placeholder-text">Загрузка...</p>';
+
+        // Отправляем HTMX GET запрос, прикрепляя к нему удаленные данные из JS!
+        htmx.ajax('GET', '{% url "form-editor" %}', {
+            target: '#right-sidebar-content', // Вставляем ответ сервера прямо в сайдбар
+            swap: 'innerHTML',
+            values: {
+                'type_of_order_selected': currentTypeOfOrder,
+                'objects_show': categoryId,
+                // Передаем локально удаленные поля как строку JSON
+                'deleted_forms_from_js': JSON.stringify(deletedFormsForCategory)
+            }
+        });
+    }
+
+    // Эта функция срабатывает при выборе поля в сайдбаре
+    function insertFieldIntoSlot(categoryId, fieldKey, fieldLabel) {
+        // 1. Убираем поле из map (отменяем заявку на его удаление), если оно там было
+        if (map.has(categoryId)) {
+            let existingArray = map.get(categoryId);
+            existingArray = existingArray.filter(item => item !== fieldKey); // Вычищаем ключ
+            map.set(categoryId, existingArray);
+        }
+
+        // 2. Находим тот самый пунктирный слот, по которому мы кликнули
+        const slot = document.getElementById(activeSlotId);
+        if (!slot) return;
+
+        // 3. Формируем структуру data, как она была изначально, чтобы работало удаление (Корзина)
+        const dataAttr = JSON.stringify({ "id": categoryId, "obj": fieldKey });
+
+        // 4. Восстанавливаем HTML карточки поля
+        const pillHTML = `
+        <div class="field-pill" data-key="${fieldKey}">
+            <span class="drag-handle">☰</span>
+            <span class="field-name">${fieldLabel}</span>
+            <button type="button" class="btn-danger" data='${dataAttr}' onclick="handleClick(this)">
+                🗑️
+            </button>
+        </div>
+    `;
+
+        // 5. Заменяем пунктирный слот на новенькую карточку
+        slot.outerHTML = pillHTML;
+
+        // 6. Закрываем сайдбар и очищаем память о слоте
+        closeSidebar();
+        activeSlotId = null;
+
+        // (Важно!) Перезапускаем SortableJS, чтобы новую карточку можно было перетаскивать
+        initSortables();
     }
 
     // Функция с заявкой на удаление выбранных форм

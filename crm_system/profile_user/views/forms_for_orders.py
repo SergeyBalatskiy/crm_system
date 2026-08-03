@@ -63,7 +63,6 @@ class FormsForOrdersEdit(TemplateView):
         if request.headers.get('HX-Request') == 'true':
 
             # Сначала собираю инфу о том, откуда к нам пришел запрс (из какого места) благодаря переменным:
-
             # Тип заказа
             type_of_order_selected = request.GET.get('type_of_order_selected')
 
@@ -75,7 +74,31 @@ class FormsForOrdersEdit(TemplateView):
             # Если в результате проверки выяснится, что у нас отсутствует хоть 1 обьект, значит, мы пришли
             # сюда (request.headers.get('HX-Request') == 'true':) благодаря только лишь выбору типа заказа
             if objects_show and type_of_order_selected:
+
+                # --- НОВОЕ: Ловим список удаленных форм из браузера (JS) ---
+                deleted_forms_str = request.GET.get('deleted_forms_from_js', '[]')
+                try:
+                    deleted_forms_from_js = json.loads(deleted_forms_str)
+                except json.JSONDecodeError:
+                    deleted_forms_from_js = []
+                # ------------------------------------------------------------
                 
+                deleted_keys = []
+
+                for item in deleted_forms_from_js:
+                    if isinstance(item, str):
+                        try:
+                            # Если пришла строка вида "{'field_key': 'complectation'...}"
+                            parsed = ast.literal_eval(item)
+                            if isinstance(parsed, dict) and 'field_key' in parsed:
+                                deleted_keys.append(parsed['field_key'])
+                            else:
+                                deleted_keys.append(item)
+                        except Exception:
+                            deleted_keys.append(item)
+                    elif isinstance(item, dict):
+                        deleted_keys.append(item.get('field_key'))
+
                 # Получаю информацию о самом JSON
                 order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
 
@@ -93,10 +116,14 @@ class FormsForOrdersEdit(TemplateView):
 
                 # Цикл который это делает
                 for obj_info in self.ALL_CRM_FIELDS.get(objects_show, []):
-                    if obj_info['field_key'] not in current_forms:
+                    # --- ИЗМЕНЕНО УСЛОВИЕ ---
+                    # Форма считается "доступной для добавления", если её НЕТ в БД (current_forms)
+                    # ИЛИ если она ЕСТЬ в списке удаленных прямо сейчас в браузере (deleted_forms_from_js)
+                    if obj_info['field_key'] not in current_forms or obj_info['field_key'] in deleted_keys:
                         irrelevant_forms.append(obj_info)
+                print(irrelevant_forms)
                 return render(request, self.individual_window_forms, {'irrelevant_forms' : irrelevant_forms, 'objects_show': objects_show, 'type_of_order_selected': type_of_order_selected})
-            
+                
             # После получения запроса через HTMX, я показываю именно то, чего хочет пользователь!
             order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
             return render(request, self.form_orders_file, {'form_order' : order_information})
