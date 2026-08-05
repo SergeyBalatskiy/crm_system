@@ -75,13 +75,13 @@ class FormsForOrdersEdit(TemplateView):
             # сюда (request.headers.get('HX-Request') == 'true':) благодаря только лишь выбору типа заказа
             if objects_show and type_of_order_selected:
 
-                # --- НОВОЕ: Ловим список удаленных форм из браузера (JS) ---
+                
                 deleted_forms_str = request.GET.get('deleted_forms_from_js', '[]')
                 try:
                     deleted_forms_from_js = json.loads(deleted_forms_str)
                 except json.JSONDecodeError:
                     deleted_forms_from_js = []
-                # ------------------------------------------------------------
+                
                 
                 deleted_keys = []
 
@@ -239,7 +239,12 @@ class FormsForOrdersEdit(TemplateView):
         #--------------------------------------------------------
         # JSON с заявками на удаление (в строковом формате)
         json_string_forms = request.POST.get('list_deleted_forms')
+        json_added_forms = request.POST.get('list_added_forms')
         #--------------------------------------------------------
+
+        # Преобразую из JSON (string) в привычный обьект для работы
+        # словарь с заявками на добавление 
+        forms_to_add = json.loads(json_added_forms)
 
         # Преобразую из JSON (string) в привычный обьект для работы
         # словарь с заявками на удаление 
@@ -248,20 +253,7 @@ class FormsForOrdersEdit(TemplateView):
         # Тип заказа
         type_of_order_selected = request.POST.get('type_of_order_selected')
 
-        # Сделать так, чтобы в БД удалялись ненужные формы
-
-        {'client_info': [
-            "{'type': 'text', 'label': 'Имя клиента', 'order': 1, 'field_key': 'name', 'is_required': True}"
-            ], 
-        'device_info': [
-            "{'type': 'select', 'label': 'Марка', 'order': 3, 'field_key': 'device_company', 'is_required': False}", 
-            "{'type': 'select', 'label': 'Тип устройства', 'order': 2, 'field_key': 'type_of_device', 'is_required': False}"
-            ], 
-        'bonus_information': [
-            "{'type': 'select', 'label': 'Менеджер', 'order': 3, 'field_key': 'manager', 'is_required': False}"
-            ]
-        }
-
+        print(forms_to_add)
 
         # Достаю именно тот обьект из БД который связан с типом заказа
         order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
@@ -269,35 +261,36 @@ class FormsForOrdersEdit(TemplateView):
         # Беру JSON определенного типа заказа и для удобства записываю в переменную
         json_models_data = order_information.json_forms
 
-        # Для начала прохожусь по JSON (forms_to_delete) - каждой категории - 'device_info', 'bonus_information' и т.д.
-        for current_category_to_delete in forms_to_delete:
+        # Один проход по секциям из БД
+        for section in json_models_data.get('sections', []):
+            category_id = section.get('id')
 
-            # Беру по одному обьекту (со всем содержимым)
-            for objects_info_category in json_models_data.get('sections', []):
+            # Удаление элементов
+            if category_id in forms_to_delete:
+                # Теперь здесь уже лежит чистый список ключей: ['color', 'model']
+                keys_to_delete = forms_to_delete[category_id]
 
-                #  Если текущая категория на удаление РАВНА категории обьекта из БД (id):
-                if current_category_to_delete == objects_info_category['id']:
+                # Оставляем только те поля, чьих field_key нет в списке на удаление
+                section['fields'] = [
+                    field for field in section.get('fields', [])
+                    if field.get('field_key') not in keys_to_delete]
 
-                    # Беру обьект (ключ и значение) из заявок на удаление
-                    for key, selected_objects_to_delete in forms_to_delete.items():
-                        
-                        # Если КЛЮЧ == текущей выбранной категории (чтобы удалить именно те элементы в списке, которые относятся к 
-                        # текущей категории)
-                        if key == current_category_to_delete:
+            # Добавление элементов
+            if category_id in forms_to_add:
+                keys_to_add = forms_to_add[category_id]
+                all_category_fields = self.ALL_CRM_FIELDS.get(category_id, [])
 
-                            # Беру один обьект из списка, который ОТ заявок на удаление (обьект относится к текущей категории)
-                            for one_obj in selected_objects_to_delete:
-                                
-                                # Из "{'type': 'select', 'label': 'Менеджер', 'order': 3, 'field_key': 'manager', 'is_required': False}"
-                                # убираю кавычки:
-                                # {'type': 'select', 'label': 'Менеджер', 'order': 3, 'field_key': 'manager', 'is_required': False}
-                                one_obj = ast.literal_eval(one_obj)
+                # Смотрим, какие ключи уже есть в БД
+                existing_keys = [f.get('field_key') for f in section.get('fields', [])]
 
-                                # Записываю в переменную текущий список из БД (по конкретной категории) ('fields')
-                                current_lst_from_model = objects_info_category.get('fields', [])
-
-                                # Удаляю текущий обьект, выбранный из заявок на удаление
-                                current_lst_from_model.remove(one_obj)
+                for key in keys_to_add:
+                    if key not in existing_keys:
+                        # Ищем полное описание поля в ALL_CRM_FIELDS
+                        # Функция next позволяет нам отдавать весь первый попавшийся элемент
+                        field_obj = next((item for item in all_category_fields if item.get('field_key') == key), None)
+                        if field_obj:
+                            section['fields'].append(field_obj)
+                            print(field_obj)
 
         # Сохраняю сам новый порядок (после изменения списка)
         order_information.json_forms = json_models_data

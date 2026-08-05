@@ -170,5 +170,45 @@ for object in x.get('sections', []):
     if object['id'] == objects_show:
         target_lst = object.get('fields', [])
         target_lst.remove(delete)
-print(target_lst)
-            
+
+
+forms_to_add = {'client_info': ['name'], 'device_info': ['destroyed', 'device_company'], 'bonus_information': ['urgently']}
+
+crm = {
+    'client_info': [
+        {'field_key': 'name', 'label': 'Имя клиента', 'type': 'text'},
+        {'field_key': 'phone', 'label': 'Телефон', 'type': 'phone'},
+        {'field_key': 'telegram', 'label': 'Телеграм', 'type': 'text'},
+        {'field_key': 'address', 'label': 'Адрес клиента', 'type': 'text'},
+        {'field_key': 'ad_source', 'label': 'Рекламный источник', 'type': 'select'},
+        {'field_key': 'email', 'label': 'Email', 'type': 'email'},
+    ],
+    'device_info': [
+        {'field_key': 'serial_number', 'label': 'Серийный номер / IMEI', 'type': 'text'},
+        {'field_key': 'type_of_device', 'label': 'Тип устройства', 'type': 'select'},
+        {'field_key': 'device_company', 'label': 'Марка', 'type': 'select'},
+        {'field_key': 'model', 'label': 'Модель', 'type': 'text'},
+        {'field_key': 'color', 'label': 'Цвет', 'type': 'text'},
+        {'field_key': 'visual', 'label': 'Внешний вид', 'type': 'select'},
+        {'field_key': 'destroyed', 'label': 'Неисправность', 'type': 'text'},
+        {'field_key': 'complectation', 'label': 'Комплектация', 'type': 'select'},
+
+    ],
+    'bonus_information' : [
+        {'field_key': 'comment_of_order', 'label': 'Комментарий приемщика', 'type': 'textarea'},
+        {'field_key': 'master', 'label': 'Мастер', 'type': 'select'},
+        {'field_key': 'manager', 'label': 'Менеджер', 'type': 'select'},
+        {'field_key': 'prepay', 'label': 'Предоплата', 'type': 'checkbox'},
+        {'field_key': 'day_of_the_end', 'label': 'Крайний срок', 'type': 'text'},
+        {'field_key': 'target_price', 'label': 'Ориентировочная цена', 'type': 'number'},
+        {'field_key': 'urgently', 'label': 'Срочно', 'type': 'checkbox'},
+    ]
+}
+lst12 = []
+for category_to_add in forms_to_add:
+    for category_data in crm.get(category_to_add):
+        if category_data['field_key'] in forms_to_add[category_to_add]:
+            for i in range(len(forms_to_add[category_to_add])):
+                lst12.append(category_data)
+            print(lst12)
+    lst12 = []

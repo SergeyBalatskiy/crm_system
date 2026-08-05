@@ -2,7 +2,7 @@
 {% load static %}
 
 {% block content %}
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <style>
     .editor-page-wrapper {
         padding: 24px;
@@ -16,6 +16,12 @@
         align-items: center;
         gap: 12px;
         font-weight: 500;
+    }
+
+    .sortable-swap-highlight {
+        background-color: #e0e7ff !important;
+        border: 2px dashed #4f46e5 !important;
+        opacity: 0.8;
     }
 
     .custom-select {
@@ -345,248 +351,157 @@
 
 <script>
 
-    function openSidebar() {
-        document.getElementById('right-sidebar').classList.remove('hidden');
-        showSaveBar();
-    }
-
-    function closeSidebar() {
-        document.getElementById('right-sidebar').classList.add('hidden');
-    }
-
-    function showSaveBar() {
-        document.getElementById('bottom-save-bar').classList.remove('hidden');
-    }
-
     function cancelChanges() {
         location.reload();
     }
 
-    function hideSaveBar() { document.getElementById('bottom-save-bar').classList.add('hidden'); }
-
-
-    // Словарь, который удобно сортирует каждый {{ obj }} в зависимости от {{ objects_show.id }}
-    const map = new Map();
-
-    let activeSlotId = null;
-    // Функция отвечает за слушание события, когда нажимают на кнопку для удаления категории
-    // onclick="handleClick(this)
-    function handleClick(element) {
-
-        // Говорю, что в переменную one_object_to_delete записывается то, что находится внутри data (у HTML): button data={{ obj }} и {{ objects_show.id }}
-        // Распарсиваю и вношу в переменную oneObjectToDelete
-        // Сама структура выглядела так: { "id": "{{ objects_show.id }}", "obj": "{{ obj }}" }
-        const oneObjectToDelete = JSON.parse(element.getAttribute('data'));
-        // а теперь выглядит так: { id: '1', obj: 'что-то' }
-
-        // В id хранится именно категория (objects_show.id)
-        const id = oneObjectToDelete.id;
-
-        // В obj хранится именно конкретная форма (obj)
-        const obj = oneObjectToDelete.obj;
-
-        // Если КАТЕГОРИЯ (id) уже имеется в словаре (map) 
-        if (map.has(id)) {
-
-            // Обьявляю "переменную" которая хранит в себе ключ с значениями (просто беру тот обьект, который хранит
-            // в себе именно ту категорию, которая нужна для дальнейшего добавления)
-            // { '1': ... }
-            const existingArray = map.get(id);
-
-            // К этой переменной добавляю новый элемент (к ключу добавляю еще одно значение)
-            // { '1': ['объект А', 'объект Б' ... ]
-            existingArray.push(obj);
-
-            // Если категории такой нету, то создаю ее и вношу туда значение
-        } else {
-
-            // { '2': ['объект Д']}
-            map.set(id, [obj])
-        }
-
-        // --- НОВАЯ ВИЗУАЛЬНАЯ ЛОГИКА ---
-        // 1. Находим саму карточку поля, внутри которой нажали на корзину
-        const pill = element.closest('.field-pill');
-
-        // 2. Генерируем уникальный ID для нового слота (чтобы знать куда вставлять обратно)
-        const placeholderId = 'slot-' + Math.random().toString(36).substr(2, 9);
-
-        // 3. Создаем HTML пунктирного прямоугольника. При клике он вызовет openSidebarForSlot
-        const placeholderHTML = `
-        <div id="${placeholderId}" class="placeholder-slot" onclick="openSidebarForSlot('${id}', '${placeholderId}')">
-            + Добавить поле
-        </div>
-    `;
-
-        // 4. Мгновенно заменяем карточку поля на пунктир
-        pill.outerHTML = placeholderHTML;
-
-        // 5. Показываем нижнюю плашку сохранения
-        showSaveBar();
-
+    function hideSaveBar() {
+        document.getElementById('bottom-save-bar').classList.add('hidden');
     }
 
-    // Функция клика по пунктирному слоту
+    // Хранилище УДАЛЕННЫХ полей: { categoryId: ['manager', 'color'] }
+    const map = new Map();
+
+    // Хранилище ДОБАВЛЕННЫХ полей: { categoryId: ['urgently'] }
+    const addedMap = new Map();
+
+    let activeSlotId = null;
+
+    // Вспомогательная функция для очистки мусора из Django-строки
+    function extractFieldKey(rawObj) {
+        if (typeof rawObj === 'string') {
+            // Если прилетела строка вида "{'field_key': 'manager', 'type': 'select'}"
+            // Вытаскиваем только то, что лежит внутри field_key
+            const match = rawObj.match(/['"]field_key['"]\s*:\s*['"]([^'"]+)['"]/);
+            if (match) {
+                return match[1]; // Вернет чистое слово, например "manager"
+            }
+            return rawObj;
+        } else if (typeof rawObj === 'object' && rawObj !== null) {
+            return rawObj.field_key || rawObj;
+        }
+        return rawObj;
+    }
+
+    // Кликер по кнопке удаления (корзина)
+    function handleClick(element) {
+        const oneObjectToDelete = JSON.parse(element.getAttribute('data'));
+        const id = String(oneObjectToDelete.id);
+
+        // ОЧИЩАЕМ КЛЮЧ ЗДЕСЬ!
+        const cleanFieldKey = extractFieldKey(oneObjectToDelete.obj);
+
+        // Фиксируем удаление в map (теперь там будет лежать ['manager'], а не огромная строка)
+        if (map.has(id)) {
+            const existingArray = map.get(id);
+            if (!existingArray.includes(cleanFieldKey)) {
+                existingArray.push(cleanFieldKey);
+            }
+        } else {
+            map.set(id, [cleanFieldKey]);
+        }
+
+        // Заменяем плашку на пунктирный слот
+        const pill = element.closest('.field-pill');
+        const placeholderId = 'slot-' + Math.random().toString(36).substr(2, 9);
+        const placeholderHTML = `
+            <div id="${placeholderId}" class="placeholder-slot" onclick="openSidebarForSlot('${id}', '${placeholderId}')">
+                + Добавить поле
+            </div>
+        `;
+
+        pill.outerHTML = placeholderHTML;
+        showSaveBar();
+    }
+
+    // Клик по пунктирному слоту для выбора нового поля
     function openSidebarForSlot(categoryId, placeholderId) {
-        // Запоминаем, куда потом будем вставлять выбранное поле
         activeSlotId = placeholderId;
-
         const currentTypeOfOrder = document.getElementById('type_of_order_selected').value;
-
-        // Достаем из нашего map удаленные формы именно для этой категории
-        // Если ничего не удаляли, передаем пустой список []
         const deletedFormsForCategory = map.has(categoryId) ? map.get(categoryId) : [];
 
-        // Открываем сайдбар визуально
         openSidebar();
         document.getElementById('right-sidebar-content').innerHTML = '<p class="placeholder-text">Загрузка...</p>';
 
-        // Отправляем HTMX GET запрос, прикрепляя к нему удаленные данные из JS!
         htmx.ajax('GET', '{% url "form-editor" %}', {
-            target: '#right-sidebar-content', // Вставляем ответ сервера прямо в сайдбар
+            target: '#right-sidebar-content',
             swap: 'innerHTML',
             values: {
                 'type_of_order_selected': currentTypeOfOrder,
                 'objects_show': categoryId,
-                // Передаем локально удаленные поля как строку JSON
                 'deleted_forms_from_js': JSON.stringify(deletedFormsForCategory)
             }
         });
     }
 
-    // Эта функция срабатывает при выборе поля в сайдбаре
+    // Выбор и вставка поля из сайдбара
     function insertFieldIntoSlot(categoryId, fieldKey, fieldLabel) {
-        // 1. Убираем поле из map (отменяем заявку на его удаление), если оно там было
+        let wasRestored = false;
+
+        // Если поле возвращают обратно из удаленных — убираем его из map
         if (map.has(categoryId)) {
             let existingArray = map.get(categoryId);
-            existingArray = existingArray.filter(item => item !== fieldKey); // Вычищаем ключ
+            const initialLength = existingArray.length;
+
+            existingArray = existingArray.filter(keyInMap => keyInMap !== fieldKey);
+
+            if (existingArray.length < initialLength) {
+                wasRestored = true;
+            }
             map.set(categoryId, existingArray);
         }
 
-        // 2. Находим тот самый пунктирный слот, по которому мы кликнули
+        // Если это новое добавление — фиксируем в addedMap
+        if (!wasRestored) {
+            if (addedMap.has(categoryId)) {
+                const arr = addedMap.get(categoryId);
+                if (!arr.includes(fieldKey)) arr.push(fieldKey);
+            } else {
+                addedMap.set(categoryId, [fieldKey]);
+            }
+        }
+
         const slot = document.getElementById(activeSlotId);
         if (!slot) return;
 
-        // 3. Формируем структуру data, как она была изначально, чтобы работало удаление (Корзина)
         const dataAttr = JSON.stringify({ "id": categoryId, "obj": fieldKey });
-
-        // 4. Восстанавливаем HTML карточки поля
         const pillHTML = `
-        <div class="field-pill" data-key="${fieldKey}">
-            <span class="drag-handle">☰</span>
-            <span class="field-name">${fieldLabel}</span>
-            <button type="button" class="btn-danger" data='${dataAttr}' onclick="handleClick(this)">
-                🗑️
-            </button>
-        </div>
-    `;
+            <div class="field-pill" data-key="${fieldKey}">
+                <span class="drag-handle">☰</span>
+                <span class="field-name">${fieldLabel}</span>
+                <button type="button" class="btn-danger" data='${dataAttr}' onclick="handleClick(this)">
+                    🗑️
+                </button>
+            </div>
+        `;
 
-        // 5. Заменяем пунктирный слот на новенькую карточку
         slot.outerHTML = pillHTML;
-
-        // 6. Закрываем сайдбар и очищаем память о слоте
         closeSidebar();
         activeSlotId = null;
 
-        // (Важно!) Перезапускаем SortableJS, чтобы новую карточку можно было перетаскивать
-        initSortables();
-
-        // Нахожу само поле <div class="field-pill" data-key="{{ obj.field_key }}">
-        const fieldPillChange = element.closest('.field-pill')
-
-        // Создаю вместо старого div новый div и записываю в переменную placeholder
-        const placeholder = document.createElement('div')
-
-        // Задаю имя этому блоку div = field-placeholder-dotted
-        placeholder.className = 'field-placeholder-dotted'
-
-        // Записываю в dataset сам обьект (на случай, если человек захочет вернуть его назад) - это
-        // сделано только для восстановления
-        placeholder.dataset.removedKey = obj.field_key || 'unknown_field_key'
-
-        // Записываю сюда саму ссылку на обьект
-        placeholder.dataset.categoryid = id
-
-        // Добавляю span (элемент) в удаленное поле используя разметку <button>...</button>
-        const textButton = document.createElement('button')
-
-        // Устанавливаю сам текст в мой добавленный <button>
-        textButton.textContent = 'Добавить поле + '
-
-        // Добавляю само поле <button> с текстом внутри (Появится оно вместе с новым div='field-placeholder-dotted')
-        placeholder.appendChild(textButton)
-
-        fieldPillChange.replaceWith(placeholder)
+        if (typeof initSortables === 'function') {
+            initSortables();
+        }
     }
 
-    // Функция с заявкой на удаление выбранных форм
+    // Сохранение изменений на сервер
     function saveChanges() {
-
-        // Из "специального словаря" я преобразую map В обычный обьект
-        const mapAsObject = Object.fromEntries(map)
-
-        // Переменная, которая принимает тип заказа (Обращается к УНИКАЛЬНОМУ ИДЕНТИФИКАТОРУ в HTML)
+        const mapAsObject = Object.fromEntries(map);
+        const addedMapAsObject = Object.fromEntries(addedMap);
         const currentTypeOfOrder = document.getElementById('type_of_order_selected').value;
 
-        // Асинхронный запрос на сервер с методом POST
-        // AJAX  — это подход в веб-разработке, который позволяет обмениваться данными между браузером и сервером без полной перезагрузки страницы.
-
         htmx.ajax('POST', '{% url "form-editor" %}', {
-
-            // swap: 'none' - обновление страницы после ответа сервера НЕ требуется
             swap: 'none',
-
-            // Обычные данные которые отправляются "как буд-то" из обычного HTML
             values: {
-                // Тип заказа
                 'type_of_order_selected': currentTypeOfOrder,
-
-                // Отдаем JSON-СПИСОК (в виде строки) JSON.stringify(mapAsObject)
-                // чтобы потом в функции его правильно распаковать
-
-                // Обьект mapAsObject преобразуется в JSON (string) потому, что по интернету категорически НЕЛЬЗЯ никак отправить переменную! 
-                // ТОЛЬКО JSON (в моем случае)
-
-                // НЕЛЬЗЯ сделать так передачу данных: 
-                //  'list_deleted_forms': mapAsObject
-
-                // Исключительно так:
                 'list_deleted_forms': JSON.stringify(mapAsObject),
+                'list_added_forms': JSON.stringify(addedMapAsObject),
                 'csrfmiddlewaretoken': '{{ csrf_token }}'
             }
-
-            // После отправки запроса, очищаю список (на всякий случай)
         }).then(() => {
-            map.clear()
-        });
-    }
-
-
-    function initSortables() {
-        document.querySelectorAll('.fields-sortable-list').forEach(function (element) {
-            new Sortable(element, {
-                animation: 150,
-                handle: '.drag-handle',
-                ghostClass: 'sortable-ghost',
-                onEnd: function (evt) {
-                    showSaveBar();
-                    const sectionCard = evt.to.closest('.section-card');
-                    const sectionId = sectionCard.id;
-
-                    const orderedKeys = Array.from(evt.to.querySelectorAll('.field-pill'))
-                        .map(item => item.getAttribute('data-key'));
-
-                    htmx.ajax('POST', '{% url "form-editor" %}', {
-                        swap: 'none',
-                        values: {
-                            'ordered_keys': orderedKeys,
-                            'section_id': sectionId,
-                            'type_of_order_selected': '{{ form_order.type_of_order }}',
-                            'csrfmiddlewaretoken': '{{ csrf_token }}'
-                        }
-                    });
-                }
-            });
+            map.clear();
+            addedMap.clear();
+            hideSaveBar();
         });
     }
 
