@@ -64,6 +64,7 @@ def get_dict_for_json_forms():
              'label' : 'Имя клиента',
              'type' : 'text',
              'is_required' : True,
+             'hints' : [],
              'order' : 1
          },
          {
@@ -71,6 +72,7 @@ def get_dict_for_json_forms():
              'label' : 'Телефон',
              'type' : 'phone',
              'is_required' : True,
+             'hints' : [],
              'order' : 2
          },
          {
@@ -78,6 +80,7 @@ def get_dict_for_json_forms():
              'label' : 'Телеграм',
              'type' : 'text',
              'is_required' : False,
+             'hints' : [],
              'order' : 3
          }
         ]
@@ -98,6 +101,7 @@ def get_dict_for_json_forms():
             'label' : 'Тип устройства',
             'type' : 'select',
             'is_required' : False,
+            'hints' : ['Телефон', 'Ноутбук', 'Планшет', 'Компьютер'],
             'order' : 2
          },
          {
@@ -105,6 +109,7 @@ def get_dict_for_json_forms():
             'label' : 'Марка',
             'type' : 'select',
             'is_required' : False,
+            'hints' : [],
             'order' : 3
          },
          {
@@ -112,6 +117,7 @@ def get_dict_for_json_forms():
             'label' : 'Цвет',
             'type' : 'select',
             'is_required' : False,
+            'hints' : [],
             'order' : 4
          }
         ]

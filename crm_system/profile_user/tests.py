@@ -212,3 +212,14 @@ for category_to_add in forms_to_add:
                 lst12.append(category_data)
             print(lst12)
     lst12 = []
+
+x = {'123' : 'master'}
+
+x = ['23', '23', 'master'] 
+
+while '23' in x:
+    x.remove(
+        '23'
+    )
+
+print(x)

@@ -17,4 +17,7 @@ urlpatterns = [
     path('documents', ShowDocumentView.as_view(), name='tiny_mce'),
     # Указываю на путь к редактированию форм для заказа
     path('form-editor', FormsForOrdersEdit.as_view(), name='form-editor'),
+    # Указываю на путь, где лежит центральное окно с возможностью корректировки каждой формы индивидуально
+    path('edit-individual-form', EditIndividualCenterForm.as_view(), name='get-individual-field-modal'),
+    
 ]

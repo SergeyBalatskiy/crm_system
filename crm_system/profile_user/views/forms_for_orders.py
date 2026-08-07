@@ -69,8 +69,6 @@ class FormsForOrdersEdit(TemplateView):
             # Выбранный обьект
             objects_show = request.GET.get('objects_show')
 
-            print(type_of_order_selected, objects_show)
-
             # Если в результате проверки выяснится, что у нас отсутствует хоть 1 обьект, значит, мы пришли
             # сюда (request.headers.get('HX-Request') == 'true':) благодаря только лишь выбору типа заказа
             if objects_show and type_of_order_selected:

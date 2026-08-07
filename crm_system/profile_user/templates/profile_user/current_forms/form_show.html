@@ -22,6 +22,13 @@
                     <input type="hidden" id="type_of_order_selected" value="{{ form_order.type_of_order }}">
                     <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
                 </button>
+
+                <!-- Кнопка редактирования поля -->
+                <button type="button"
+                    hx-get="{% url 'get-individual-field-modal' %}?section_id={{ objects_show.id }}&field_key={{ obj.field_key }}&type_of_order_selected={{ form_order.type_of_order }}&category={{objects_show.id}}"
+                    hx-target="#center-modal-container" onclick="openFieldModal()" title="Настройки поля">
+                    <i class="fa fa-cogs" aria-hidden="true"></i>
+                </button>
             </div>
         </div>
         {% empty %}
@@ -64,6 +71,19 @@
 {% endfor %}
 
 <script>
+
+
+    function openFieldModal() {
+        const modal = document.getElementById('field-settings-modal');
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    function closeFieldModal() {
+        const modal = document.getElementById('field-settings-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+
     function openSidebar() {
         const sidebar = document.getElementById('right-sidebar');
         sidebar.classList.remove('hidden');
