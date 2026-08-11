@@ -18,7 +18,9 @@
 
             <div class="outer-wrapper">
                 <span class="field-name">{{ obj.label }}</span>
-                <button data='{"id": "{{ objects_show.id }}", "obj": "{{ obj }}"}' onclick="handleClick(this)">
+                <button type="button" data-section-id="{{ objects_show.id }}"
+                    data-field-key="{% if obj.field_key %}{{ obj.field_key }}{% else %}{{ obj }}{% endif %}"
+                    onclick="DeleteClick(this)">
                     <input type="hidden" id="type_of_order_selected" value="{{ form_order.type_of_order }}">
                     <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
                 </button>

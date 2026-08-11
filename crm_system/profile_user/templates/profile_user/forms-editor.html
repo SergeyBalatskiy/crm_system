@@ -388,33 +388,58 @@
     }
 
     // Кликер по кнопке удаления (корзина)
-    function handleClick(element) {
-        const oneObjectToDelete = JSON.parse(element.getAttribute('data'));
-        const id = String(oneObjectToDelete.id);
+    function DeleteClick(element) {
+        // 1. Извлекаем данные
+        // (Если вы используете dataset, заберите через element.dataset):
+        const dataObj = typeof element.dataset.fieldKey !== 'undefined'
+            ? { id: element.dataset.sectionId, key: element.dataset.fieldKey }
+            : JSON.parse(element.getAttribute('data'));
 
-        // ОЧИЩАЕМ КЛЮЧ ЗДЕСЬ!
-        const cleanFieldKey = extractFieldKey(oneObjectToDelete.obj);
+        const categoryId = String(dataObj.id);
+        const fieldKey = dataObj.key || extractFieldKey(dataObj.obj);
 
-        // Фиксируем удаление в map (теперь там будет лежать ['manager'], а не огромная строка)
-        if (map.has(id)) {
-            const existingArray = map.get(id);
-            if (!existingArray.includes(cleanFieldKey)) {
-                existingArray.push(cleanFieldKey);
+        let wasJustAdded = false;
+
+        // 2. ВАЖНО: Если поле было только что добавлено в текущей сессии — удаляем его из addedMap
+        if (addedMap.has(categoryId)) {
+            let addedArr = addedMap.get(categoryId);
+            const initialLength = addedArr.length;
+
+            // Фильтруем массив, убирая наш ключ
+            addedArr = addedArr.filter(key => key !== fieldKey);
+            addedMap.set(categoryId, addedArr);
+
+            // Если длина уменьшилась, значит поле было в свежедобавленных
+            if (addedArr.length < initialLength) {
+                wasJustAdded = true;
             }
-        } else {
-            map.set(id, [cleanFieldKey]);
         }
 
-        // Заменяем плашку на пунктирный слот
+        // 3. Если поле НЕ новое (уже было в БД), заносим его в map на удаление
+        if (!wasJustAdded) {
+            if (map.has(categoryId)) {
+                const existingArray = map.get(categoryId);
+                if (!existingArray.includes(fieldKey)) {
+                    existingArray.push(fieldKey);
+                }
+            } else {
+                map.set(categoryId, [fieldKey]);
+            }
+        }
+
+        // 4. Заменяем плашку на слот "+ Добавить поле"
         const pill = element.closest('.field-pill');
         const placeholderId = 'slot-' + Math.random().toString(36).substr(2, 9);
         const placeholderHTML = `
-            <div id="${placeholderId}" class="placeholder-slot" onclick="openSidebarForSlot('${id}', '${placeholderId}')">
-                + Добавить поле
-            </div>
-        `;
+        <div id="${placeholderId}" class="placeholder-slot" onclick="openSidebarForSlot('${categoryId}', '${placeholderId}')">
+            + Добавить поле
+        </div>
+    `;
 
-        pill.outerHTML = placeholderHTML;
+        if (pill) {
+            pill.outerHTML = placeholderHTML;
+        }
+
         showSaveBar();
     }
 
@@ -473,7 +498,11 @@
             <div class="field-pill" data-key="${fieldKey}">
                 <span class="drag-handle">☰</span>
                 <span class="field-name">${fieldLabel}</span>
-                <button type="button" class="btn-danger" data='${dataAttr}' onclick="handleClick(this)">
+                <button type="button" 
+                        class="btn-danger" 
+                        data-section-id="${categoryId}" 
+                        data-field-key="${fieldKey}" 
+                        onclick="DeleteClick(this)">
                     🗑️
                 </button>
             </div>

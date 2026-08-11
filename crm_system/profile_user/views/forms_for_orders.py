@@ -261,79 +261,88 @@ class FormsForOrdersEdit(TemplateView):
     
     def _delete_selected_forms(self, request):
 
-        #--------------------------------------------------------
-        # JSON с заявками на удаление (в строковом формате)
-        json_string_forms = request.POST.get('list_deleted_forms')
-        json_added_forms = request.POST.get('list_added_forms')
-        #--------------------------------------------------------
+        json_string_forms = request.POST.get('list_deleted_forms', '{}')
+        json_added_forms = request.POST.get('list_added_forms', '{}')
 
-        # Преобразую из JSON (string) в привычный обьект для работы
-        # словарь с заявками на добавление 
-        forms_to_add = json.loads(json_added_forms)
+        try:
+            forms_to_add = json.loads(json_added_forms)
+        except json.JSONDecodeError:
+            forms_to_add = {}
 
-        print(forms_to_add)
+        try:
+            forms_to_delete = json.loads(json_string_forms)
+        except json.JSONDecodeError:
+            forms_to_delete = {}
 
-        # Преобразую из JSON (string) в привычный обьект для работы
-        # словарь с заявками на удаление 
-        forms_to_delete = json.loads(json_string_forms)
-
-        # Тип заказа
         type_of_order_selected = request.POST.get('type_of_order_selected')
 
-        # Достаю именно тот обьект из БД который связан с типом заказа
-        order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
+        order_information = FormsForOrder.objects.filter(
+            type_of_order=type_of_order_selected, 
+            user=self.request.user
+        ).first()
 
-        # Беру JSON определенного типа заказа и для удобства записываю в переменную
+        if not order_information or not order_information.json_forms:
+            return HttpResponse(status=204)
+
         json_models_data = order_information.json_forms
 
-        # Один проход по секциям из БД
         for section in json_models_data.get('sections', []):
+            if not isinstance(section, dict):
+                continue
+
             category_id = section.get('id')
 
-            # Удаление элементов
+            # --- УДАЛЕНИЕ ЭЛЕМЕНТОВ ---
             if category_id in forms_to_delete:
                 keys_to_delete = forms_to_delete[category_id]
-
-                current_fields = section.get('fields', [])
+                current_fields = section.get('fields', []) or []
                 new_fields_list = []
 
                 for field in current_fields:
-                    if field.get('field_key') in keys_to_delete:
-                        if field.get('custom_form'):
-                            if 'custom_forms' not in section:
-                                section['custom_forms'] = []
-                            if not any(f.get('field_key') == field.get('field_key') for f in section['custom_forms']):
-                                section['custom_forms'].append(field)
-                    else:
-                        new_fields_list.append(field)
-                
+                    if isinstance(field, dict):
+                        if field.get('field_key') in keys_to_delete:
+                            if field.get('custom_form'):
+                                if 'custom_forms' not in section or not isinstance(section['custom_forms'], list):
+                                    section['custom_forms'] = []
+                                
+                                if not any(isinstance(f, dict) and f.get('field_key') == field.get('field_key') for f in section['custom_forms']):
+                                    section['custom_forms'].append(field)
+                        else:
+                            new_fields_list.append(field)
+
                 section['fields'] = new_fields_list
-            # Добавление элементов
+
+            # --- ДОБАВЛЕНИЕ ЭЛЕМЕНТОВ ---
             if category_id in forms_to_add:
                 keys_to_add = forms_to_add[category_id]
                 all_category_fields = self.ALL_CRM_FIELDS.get(category_id, [])
 
-                # Смотрим, какие ключи уже есть в БД
-                existing_keys = [f.get('field_key') for f in section.get('fields', [])]
+                # Безопасно собираем существующие ключи, игнорируя None
+                current_fields = section.get('fields', []) or []
+                existing_keys = [f.get('field_key') for f in current_fields if isinstance(f, dict) and 'field_key' in f]
+
+                if 'fields' not in section or not isinstance(section['fields'], list):
+                    section['fields'] = []
 
                 for key in keys_to_add:
                     if key not in existing_keys:
-                        # Ищем полное описание поля в ALL_CRM_FIELDS
-                        # Функция next позволяет нам отдавать весь первый попавшийся элемент
-                        field_obj = next((item for item in all_category_fields if item.get('field_key') == key), None)
+                        # 1. Ищем в ALL_CRM_FIELDS
+                        field_obj = next((item for item in all_category_fields if isinstance(item, dict) and item.get('field_key') == key), None)
+                        
                         if field_obj:
                             section['fields'].append(field_obj)
                         else:
-                            data_custom_forms = section.get('custom_forms')
-                            print(data_custom_forms)
-                            custom_field = next((item for item in data_custom_forms if item.get('field_key') == key), None)
-                            section['fields'].append(custom_field)
+                            # 2. Ищем в custom_forms (с защитой от None)
+                            data_custom_forms = section.get('custom_forms') or []
+                            custom_field = next((item for item in data_custom_forms if isinstance(item, dict) and item.get('field_key') == key), None)
+                            
+                            # Добавляем в fields ТОЛЬКО если поле действительно найдено
+                            if custom_field:
+                                section['fields'].append(custom_field)
 
-        # Сохраняю сам новый порядок (после изменения списка)
         order_information.json_forms = json_models_data
         order_information.save()
 
         return HttpResponse(status=204)
-
 
 
