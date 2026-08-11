@@ -11,23 +11,28 @@
         </h2>
     </div>
 
-    <div class="fields-sortable-list" id="sortable-{{ objects_show.id }}">
+    <!-- Скрытое поле должно быть в ОДНОМ экземпляре вне цикла -->
+    <input type="hidden" id="type_of_order_selected" value="{{ form_order.type_of_order }}">
+
+    <!-- Добавлен data-section-id в контейнер списка для SortableJS -->
+    <div class="fields-sortable-list" id="sortable-{{ objects_show.id }}" data-section-id="{{ objects_show.id }}">
         {% for obj in objects_show.fields %}
         <div class="field-pill" data-key="{{ obj.field_key }}">
             <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
 
             <div class="outer-wrapper">
                 <span class="field-name">{{ obj.label }}</span>
+
+                <!-- Кнопка удаления -->
                 <button type="button" data-section-id="{{ objects_show.id }}"
                     data-field-key="{% if obj.field_key %}{{ obj.field_key }}{% else %}{{ obj }}{% endif %}"
                     onclick="DeleteClick(this)">
-                    <input type="hidden" id="type_of_order_selected" value="{{ form_order.type_of_order }}">
                     <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
                 </button>
 
                 <!-- Кнопка редактирования поля -->
                 <button type="button"
-                    hx-get="{% url 'get-individual-field-modal' %}?section_id={{ objects_show.id }}&field_key={{ obj.field_key }}&type_of_order_selected={{ form_order.type_of_order }}&category={{objects_show.id}}"
+                    hx-get="{% url 'get-individual-field-modal' %}?section_id={{ objects_show.id }}&field_key={{ obj.field_key }}&type_of_order_selected={{ form_order.type_of_order }}&category={{ objects_show.id }}"
                     hx-target="#center-modal-container" onclick="openFieldModal()" title="Настройки поля">
                     <i class="fa fa-cogs" aria-hidden="true"></i>
                 </button>

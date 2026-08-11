@@ -213,51 +213,71 @@ class FormsForOrdersEdit(TemplateView):
         return render(request, self.template_name)
     
     def _save_fields_order(self, request):
-            
-            # Местоположение форм (секции и их айди)
-            section_id = request.POST.get('section_id')
+        section_id = request.POST.get('section_id')
+        type_of_order = request.POST.get('type_of_order_selected')
+        
+        # Получаем сырые данные из POST
+        raw_keys = request.POST.getlist('ordered_keys') or request.POST.get('ordered_keys')
+        
+        # Разбираем JSON-строку
+        ordered_keys = []
+        if isinstance(raw_keys, list) and len(raw_keys) > 0 and raw_keys[0].startswith('['):
+            try:
+                ordered_keys = json.loads(raw_keys[0])
+            except json.JSONDecodeError:
+                ordered_keys = raw_keys
+        elif isinstance(raw_keys, str) and raw_keys.startswith('['):
+            try:
+                ordered_keys = json.loads(raw_keys)
+            except json.JSONDecodeError:
+                ordered_keys = [raw_keys]
+        else:
+            ordered_keys = raw_keys
 
-            # Тип заказа
-            type_of_order = request.POST.get('type_of_order_selected')
+        order_information = FormsForOrder.objects.filter(
+            type_of_order=type_of_order, 
+            user=self.request.user
+        ).first()
 
-            # Распаковываю именно весь список
-            ordered_keys = request.POST.getlist('ordered_keys')
+        if not order_information or not order_information.json_forms:
+            return HttpResponse(status=400)
 
-            # Достаю именно тот обьект из БД который связан с типом заказа
-            order_information = FormsForOrder.objects.filter(type_of_order = type_of_order, user = self.request.user).first()
+        json_data = order_information.json_forms
+        sections = json_data.get('sections', []) if isinstance(json_data, dict) else []
 
-            # Беру JSON определенного типа заказа и для удобства записываю в переменную
-            json_data = order_information.json_forms
+        for section in sections:
+            if str(section.get('id')) == str(section_id):
+                current_fields = section.get('fields', [])
+                
+                fields_by_key = {
+                    f['field_key']: f 
+                    for f in current_fields 
+                    if isinstance(f, dict) and 'field_key' in f
+                }
 
-            # Добираюсь до самого обьекта, где хранится тип категории ('id')
-            for section_name, sections_list in json_data.items():
-                for section in sections_list:
-                    if str(section.get('id')) == str(section_id):
+                reordered_fields = []
+                for idx, key in enumerate(ordered_keys, start=1):
+                    if key in fields_by_key:
+                        field_obj = fields_by_key[key]
+                        field_obj['order'] = idx
+                        reordered_fields.append(field_obj)
 
-                        # Получаю весь ДЕЙСТВУЮЩИЙ список у этой категории
-                        current_fields = section.get('fields', [])
+                missing_fields = [
+                    f for f in current_fields 
+                    if isinstance(f, dict) and f.get('field_key') not in ordered_keys
+                ]
+                start_order = len(reordered_fields) + 1
+                for idx, f in enumerate(missing_fields, start=start_order):
+                    f['order'] = idx
 
-                        # Запаковываю каждую форму в field_key
-                        # 'master': {'field_key': 'master', 'label': 'Мастер', ...}
-                        fields_by_key = {f['field_key']: f for f in current_fields if 'field_key' in f}
-                        
-                        # Отвечает за прохождение по каждой форме И сохранение нового порядка благодаря записи в список по очереди
-                        reordered_fields = [fields_by_key[key] for key in ordered_keys if key in fields_by_key]
+                section['fields'] = reordered_fields + missing_fields
+                break
 
-                        # Отдаю все то, что лежит в БД В СПИСОК
-                        missing_fields = [f for f in current_fields if f.get('field_key') not in ordered_keys]
+        # Принудительно перезаписываем и сохраняем JSONField
+        order_information.json_forms = dict(json_data)
+        order_information.save(update_fields=['json_forms'])
 
-                        # Соединяю все то, что получилось из 2 списков
-                        section['fields'] = reordered_fields + missing_fields
-
-                        # Завершаем сохранение
-                        break
-
-            # Сохраняю сам новый порядок
-            order_information.json_forms = json_data
-            order_information.save()
-
-            return HttpResponse(status=200)
+        return HttpResponse(status=200)
     
     def _delete_selected_forms(self, request):
 

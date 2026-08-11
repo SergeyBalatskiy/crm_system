@@ -463,6 +463,49 @@
         });
     }
 
+    function initSortables() {
+        document.querySelectorAll('.fields-sortable-list').forEach(listEl => {
+            if (listEl._sortable) {
+                listEl._sortable.destroy();
+            }
+
+            listEl._sortable = new Sortable(listEl, {
+                animation: 150,
+                handle: '.drag-handle',
+                draggable: '.field-pill',
+                onEnd: function (evt) {
+                    const sectionId = evt.to.dataset.sectionId;
+                    const typeOfOrderEl = document.getElementById('type_of_order_selected');
+                    const typeOfOrder = typeOfOrderEl ? typeOfOrderEl.value : '';
+
+                    // Собираем ключи полей в новом порядке
+                    const orderedKeys = Array.from(evt.to.children)
+                        .filter(child => child.classList.contains('field-pill'))
+                        .map(child => child.dataset.key);
+
+                    if (!sectionId || orderedKeys.length === 0) return;
+
+                    const formData = new FormData();
+                    formData.append('section_id', sectionId);
+                    formData.append('type_of_order_selected', type_of_order);
+
+                    orderedKeys.forEach(key => {
+                        formData.append('ordered_keys', key);
+                    });
+
+                    // Отправляем через fetch для корректной передачи FormData
+                    fetch('{% url "form-editor" %}', {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        body: formData
+                    });
+                }
+            });
+        });
+    }
+
     // Выбор и вставка поля из сайдбара
     function insertFieldIntoSlot(categoryId, fieldKey, fieldLabel) {
         let wasRestored = false;
@@ -516,6 +559,7 @@
             initSortables();
         }
     }
+
 
     // Сохранение изменений на сервер
     function saveChanges() {
