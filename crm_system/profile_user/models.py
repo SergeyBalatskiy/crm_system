@@ -62,7 +62,7 @@ def get_dict_for_json_forms():
          'fields' : [{
              'field_key' : 'name',
              'label' : 'Имя клиента',
-             'type' : 'text',
+             'type' : 'select',
              'is_required' : True,
              'hints' : [],
              'order' : 1
@@ -70,7 +70,7 @@ def get_dict_for_json_forms():
          {
             'field_key' : 'phone',
              'label' : 'Телефон',
-             'type' : 'phone',
+             'type' : 'select',
              'is_required' : True,
              'hints' : [],
              'order' : 2
@@ -78,12 +78,13 @@ def get_dict_for_json_forms():
          {
              'field_key' : 'telegram',
              'label' : 'Телеграм',
-             'type' : 'text',
+             'type' : 'select',
              'is_required' : False,
              'hints' : [],
              'order' : 3
          }
-        ]
+        ], 
+         'custom_forms' : []
     },
     {
         'id':'device_info', 
@@ -92,7 +93,7 @@ def get_dict_for_json_forms():
         'fields' : [{
             'field_key' : 'serial_number',
             'label' : 'Серийный номер',
-            'type' : 'text',
+            'type' : 'select',
             'is_required' : False,
             'order' : 1
          },
@@ -120,7 +121,8 @@ def get_dict_for_json_forms():
             'hints' : [],
             'order' : 4
          }
-        ]
+        ], 
+        'custom_forms' : []
     },
     {
         'id':'bonus_information', 
@@ -129,7 +131,7 @@ def get_dict_for_json_forms():
         'fields' : [{
             'field_key' : 'target_price',
             'label' : 'Ориентировочная цена',
-            'type' : 'number',
+            'type' : 'select',
             'is_required' : False,
             'order' : 1
          },
@@ -154,7 +156,8 @@ def get_dict_for_json_forms():
             'is_required' : False,
             'order' : 4
          }
-        ]
+        ], 
+        'custom_forms' : []
     }
     ]}
 

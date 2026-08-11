@@ -28,21 +28,21 @@ class FormsForOrdersEdit(TemplateView):
 
     ALL_CRM_FIELDS = {
     'client_info': [
-        {'field_key': 'name', 'label': 'Имя клиента', 'type': 'text'},
-        {'field_key': 'phone', 'label': 'Телефон', 'type': 'phone'},
-        {'field_key': 'telegram', 'label': 'Телеграм', 'type': 'text'},
-        {'field_key': 'address', 'label': 'Адрес клиента', 'type': 'text'},
+        {'field_key': 'name', 'label': 'Имя клиента', 'type': 'select'},
+        {'field_key': 'phone', 'label': 'Телефон', 'type': 'select'},
+        {'field_key': 'telegram', 'label': 'Телеграм', 'type': 'select'},
+        {'field_key': 'address', 'label': 'Адрес клиента', 'type': 'select'},
         {'field_key': 'ad_source', 'label': 'Рекламный источник', 'type': 'select'},
-        {'field_key': 'email', 'label': 'Email', 'type': 'email'},
+        {'field_key': 'email', 'label': 'Email', 'type': 'select'},
     ],
     'device_info': [
-        {'field_key': 'serial_number', 'label': 'Серийный номер / IMEI', 'type': 'text'},
+        {'field_key': 'serial_number', 'label': 'Серийный номер / IMEI', 'type': 'select'},
         {'field_key': 'type_of_device', 'label': 'Тип устройства', 'type': 'select'},
         {'field_key': 'device_company', 'label': 'Марка', 'type': 'select'},
-        {'field_key': 'model', 'label': 'Модель', 'type': 'text'},
-        {'field_key': 'color', 'label': 'Цвет', 'type': 'text'},
+        {'field_key': 'model', 'label': 'Модель', 'type': 'select'},
+        {'field_key': 'color', 'label': 'Цвет', 'type': 'select'},
         {'field_key': 'visual', 'label': 'Внешний вид', 'type': 'select'},
-        {'field_key': 'destroyed', 'label': 'Неисправность', 'type': 'text'},
+        {'field_key': 'destroyed', 'label': 'Неисправность', 'type': 'select'},
         {'field_key': 'complectation', 'label': 'Комплектация', 'type': 'select'},
 
     ],
@@ -51,42 +51,32 @@ class FormsForOrdersEdit(TemplateView):
         {'field_key': 'master', 'label': 'Мастер', 'type': 'select'},
         {'field_key': 'manager', 'label': 'Менеджер', 'type': 'select'},
         {'field_key': 'prepay', 'label': 'Предоплата', 'type': 'checkbox'},
-        {'field_key': 'day_of_the_end', 'label': 'Крайний срок', 'type': 'text'},
-        {'field_key': 'target_price', 'label': 'Ориентировочная цена', 'type': 'number'},
+        {'field_key': 'day_of_the_end', 'label': 'Крайний срок', 'type': 'select'},
+        {'field_key': 'target_price', 'label': 'Ориентировочная цена', 'type': 'select'},
         {'field_key': 'urgently', 'label': 'Срочно', 'type': 'checkbox'},
     ]
 }
 
     def get(self, request, *args, **kwargs):
 
-        # Узнаю, передавалось ли подключение через HTMX или нет?
         if request.headers.get('HX-Request') == 'true':
 
-            # Сначала собираю инфу о том, откуда к нам пришел запрс (из какого места) благодаря переменным:
-            # Тип заказа
             type_of_order_selected = request.GET.get('type_of_order_selected')
-
-            # Выбранный обьект
             objects_show = request.GET.get('objects_show')
 
-            # Если в результате проверки выяснится, что у нас отсутствует хоть 1 обьект, значит, мы пришли
-            # сюда (request.headers.get('HX-Request') == 'true':) благодаря только лишь выбору типа заказа
             if objects_show and type_of_order_selected:
 
-                
                 deleted_forms_str = request.GET.get('deleted_forms_from_js', '[]')
                 try:
                     deleted_forms_from_js = json.loads(deleted_forms_str)
                 except json.JSONDecodeError:
                     deleted_forms_from_js = []
                 
-                
                 deleted_keys = []
 
                 for item in deleted_forms_from_js:
                     if isinstance(item, str):
                         try:
-                            # Если пришла строка вида "{'field_key': 'complectation'...}"
                             parsed = ast.literal_eval(item)
                             if isinstance(parsed, dict) and 'field_key' in parsed:
                                 deleted_keys.append(parsed['field_key'])
@@ -97,31 +87,51 @@ class FormsForOrdersEdit(TemplateView):
                     elif isinstance(item, dict):
                         deleted_keys.append(item.get('field_key'))
 
-                # Получаю информацию о самом JSON
-                order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
+                # 1. Запрос в БД
+                order_information = FormsForOrder.objects.filter(
+                    type_of_order=type_of_order_selected, 
+                    user=self.request.user
+                ).first()
 
-                #  Список, куда передаются активные формы из БД
                 current_forms = []
 
-                # Цикл который это делает
-                for sec in order_information.json_forms.get('sections', []):
-                    if sec['id'] == objects_show:
-                        for field in sec.get('fields', []):
-                            current_forms.append(field['field_key'])
+                # 2. Безопасное извлечение текущих активных форм из БД
+                if order_information and order_information.json_forms:
+                    for sec in order_information.json_forms.get('sections', []):
+                        # Безопасное получение id секции
+                        if isinstance(sec, dict) and sec.get('id') == objects_show:
+                            for field in sec.get('fields', []):
+                                # Защита от None и битых словарей
+                                if isinstance(field, dict) and 'field_key' in field:
+                                    current_forms.append(field['field_key'])
 
-                # Список, куда передаются те формы, которые НЕ задействованы в данный момент
                 irrelevant_forms = []
 
-                # Цикл который это делает
+                # 3. Фильтрация базовых форм CRM
                 for obj_info in self.ALL_CRM_FIELDS.get(objects_show, []):
-                    # --- ИЗМЕНЕНО УСЛОВИЕ ---
-                    # Форма считается "доступной для добавления", если её НЕТ в БД (current_forms)
-                    # ИЛИ если она ЕСТЬ в списке удаленных прямо сейчас в браузере (deleted_forms_from_js)
-                    if obj_info['field_key'] not in current_forms or obj_info['field_key'] in deleted_keys:
-                        irrelevant_forms.append(obj_info)
-                print(irrelevant_forms)
-                return render(request, self.individual_window_forms, {'irrelevant_forms' : irrelevant_forms, 'objects_show': objects_show, 'type_of_order_selected': type_of_order_selected})
+                    if isinstance(obj_info, dict) and 'field_key' in obj_info:
+                        if obj_info['field_key'] not in current_forms or obj_info['field_key'] in deleted_keys:
+                            irrelevant_forms.append(obj_info)
+
+                # 4. Безопасная обработка кастомных полей из библиотеки
+                if order_information and order_information.json_forms:
+                    for section in order_information.json_forms.get('sections', []):
+                        if isinstance(section, dict) and section.get('id') == objects_show:
+                            custom_pool = section.get('custom_forms', [])
+                            for custom_field in custom_pool:
+                                if isinstance(custom_field, dict) and 'field_key' in custom_field:
+                                    if custom_field['field_key'] not in current_forms:
+                                        irrelevant_forms.append(custom_field)
                 
+                return render(
+                    request, 
+                    self.individual_window_forms, 
+                    {
+                        'irrelevant_forms': irrelevant_forms, 
+                        'objects_show': objects_show, 
+                        'type_of_order_selected': type_of_order_selected
+                    }
+                )
             # После получения запроса через HTMX, я показываю именно то, чего хочет пользователь!
             order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
             return render(request, self.form_orders_file, {'form_order' : order_information})
@@ -160,23 +170,40 @@ class FormsForOrdersEdit(TemplateView):
                 if section['id'] == objects_show:
                     # Беру обьект всего списка из БД
                     forms_list = section.get('fields', [])
-                    
+                    custom_pool = section.get('custom_forms', [])
                     
                     # Прохожу по каждому обьекту, который выбрал пользователь в добавление формы
                     for key in selected_forms:
 
-                        # Добираюсь до того обьекта, который выбран (из всего полного словаря JSON)
-                        for i in self.ALL_CRM_FIELDS.get(objects_show, []):
+                        # Поиск сначала в стандартных ALL_CRM_FIELDS
+                        standard_field = next((item for item in self.ALL_CRM_FIELDS.get(objects_show, []) if item.get('field_key') == key), None)
 
-                            # Когда у нас находится совпадение между обоими словарями {} (сравнение) {}
-                            if i['field_key'] == key:
+                        # Поиск в обычных полях
+                        if standard_field:
+                            if not any(f.get('field_key') == key for f in forms_list):
                                 forms_list.append({
                                     'order': len(forms_list) + 1,
-                                    'label': i['label'],
-                                    'field_key': i['field_key'],
-                                    'type': i['type']
+                                    'label': standard_field['label'],
+                                    'field_key': standard_field['field_key'],
+                                    'type': standard_field['type']
                                 })
-                                break
+                        # Поиск в кастомных полях
+                        else:
+                            custom_field = next((item for item in custom_pool if item.get('field_key') == key), None)
+                            
+                            if custom_field:
+                                if not any(f.get('field_key') == key for f in forms_list):
+                                    # Добавляем на форму
+                                    forms_list.append({
+                                        'order': len(forms_list) + 1,
+                                        'label': custom_field['label'],
+                                        'field_key': custom_field['field_key'],
+                                        'type': custom_field['type'],
+                                        'hints': custom_field.get('hints', []),
+                                        'custom_form': True
+                                    })
+                                    # УДАЛЯЕМ из пула доступных в сайдбаре, раз оно теперь на экране!
+                                    section['custom_forms'] = [f for f in custom_pool if f.get('field_key') != key]
 
             # Сохраняю список (перезаписанный) от обьекта
             order_information.save()
@@ -244,14 +271,14 @@ class FormsForOrdersEdit(TemplateView):
         # словарь с заявками на добавление 
         forms_to_add = json.loads(json_added_forms)
 
+        print(forms_to_add)
+
         # Преобразую из JSON (string) в привычный обьект для работы
         # словарь с заявками на удаление 
         forms_to_delete = json.loads(json_string_forms)
 
         # Тип заказа
         type_of_order_selected = request.POST.get('type_of_order_selected')
-
-        print(forms_to_add)
 
         # Достаю именно тот обьект из БД который связан с типом заказа
         order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
@@ -265,14 +292,22 @@ class FormsForOrdersEdit(TemplateView):
 
             # Удаление элементов
             if category_id in forms_to_delete:
-                # Теперь здесь уже лежит чистый список ключей: ['color', 'model']
                 keys_to_delete = forms_to_delete[category_id]
 
-                # Оставляем только те поля, чьих field_key нет в списке на удаление
-                section['fields'] = [
-                    field for field in section.get('fields', [])
-                    if field.get('field_key') not in keys_to_delete]
+                current_fields = section.get('fields', [])
+                new_fields_list = []
 
+                for field in current_fields:
+                    if field.get('field_key') in keys_to_delete:
+                        if field.get('custom_form'):
+                            if 'custom_forms' not in section:
+                                section['custom_forms'] = []
+                            if not any(f.get('field_key') == field.get('field_key') for f in section['custom_forms']):
+                                section['custom_forms'].append(field)
+                    else:
+                        new_fields_list.append(field)
+                
+                section['fields'] = new_fields_list
             # Добавление элементов
             if category_id in forms_to_add:
                 keys_to_add = forms_to_add[category_id]
@@ -288,7 +323,11 @@ class FormsForOrdersEdit(TemplateView):
                         field_obj = next((item for item in all_category_fields if item.get('field_key') == key), None)
                         if field_obj:
                             section['fields'].append(field_obj)
-                            print(field_obj)
+                        else:
+                            data_custom_forms = section.get('custom_forms')
+                            print(data_custom_forms)
+                            custom_field = next((item for item in data_custom_forms if item.get('field_key') == key), None)
+                            section['fields'].append(custom_field)
 
         # Сохраняю сам новый порядок (после изменения списка)
         order_information.json_forms = json_models_data

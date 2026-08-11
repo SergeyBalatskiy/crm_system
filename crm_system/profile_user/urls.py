@@ -19,5 +19,7 @@ urlpatterns = [
     path('form-editor', FormsForOrdersEdit.as_view(), name='form-editor'),
     # Указываю на путь, где лежит центральное окно с возможностью корректировки каждой формы индивидуально
     path('edit-individual-form', EditIndividualCenterForm.as_view(), name='get-individual-field-modal'),
+    # Указываю на путь, чтобы можно было СОЗДАТЬ новую форму внутри определенной категории
+    path('get-create-new-form', CreateNewFormInCategory.as_view(), name='create-new-form'),
     
 ]

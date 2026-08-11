@@ -204,22 +204,14 @@ crm = {
         {'field_key': 'urgently', 'label': 'Срочно', 'type': 'checkbox'},
     ]
 }
-lst12 = []
-for category_to_add in forms_to_add:
-    for category_data in crm.get(category_to_add):
-        if category_data['field_key'] in forms_to_add[category_to_add]:
-            for i in range(len(forms_to_add[category_to_add])):
-                lst12.append(category_data)
-            print(lst12)
-    lst12 = []
 
-x = {'123' : 'master'}
+for section in x.get('sections', []):
+    if section['id'] == 'client_info':
+        lst_for_add_category = section['fields']
+print(lst_for_add_category)
 
-x = ['23', '23', 'master'] 
 
-while '23' in x:
-    x.remove(
-        '23'
-    )
 
-print(x)
+
+slug_value = slugify("Пример названия статьи!")
+print(slug_value)
