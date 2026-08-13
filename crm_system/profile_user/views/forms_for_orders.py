@@ -162,52 +162,49 @@ class FormsForOrdersEdit(TemplateView):
 
         # Если все есть:
         if objects_show and selected_forms and type_of_order_selected:
+            order_information = FormsForOrder.objects.filter(type_of_order=type_of_order_selected, user=self.request.user).first()
             
-            # Получаю обьект из БД
-            order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
+            # Достаем реестр сохраненных подсказок
+            all_saved_hints = order_information.json_forms.get('all_hints', {})
 
             for section in order_information.json_forms.get('sections', []):
                 if section['id'] == objects_show:
-                    # Беру обьект всего списка из БД
                     forms_list = section.get('fields', [])
                     custom_pool = section.get('custom_forms', [])
                     
-                    # Прохожу по каждому обьекту, который выбрал пользователь в добавление формы
-                    for key in selected_forms:
+                    # Память подсказок секции
+                    saved_hints = section.get('saved_hints', {})
 
-                        # Поиск сначала в стандартных ALL_CRM_FIELDS
+                    for key in selected_forms:
                         standard_field = next((item for item in self.ALL_CRM_FIELDS.get(objects_show, []) if item.get('field_key') == key), None)
 
-                        # Поиск в обычных полях
+                        # Берем сохраненные подсказки
+                        field_hints = saved_hints.get(key, [])
+
                         if standard_field:
                             if not any(f.get('field_key') == key for f in forms_list):
                                 forms_list.append({
                                     'order': len(forms_list) + 1,
                                     'label': standard_field['label'],
                                     'field_key': standard_field['field_key'],
-                                    'type': standard_field['type']
+                                    'type': standard_field['type'],
+                                    'hints': field_hints
                                 })
-                        # Поиск в кастомных полях
                         else:
                             custom_field = next((item for item in custom_pool if item.get('field_key') == key), None)
-                            
                             if custom_field:
                                 if not any(f.get('field_key') == key for f in forms_list):
-                                    # Добавляем на форму
                                     forms_list.append({
                                         'order': len(forms_list) + 1,
                                         'label': custom_field['label'],
                                         'field_key': custom_field['field_key'],
                                         'type': custom_field['type'],
-                                        'hints': custom_field.get('hints', []),
+                                        'hints': field_hints or custom_field.get('hints', []),
                                         'custom_form': True
                                     })
-                                    # УДАЛЯЕМ из пула доступных в сайдбаре, раз оно теперь на экране!
                                     section['custom_forms'] = [f for f in custom_pool if f.get('field_key') != key]
 
-            # Сохраняю список (перезаписанный) от обьекта
             order_information.save()
-
             return render(request, self.form_orders_file, {'form_order': order_information})
         
         return render(request, self.template_name)
@@ -216,10 +213,8 @@ class FormsForOrdersEdit(TemplateView):
         section_id = request.POST.get('section_id')
         type_of_order = request.POST.get('type_of_order_selected')
         
-        # Получаем сырые данные из POST
         raw_keys = request.POST.getlist('ordered_keys') or request.POST.get('ordered_keys')
         
-        # Разбираем JSON-строку
         ordered_keys = []
         if isinstance(raw_keys, list) and len(raw_keys) > 0 and raw_keys[0].startswith('['):
             try:
@@ -273,7 +268,6 @@ class FormsForOrdersEdit(TemplateView):
                 section['fields'] = reordered_fields + missing_fields
                 break
 
-        # Принудительно перезаписываем и сохраняем JSONField
         order_information.json_forms = dict(json_data)
         order_information.save(update_fields=['json_forms'])
 
@@ -309,10 +303,8 @@ class FormsForOrdersEdit(TemplateView):
             if not isinstance(section, dict):
                 continue
 
-            # Приводим ID секции к строке для надежного сравнения с ключами из JSON
             category_id = str(section.get('id'))
 
-            # 1. СОХРАНЯЕМ КАРТУ СУЩЕСТВУЮЩИХ ПОДСКАЗОК (чтобы не потерять их при пересборке)
             current_fields = section.get('fields', []) or []
             existing_hints_map = {
                 f.get('field_key'): f.get('hints', []) 
@@ -320,7 +312,11 @@ class FormsForOrdersEdit(TemplateView):
                 if isinstance(f, dict) and f.get('field_key')
             }
 
-            # Получаем ключи удаления для текущей категории
+            for cf in section.get('custom_forms', []) or []:
+                if isinstance(cf, dict) and cf.get('field_key'):
+                    if cf.get('field_key') not in existing_hints_map or not existing_hints_map[cf.get('field_key')]:
+                        existing_hints_map[cf.get('field_key')] = cf.get('hints', [])
+
             keys_to_delete = forms_to_delete.get(category_id) or forms_to_delete.get(int(category_id) if category_id.isdigit() else category_id) or []
 
             # --- УДАЛЕНИЕ ЭЛЕМЕНТОВ ---
@@ -333,50 +329,44 @@ class FormsForOrdersEdit(TemplateView):
                     if isinstance(field, dict):
                         f_key = field.get('field_key')
                         if f_key in keys_to_delete:
-                            # Если это кастомное поле — переносим/ОБНОВЛЯЕМ его в custom_forms со свежими подсказками!
                             if field.get('custom_form'):
-                                # Удаляем старую (устаревшую) версию из custom_forms, если она там была
                                 section['custom_forms'] = [
                                     cf for cf in section['custom_forms'] 
                                     if isinstance(cf, dict) and cf.get('field_key') != f_key
                                 ]
-                                # Записываем актуальное поле со СВЕЖИМИ hints из модалки
                                 section['custom_forms'].append(field)
                         else:
                             new_fields_list.append(field)
 
                 section['fields'] = new_fields_list
 
-            # Получаем ключи добавления для текущей категории
             keys_to_add = forms_to_add.get(category_id) or forms_to_add.get(int(category_id) if category_id.isdigit() else category_id) or []
 
-            # --- ДОБАВЛЕНИЕ ЭЛЕМЕНТОВ ---
             if keys_to_add:
                 all_category_fields = self.ALL_CRM_FIELDS.get(category_id) or self.ALL_CRM_FIELDS.get(int(category_id) if category_id.isdigit() else category_id) or []
                 
                 current_fields = section.get('fields', []) or []
                 existing_keys = [f.get('field_key') for f in current_fields if isinstance(f, dict) and 'field_key' in f]
+                
+                saved_hints = section.get('saved_hints', {})
 
                 for key in keys_to_add:
                     if key not in existing_keys:
                         added_field = None
 
-                        # 1. Ищем в ALL_CRM_FIELDS
                         field_obj = next((item for item in all_category_fields if isinstance(item, dict) and item.get('field_key') == key), None)
                         
                         if field_obj:
-                            added_field = dict(field_obj)  # Делаем копию
+                            added_field = dict(field_obj)
                         else:
-                            # 2. Ищем в custom_forms
                             data_custom_forms = section.get('custom_forms') or []
                             custom_field = next((item for item in data_custom_forms if isinstance(item, dict) and item.get('field_key') == key), None)
                             if custom_field:
                                 added_field = dict(custom_field)
 
                         if added_field:
-                            # ВОССТАНАВЛИВАЕМ HINTS: если для этого поля ранее сохранялись автоответы, возвращаем их
-                            if key in existing_hints_map and existing_hints_map[key]:
-                                added_field['hints'] = existing_hints_map[key]
+                            if key in saved_hints:
+                                added_field['hints'] = saved_hints[key]
                             
                             section['fields'].append(added_field)
 
