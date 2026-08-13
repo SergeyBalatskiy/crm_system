@@ -12,6 +12,10 @@
     <!-- Название только самого поля (phone, master etc) -->
     <input type="hidden" name="field_key" value="{{ individual_form.field_key }}">
 
+    <!-- Скрытое поле с названием на русском -->
+    <input type="hidden" name="field_label" value="{{ individual_form.label }}">
+
+
     <div class="place_ind_hints" id="hints-container">
         {% for one_hint in individual_form.hints %}
         <div class="hint-row">

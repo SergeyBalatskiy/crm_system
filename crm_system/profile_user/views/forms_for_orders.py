@@ -280,7 +280,6 @@ class FormsForOrdersEdit(TemplateView):
         return HttpResponse(status=200)
     
     def _delete_selected_forms(self, request):
-
         json_string_forms = request.POST.get('list_deleted_forms', '{}')
         json_added_forms = request.POST.get('list_added_forms', '{}')
 
@@ -310,59 +309,78 @@ class FormsForOrdersEdit(TemplateView):
             if not isinstance(section, dict):
                 continue
 
-            category_id = section.get('id')
+            # Приводим ID секции к строке для надежного сравнения с ключами из JSON
+            category_id = str(section.get('id'))
+
+            # 1. СОХРАНЯЕМ КАРТУ СУЩЕСТВУЮЩИХ ПОДСКАЗОК (чтобы не потерять их при пересборке)
+            current_fields = section.get('fields', []) or []
+            existing_hints_map = {
+                f.get('field_key'): f.get('hints', []) 
+                for f in current_fields 
+                if isinstance(f, dict) and f.get('field_key')
+            }
+
+            # Получаем ключи удаления для текущей категории
+            keys_to_delete = forms_to_delete.get(category_id) or forms_to_delete.get(int(category_id) if category_id.isdigit() else category_id) or []
 
             # --- УДАЛЕНИЕ ЭЛЕМЕНТОВ ---
-            if category_id in forms_to_delete:
-                keys_to_delete = forms_to_delete[category_id]
-                current_fields = section.get('fields', []) or []
+            if keys_to_delete:
                 new_fields_list = []
+                if 'custom_forms' not in section or not isinstance(section['custom_forms'], list):
+                    section['custom_forms'] = []
 
                 for field in current_fields:
                     if isinstance(field, dict):
-                        if field.get('field_key') in keys_to_delete:
+                        f_key = field.get('field_key')
+                        if f_key in keys_to_delete:
+                            # Если это кастомное поле — переносим/ОБНОВЛЯЕМ его в custom_forms со свежими подсказками!
                             if field.get('custom_form'):
-                                if 'custom_forms' not in section or not isinstance(section['custom_forms'], list):
-                                    section['custom_forms'] = []
-                                
-                                if not any(isinstance(f, dict) and f.get('field_key') == field.get('field_key') for f in section['custom_forms']):
-                                    section['custom_forms'].append(field)
+                                # Удаляем старую (устаревшую) версию из custom_forms, если она там была
+                                section['custom_forms'] = [
+                                    cf for cf in section['custom_forms'] 
+                                    if isinstance(cf, dict) and cf.get('field_key') != f_key
+                                ]
+                                # Записываем актуальное поле со СВЕЖИМИ hints из модалки
+                                section['custom_forms'].append(field)
                         else:
                             new_fields_list.append(field)
 
                 section['fields'] = new_fields_list
 
-            # --- ДОБАВЛЕНИЕ ЭЛЕМЕНТОВ ---
-            if category_id in forms_to_add:
-                keys_to_add = forms_to_add[category_id]
-                all_category_fields = self.ALL_CRM_FIELDS.get(category_id, [])
+            # Получаем ключи добавления для текущей категории
+            keys_to_add = forms_to_add.get(category_id) or forms_to_add.get(int(category_id) if category_id.isdigit() else category_id) or []
 
-                # Безопасно собираем существующие ключи, игнорируя None
+            # --- ДОБАВЛЕНИЕ ЭЛЕМЕНТОВ ---
+            if keys_to_add:
+                all_category_fields = self.ALL_CRM_FIELDS.get(category_id) or self.ALL_CRM_FIELDS.get(int(category_id) if category_id.isdigit() else category_id) or []
+                
                 current_fields = section.get('fields', []) or []
                 existing_keys = [f.get('field_key') for f in current_fields if isinstance(f, dict) and 'field_key' in f]
 
-                if 'fields' not in section or not isinstance(section['fields'], list):
-                    section['fields'] = []
-
                 for key in keys_to_add:
                     if key not in existing_keys:
+                        added_field = None
+
                         # 1. Ищем в ALL_CRM_FIELDS
                         field_obj = next((item for item in all_category_fields if isinstance(item, dict) and item.get('field_key') == key), None)
                         
                         if field_obj:
-                            section['fields'].append(field_obj)
+                            added_field = dict(field_obj)  # Делаем копию
                         else:
-                            # 2. Ищем в custom_forms (с защитой от None)
+                            # 2. Ищем в custom_forms
                             data_custom_forms = section.get('custom_forms') or []
                             custom_field = next((item for item in data_custom_forms if isinstance(item, dict) and item.get('field_key') == key), None)
-                            
-                            # Добавляем в fields ТОЛЬКО если поле действительно найдено
                             if custom_field:
-                                section['fields'].append(custom_field)
+                                added_field = dict(custom_field)
+
+                        if added_field:
+                            # ВОССТАНАВЛИВАЕМ HINTS: если для этого поля ранее сохранялись автоответы, возвращаем их
+                            if key in existing_hints_map and existing_hints_map[key]:
+                                added_field['hints'] = existing_hints_map[key]
+                            
+                            section['fields'].append(added_field)
 
         order_information.json_forms = json_models_data
         order_information.save()
 
         return HttpResponse(status=204)
-
-

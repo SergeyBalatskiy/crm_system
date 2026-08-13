@@ -536,22 +536,43 @@
         const slot = document.getElementById(activeSlotId);
         if (!slot) return;
 
-        const dataAttr = JSON.stringify({ "id": categoryId, "obj": fieldKey });
+        const parentElement = slot.parentElement; // Сохраняем родительский контейнер
+
+        // 1. Динамически получаем значение выбранного типа заказа из DOM
+        const typeOfOrder = document.getElementById('type_of_order_selected')?.value || '';
+
+        // 2. Собираем URL с помощью JS-переменных (${categoryId}, ${fieldKey}, ${typeOfOrder})
+        const modalUrl = `{% url 'get-individual-field-modal' %}?section_id=${categoryId}&field_key=${fieldKey}&type_of_order_selected=${typeOfOrder}&category=${categoryId}&field_label=${encodeURIComponent(fieldLabel)}`;
+
         const pillHTML = `
-            <div class="field-pill" data-key="${fieldKey}">
-                <span class="drag-handle">☰</span>
-                <span class="field-name">${fieldLabel}</span>
-                <button type="button" 
-                        class="btn-danger" 
-                        data-section-id="${categoryId}" 
-                        data-field-key="${fieldKey}" 
-                        onclick="DeleteClick(this)">
-                    🗑️
-                </button>
-            </div>
-        `;
+    <div class="field-pill" data-key="${fieldKey}">
+        <span class="drag-handle">⋮⋮</span>
+        <span class="field-name">${fieldLabel}</span>
+        <button type="button" 
+                class="btn" 
+                data-section-id="${categoryId}" 
+                data-field-key="${fieldKey}" 
+                onclick="DeleteClick(this)">
+            <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
+        </button>
+
+        <button type="button" class="btn"
+            hx-get="${modalUrl}"
+            hx-target="#center-modal-container" 
+            onclick="openFieldModal()" 
+            title="Настройки поля">
+            <i class="fa fa-cogs" aria-hidden="true"></i>
+        </button>
+    </div>
+`;
 
         slot.outerHTML = pillHTML;
+
+        // 3. Сообщаем HTMX просканировать родительский блок на наличие новых hx-* атрибутов
+        if (window.htmx && parentElement) {
+            htmx.process(parentElement);
+        }
+
         closeSidebar();
         activeSlotId = null;
 
