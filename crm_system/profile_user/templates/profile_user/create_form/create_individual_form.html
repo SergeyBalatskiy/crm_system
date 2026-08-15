@@ -1,7 +1,6 @@
+<!-- create_individual_form.html -->
 <form hx-post="{% url 'create-new-form' %}" hx-swap="none" class="individual_window">
-
     {% csrf_token %}
-
     <!-- Передаем скрытые параметры прямо в форме -->
     <!-- Тип заказа -->
     <input type="hidden" name="type_of_order_selected" value="{{ type_of_order_selected }}">
@@ -9,13 +8,11 @@
     <input type="hidden" name="category" value="{{ category }}">
     <!-- Название только самой формы -->
     <input type="text" name="label">
-
     <div class="required_form">
         <label>
             <input type="checkbox" name="is_required" id="is_required"> Форма обязательна для заполнения?
         </label>
     </div>
-
     <div class="div-type-of-form">
         <label>
             <input type="checkbox" name="checkbox1" id="checkbox1"> Тип формы: Текст
@@ -27,10 +24,8 @@
             <input type="checkbox" name="checkbox3" id="checkbox3"> Тип формы: Большой текст
         </label>
     </div>
-
     <!-- Кнопка отправки на создание -->
     <button type="submit">Cоздать</button>
-
 </form>
 
 <script>

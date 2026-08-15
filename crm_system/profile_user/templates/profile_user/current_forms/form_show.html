@@ -1,8 +1,6 @@
-<!-- Отображает сами задействованные формы -->
-
+<!-- form_show.html -->
 {% for section, values in form_order.json_forms.items %}
 {% for objects_show in values %}
-
 <div class="section-card" id="{{ objects_show.id }}">
     <div class="section-header">
         <h2>
@@ -10,26 +8,29 @@
             {{ objects_show.title }}
         </h2>
     </div>
-
     <!-- Скрытое поле должно быть в ОДНОМ экземпляре вне цикла -->
     <input type="hidden" id="type_of_order_selected" value="{{ form_order.type_of_order }}">
-
     <!-- Добавлен data-section-id в контейнер списка для SortableJS -->
     <div class="fields-sortable-list" id="sortable-{{ objects_show.id }}" data-section-id="{{ objects_show.id }}">
         {% for obj in objects_show.fields %}
+        {% if obj.field_key == 'empty_for_add' %}
+        <!-- Пунктирное поле из БД (Маскировка под "Добавить поле") -->
+        <div id="slot-{{ objects_show.id }}-{{ forloop.counter }}" class="placeholder-slot empty-grid-slot"
+            data-key="empty_for_add"
+            onclick="openSidebarForSlot('{{ objects_show.id }}', 'slot-{{ objects_show.id }}-{{ forloop.counter }}')">
+            + Добавить поле
+        </div>
+        {% else %}
         <div class="field-pill" data-key="{{ obj.field_key }}">
             <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
-
             <div class="outer-wrapper">
                 <span class="field-name">{{ obj.label }}</span>
-
                 <!-- Кнопка удаления -->
                 <button type="button" class="btn" data-section-id="{{ objects_show.id }}"
                     data-field-key="{% if obj.field_key %}{{ obj.field_key }}{% else %}{{ obj }}{% endif %}"
                     onclick="DeleteClick(this)">
                     <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
                 </button>
-
                 <!-- Кнопка редактирования поля -->
                 <button type="button" class="btn"
                     hx-get="{% url 'get-individual-field-modal' %}?section_id={{ objects_show.id }}&field_key={{ obj.field_key }}&type_of_order_selected={{ form_order.type_of_order }}&category={{ objects_show.id }}"
@@ -38,41 +39,52 @@
                 </button>
             </div>
         </div>
-        {% empty %}
-        <div class="empty-section-placeholder">В этой секции пока нет активных полей</div>
-        {% endfor %}
-
-        {% if not objects_show.fields|length|divisibleby:2 %}
-        <div id="slot-{{ objects_show.id }}-empty" class="placeholder-slot empty-grid-slot"
-            onclick="openSidebarForSlot('{{ objects_show.id }}', 'slot-{{ objects_show.id }}-empty')">
+        {% endif %}
+        <!-- Это сделано для того, чтобы корректно отображать форму на добавление если она крайняя -->
+        {% if forloop.last and not forloop.counter|divisibleby:2 %}
+        <div id="slot-{{ objects_show.id }}-trailing" class="placeholder-slot empty-grid-slot" data-key="empty_for_add"
+            onclick="openSidebarForSlot('{{ objects_show.id }}', 'slot-{{ objects_show.id }}-trailing')">
             + Добавить поле
         </div>
         {% endif %}
+        {% empty %}
+        <div class="empty-section-placeholder">В этой секции пока нет активных полей</div>
+        {% endfor %}
     </div>
-
     <!-- Кнопка "+" -->
     <div class="add-btn-wrapper">
         <div class="add-btn-container">
             <button type="button" class="btn-plus left"
                 hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=left&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-target="#right-sidebar-content" onclick="openSidebar()" title="Добавить поле слева">
+                hx-target="#right-sidebar-content" onclick="openSidebarGlobal('{{ objects_show.id }}', 'left')"
+                title="Добавить поле слева">
                 +
             </button>
-
             <button type="button" class="btn-plus right"
                 hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=right&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-target="#right-sidebar-content" onclick="openSidebar()" title="Добавить поле справа">
+                hx-target="#right-sidebar-content" onclick="openSidebarGlobal('{{ objects_show.id }}', 'right')"
+                title="Добавить поле справа">
                 +
             </button>
         </div>
     </div>
 </div>
-
 {% endfor %}
 {% endfor %}
 
 <script>
+    // Для точного отслеживания взаимодействия на добавление форм
+    var activeSlotId = null;       // Если кликнули по пунктиру
+    var globalAddPosition = null;  // 'left' или 'right', если кликнули по нижним плюсам
 
+    // Функция для вызова нижних плюсов
+    function openSidebarGlobal(categoryId, position) {
+        activeSlotId = null; // Ставлю null так как это не вызов на добавление формы из пунктирного поля
+        globalAddPosition = position;
+
+        const sidebar = document.getElementById('right-sidebar');
+        sidebar.classList.remove('hidden');
+    }
 
     function openFieldModal() {
         const modal = document.getElementById('field-settings-modal');
@@ -99,6 +111,7 @@
         saveBar.classList.remove('hidden');
     }
 
+    // Сама логика сортировки
     document.querySelectorAll('.fields-sortable-list').forEach(function (element) {
         new Sortable(element, {
             animation: 0,
@@ -106,23 +119,37 @@
             ghostClass: 'sortable-ghost',
             filter: '.empty-grid-slot',
             preventOnFilter: false,
-
             swap: true,
             swapClass: 'sortable-swap-highlight',
 
             onEnd: function (evt) {
                 const sectionCard = evt.to.closest('.section-card');
-                const sectionId = sectionCard.id;
 
-                const orderedKeys = Array.from(evt.to.querySelectorAll('.field-pill'))
-                    .map(item => item.getAttribute('data-key'))
-                    .filter(key => key !== null); // Исключаем пустые элементы
+                // Получаю ID секции
+                const sectionId = sectionCard.dataset.sectionId || sectionCard.id;
 
+                // Считываем ВСЕ дочерние блоки контейнера по порядку
+                const orderedKeys = Array.from(evt.to.children)
+                    .map(item => {
+                        if (item.classList.contains('field-pill')) {
+                            return item.getAttribute('data-key');
+                        } else if (item.classList.contains('empty-grid-slot') || item.classList.contains('add-field-slot')) {
+                            return 'empty_for_add';
+                        }
+                        return null;
+                    })
+                    .filter(key => key !== null);
+
+                // Формируем объект, который ожидает бэкенд: { "2": ["key1", "empty_for_add", ...] }
+                const fieldsOrder = {
+                    [sectionId]: orderedKeys
+                };
+
+                // 3. Отправка ajax POST метода с отформатированным ранее fieldsOrder
                 htmx.ajax('POST', '{% url "form-editor" %}', {
                     swap: 'none',
                     values: {
-                        'ordered_keys': JSON.stringify(orderedKeys),
-                        'section_id': sectionId,
+                        'fields_order': JSON.stringify(fieldsOrder),
                         'type_of_order_selected': '{{ form_order.type_of_order }}',
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     }
