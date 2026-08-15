@@ -1,72 +1,55 @@
-from django.shortcuts import render, redirect, get_object_or_404
+import json
+import ast
+from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-from django.urls import path
 from django.http import HttpResponse
 from profile_user.models import FormsForOrder
-import json
-import ast
 
 @method_decorator(login_required(), name='dispatch')
 class FormsForOrdersEdit(TemplateView):
 
-    # ВАЖНО ЗАПОМНИТЬ!
     template_name = 'profile_user/forms-editor.html'
-    # Если я работаю с тем, чтобы в какой то области отобразить нужный для меня кусочек информации, то ОБЯЗАТЕЛЬНО
-    # Необходимо делать это так, чтобы важная информация была упакована в другой HTML шаблон, который НЕ
-    # будет отображаться полностью и копировать к примеру весь главный сайт с только лишь одной необходимой внут-
-    # рянкой
-    # То есть: при if request.headers.get('HX-Request') == 'true': (в данном случае я хочу отобразить в нужном месте нужную информацию)
-    # Я НЕ ДОЛЖНЕН ссылаться на template_name ('profile_user/form-editor.html') - потому что таким образом я создаю весь сайт внутри
-    # всего сайта, это билебирда
-    # А вот написание form_orders_file ('profile_user/orders_file/forms_show.html') покажет то, что он рендерит 
-    # именно ту область кода(сайта), которая мне и нужна!
     form_orders_file = 'profile_user/current_forms/form_show.html'
     individual_window_forms = 'profile_user/individual-window-forms/show_window_forms.html'
 
     ALL_CRM_FIELDS = {
-    'client_info': [
-        {'field_key': 'name', 'label': 'Имя клиента', 'type': 'select'},
-        {'field_key': 'phone', 'label': 'Телефон', 'type': 'select'},
-        {'field_key': 'telegram', 'label': 'Телеграм', 'type': 'select'},
-        {'field_key': 'address', 'label': 'Адрес клиента', 'type': 'select'},
-        {'field_key': 'ad_source', 'label': 'Рекламный источник', 'type': 'select'},
-        {'field_key': 'email', 'label': 'Email', 'type': 'select'},
-    ],
-    'device_info': [
-        {'field_key': 'serial_number', 'label': 'Серийный номер / IMEI', 'type': 'select'},
-        {'field_key': 'type_of_device', 'label': 'Тип устройства', 'type': 'select'},
-        {'field_key': 'device_company', 'label': 'Марка', 'type': 'select'},
-        {'field_key': 'model', 'label': 'Модель', 'type': 'select'},
-        {'field_key': 'color', 'label': 'Цвет', 'type': 'select'},
-        {'field_key': 'visual', 'label': 'Внешний вид', 'type': 'select'},
-        {'field_key': 'destroyed', 'label': 'Неисправность', 'type': 'select'},
-        {'field_key': 'complectation', 'label': 'Комплектация', 'type': 'select'},
-
-    ],
-    'bonus_information' : [
-        {'field_key': 'comment_of_order', 'label': 'Комментарий приемщика', 'type': 'textarea'},
-        {'field_key': 'master', 'label': 'Мастер', 'type': 'select'},
-        {'field_key': 'manager', 'label': 'Менеджер', 'type': 'select'},
-        {'field_key': 'prepay', 'label': 'Предоплата', 'type': 'checkbox'},
-        {'field_key': 'day_of_the_end', 'label': 'Крайний срок', 'type': 'select'},
-        {'field_key': 'target_price', 'label': 'Ориентировочная цена', 'type': 'select'},
-        {'field_key': 'urgently', 'label': 'Срочно', 'type': 'checkbox'},
-    ]
-}
+        'client_info': [
+            {'field_key': 'name', 'label': 'Имя клиента', 'type': 'select'},
+            {'field_key': 'phone', 'label': 'Телефон', 'type': 'select'},
+            {'field_key': 'telegram', 'label': 'Телеграм', 'type': 'select'},
+            {'field_key': 'address', 'label': 'Адрес клиента', 'type': 'select'},
+            {'field_key': 'ad_source', 'label': 'Рекламный источник', 'type': 'select'},
+            {'field_key': 'email', 'label': 'Email', 'type': 'select'},
+        ],
+        'device_info': [
+            {'field_key': 'serial_number', 'label': 'Серийный номер / IMEI', 'type': 'select'},
+            {'field_key': 'type_of_device', 'label': 'Тип устройства', 'type': 'select'},
+            {'field_key': 'device_company', 'label': 'Марка', 'type': 'select'},
+            {'field_key': 'model', 'label': 'Модель', 'type': 'select'},
+            {'field_key': 'color', 'label': 'Цвет', 'type': 'select'},
+            {'field_key': 'visual', 'label': 'Внешний вид', 'type': 'select'},
+            {'field_key': 'destroyed', 'label': 'Неисправность', 'type': 'select'},
+            {'field_key': 'complectation', 'label': 'Комплектация', 'type': 'select'},
+        ],
+        'bonus_information': [
+            {'field_key': 'comment_of_order', 'label': 'Комментарий приемщика', 'type': 'textarea'},
+            {'field_key': 'master', 'label': 'Мастер', 'type': 'select'},
+            {'field_key': 'manager', 'label': 'Менеджер', 'type': 'select'},
+            {'field_key': 'prepay', 'label': 'Предоплата', 'type': 'checkbox'},
+            {'field_key': 'day_of_the_end', 'label': 'Крайний срок', 'type': 'select'},
+            {'field_key': 'target_price', 'label': 'Ориентировочная цена', 'type': 'select'},
+            {'field_key': 'urgently', 'label': 'Срочно', 'type': 'checkbox'},
+        ]
+    }
 
     def get(self, request, *args, **kwargs):
-
         if request.headers.get('HX-Request') == 'true':
-
             type_of_order_selected = request.GET.get('type_of_order_selected')
             objects_show = request.GET.get('objects_show')
-            from_plus = request.GET.get('from_plus')
 
-            if from_plus and objects_show and type_of_order_selected:
-
+            if objects_show and type_of_order_selected:
                 deleted_forms_str = request.GET.get('deleted_forms_from_js', '[]')
                 try:
                     deleted_forms_from_js = json.loads(deleted_forms_str)
@@ -74,7 +57,6 @@ class FormsForOrdersEdit(TemplateView):
                     deleted_forms_from_js = []
                 
                 deleted_keys = []
-
                 for item in deleted_forms_from_js:
                     if isinstance(item, str):
                         try:
@@ -88,42 +70,40 @@ class FormsForOrdersEdit(TemplateView):
                     elif isinstance(item, dict):
                         deleted_keys.append(item.get('field_key'))
 
-                # 1. Запрос в БД
                 order_information = FormsForOrder.objects.filter(
                     type_of_order=type_of_order_selected, 
                     user=self.request.user
                 ).first()
 
                 current_forms = []
-
-                # 2. Безопасное извлечение текущих активных форм из БД
                 if order_information and order_information.json_forms:
                     for sec in order_information.json_forms.get('sections', []):
-                        # Безопасное получение id секции
-                        if isinstance(sec, dict) and sec.get('id') == objects_show:
+                        if isinstance(sec, dict) and str(sec.get('id')) == str(objects_show):
                             for field in sec.get('fields', []):
-                                # Защита от None и битых словарей
                                 if isinstance(field, dict) and 'field_key' in field:
                                     current_forms.append(field['field_key'])
 
                 irrelevant_forms = []
+                crm_pool = (
+                    self.ALL_CRM_FIELDS.get(objects_show) or 
+                    self.ALL_CRM_FIELDS.get(int(objects_show) if str(objects_show).isdigit() else objects_show) or 
+                    []
+                )
 
-                # 3. Фильтрация базовых форм CRM
-                for obj_info in self.ALL_CRM_FIELDS.get(objects_show, []):
+                for obj_info in crm_pool:
                     if isinstance(obj_info, dict) and 'field_key' in obj_info:
                         if obj_info['field_key'] not in current_forms or obj_info['field_key'] in deleted_keys:
                             irrelevant_forms.append(obj_info)
 
-                # 4. Безопасная обработка кастомных полей из библиотеки
                 if order_information and order_information.json_forms:
                     for section in order_information.json_forms.get('sections', []):
-                        if isinstance(section, dict) and section.get('id') == objects_show:
+                        if isinstance(section, dict) and str(section.get('id')) == str(objects_show):
                             custom_pool = section.get('custom_forms', [])
                             for custom_field in custom_pool:
                                 if isinstance(custom_field, dict) and 'field_key' in custom_field:
                                     if custom_field['field_key'] not in current_forms:
                                         irrelevant_forms.append(custom_field)
-                
+                print(irrelevant_forms)
                 return render(
                     request, 
                     self.individual_window_forms, 
@@ -133,83 +113,107 @@ class FormsForOrdersEdit(TemplateView):
                         'type_of_order_selected': type_of_order_selected
                     }
                 )
-            # После получения запроса через HTMX, я показываю именно то, чего хочет пользователь!
-            order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
-            return render(request, self.form_orders_file, {'form_order' : order_information})
+
+            order_information = FormsForOrder.objects.filter(
+                type_of_order=type_of_order_selected, 
+                user=self.request.user
+            ).first()
+            return render(request, self.form_orders_file, {'form_order': order_information})
 
         message = "Вы еще не выбрали ни один тип заказов."
-        return render(request, self.template_name, { 'message' : message })
+        return render(request, self.template_name, {'message': message})
 
     def post(self, request, *args, **kwargs):
-
-        # Если запрос включает в себя переданный "ordered_keys" (из js с ajax запросом POST), то вызываю другую функцию:
         if 'ordered_keys' in request.POST:
             return self._save_fields_order(request)
         
-        # Добавить обработку метода POST, следить за тем, пришел ли к нам запрос с заполненной переменной 'list_deleted_forms'
-        # если да, то вызываю определенную функцию(_delete_selected_forms) и после, рендерю заново страницу с сообщением о успешном
-        # сохранении!
         if 'list_deleted_forms' in request.POST:
             return self._delete_selected_forms(request)
         
-        # Выбранная категория (само окно куда добавляются формы)
         objects_show = request.POST.get('objects_show')
-
-        # Выбранные формы для добавления
         selected_forms = request.POST.getlist('selected_forms')
-
-        # Выбранный тип заказа
         type_of_order_selected = request.POST.get('type_of_order_selected')
+        add_empty_slot = request.POST.get('add_empty_slot')
 
-        # Если все есть:
-        if objects_show and selected_forms and type_of_order_selected:
-            order_information = FormsForOrder.objects.filter(type_of_order=type_of_order_selected, user=self.request.user).first()
-            
-            # Достаем реестр сохраненных подсказок
-            all_saved_hints = order_information.json_forms.get('all_hints', {})
+        if objects_show and type_of_order_selected:
+            order_information = FormsForOrder.objects.filter(
+                type_of_order=type_of_order_selected, 
+                user=self.request.user
+            ).first()
+
+            if not order_information or not order_information.json_forms:
+                return render(request, self.template_name)
 
             for section in order_information.json_forms.get('sections', []):
-                if section['id'] == objects_show:
+                if str(section.get('id')) == str(objects_show):
                     forms_list = section.get('fields', [])
                     custom_pool = section.get('custom_forms', [])
-                    
-                    # Память подсказок секции
                     saved_hints = section.get('saved_hints', {})
 
+                    # Обработка выбора новых форм из панели/модалки
                     for key in selected_forms:
-                        standard_field = next((item for item in self.ALL_CRM_FIELDS.get(objects_show, []) if item.get('field_key') == key), None)
+                        if any(isinstance(f, dict) and f.get('field_key') == key for f in forms_list):
+                            continue
 
-                        # Берем сохраненные подсказки
+                        standard_field = next(
+                            (item for item in (self.ALL_CRM_FIELDS.get(objects_show) or []) if item.get('field_key') == key), 
+                            None
+                        )
                         field_hints = saved_hints.get(key, [])
+                        new_field_data = None
 
                         if standard_field:
-                            if not any(f.get('field_key') == key for f in forms_list):
-                                forms_list.append({
-                                    'order': len(forms_list) + 1,
-                                    'label': standard_field['label'],
-                                    'field_key': standard_field['field_key'],
-                                    'type': standard_field['type'],
-                                    'hints': field_hints
-                                })
+                            new_field_data = {
+                                'label': standard_field['label'],
+                                'field_key': standard_field['field_key'],
+                                'type': standard_field['type'],
+                                'hints': field_hints
+                            }
                         else:
                             custom_field = next((item for item in custom_pool if item.get('field_key') == key), None)
                             if custom_field:
-                                if not any(f.get('field_key') == key for f in forms_list):
-                                    forms_list.append({
-                                        'order': len(forms_list) + 1,
-                                        'label': custom_field['label'],
-                                        'field_key': custom_field['field_key'],
-                                        'type': custom_field['type'],
-                                        'hints': field_hints or custom_field.get('hints', []),
-                                        'custom_form': True
-                                    })
-                                    section['custom_forms'] = [f for f in custom_pool if f.get('field_key') != key]
+                                new_field_data = {
+                                    'label': custom_field['label'],
+                                    'field_key': custom_field['field_key'],
+                                    'type': custom_field['type'],
+                                    'hints': field_hints or custom_field.get('hints', []),
+                                    'custom_form': True
+                                }
+                                section['custom_forms'] = [f for f in custom_pool if f.get('field_key') != key]
+
+                        if new_field_data:
+                            # Проверяем наличие пустого слота-заглушки для замещения
+                            empty_slot_idx = next(
+                                (i for i, f in enumerate(forms_list) if isinstance(f, dict) and f.get('field_key') == 'empty_place_for_add'),
+                                None
+                            )
+                            if empty_slot_idx is not None:
+                                forms_list[empty_slot_idx] = new_field_data
+                            else:
+                                forms_list.append(new_field_data)
+
+                    # Явное добавление пустого слота справа по кнопке
+                    if add_empty_slot and not any(isinstance(f, dict) and f.get('field_key') == 'empty_place_for_add' for f in forms_list):
+                        forms_list.append({
+                            'field_key': 'empty_place_for_add',
+                            'label': 'Добавить поле +',
+                            'type': '',
+                            'hints': []
+                        })
+
+                    # Автопересчет порядка от 1 до N
+                    for idx, item in enumerate(forms_list, start=1):
+                        if isinstance(item, dict):
+                            item['order'] = idx
+
+                    section['fields'] = forms_list
+                    break
 
             order_information.save()
             return render(request, self.form_orders_file, {'form_order': order_information})
         
         return render(request, self.template_name)
-    
+
     def _save_fields_order(self, request):
         section_id = request.POST.get('section_id')
         type_of_order = request.POST.get('type_of_order_selected')
@@ -217,7 +221,7 @@ class FormsForOrdersEdit(TemplateView):
         raw_keys = request.POST.getlist('ordered_keys') or request.POST.get('ordered_keys')
         
         ordered_keys = []
-        if isinstance(raw_keys, list) and len(raw_keys) > 0 and raw_keys[0].startswith('['):
+        if isinstance(raw_keys, list) and len(raw_keys) > 0 and str(raw_keys[0]).startswith('['):
             try:
                 ordered_keys = json.loads(raw_keys[0])
             except json.JSONDecodeError:
@@ -271,9 +275,8 @@ class FormsForOrdersEdit(TemplateView):
 
         order_information.json_forms = dict(json_data)
         order_information.save(update_fields=['json_forms'])
-
         return HttpResponse(status=200)
-    
+
     def _delete_selected_forms(self, request):
         json_string_forms = request.POST.get('list_deleted_forms', '{}')
         json_added_forms = request.POST.get('list_added_forms', '{}')
@@ -341,6 +344,7 @@ class FormsForOrdersEdit(TemplateView):
 
                 section['fields'] = new_fields_list
 
+            # --- ДОБАВЛЕНИЕ ЭЛЕМЕНТОВ ---
             keys_to_add = forms_to_add.get(category_id) or forms_to_add.get(int(category_id) if category_id.isdigit() else category_id) or []
 
             if keys_to_add:
@@ -348,13 +352,11 @@ class FormsForOrdersEdit(TemplateView):
                 
                 current_fields = section.get('fields', []) or []
                 existing_keys = [f.get('field_key') for f in current_fields if isinstance(f, dict) and 'field_key' in f]
-                
                 saved_hints = section.get('saved_hints', {})
 
                 for key in keys_to_add:
                     if key not in existing_keys:
                         added_field = None
-
                         field_obj = next((item for item in all_category_fields if isinstance(item, dict) and item.get('field_key') == key), None)
                         
                         if field_obj:
@@ -368,8 +370,20 @@ class FormsForOrdersEdit(TemplateView):
                         if added_field:
                             if key in saved_hints:
                                 added_field['hints'] = saved_hints[key]
-                            
-                            section['fields'].append(added_field)
+
+                            empty_slot_idx = next(
+                                (i for i, f in enumerate(section['fields']) if isinstance(f, dict) and f.get('field_key') == 'empty_place_for_add'),
+                                None
+                            )
+                            if empty_slot_idx is not None:
+                                section['fields'][empty_slot_idx] = added_field
+                            else:
+                                section['fields'].append(added_field)
+
+            # Пересчет order после всех изменений в секции
+            for idx, f in enumerate(section.get('fields', []), start=1):
+                if isinstance(f, dict):
+                    f['order'] = idx
 
         order_information.json_forms = json_models_data
         order_information.save()
