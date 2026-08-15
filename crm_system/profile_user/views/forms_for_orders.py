@@ -63,8 +63,9 @@ class FormsForOrdersEdit(TemplateView):
 
             type_of_order_selected = request.GET.get('type_of_order_selected')
             objects_show = request.GET.get('objects_show')
+            from_plus = request.GET.get('from_plus')
 
-            if objects_show and type_of_order_selected:
+            if from_plus and objects_show and type_of_order_selected:
 
                 deleted_forms_str = request.GET.get('deleted_forms_from_js', '[]')
                 try:

@@ -1,5 +1,4 @@
 <!-- Отображает сами задействованные формы -->
-
 {% for section, values in form_order.json_forms.items %}
 {% for objects_show in values %}
 
@@ -14,60 +13,20 @@
     <!-- Скрытое поле должно быть в ОДНОМ экземпляре вне цикла -->
     <input type="hidden" id="type_of_order_selected" value="{{ form_order.type_of_order }}">
 
-    <!-- Добавлен data-section-id в контейнер списка для SortableJS -->
-    <div class="fields-sortable-list" id="sortable-{{ objects_show.id }}" data-section-id="{{ objects_show.id }}">
-        {% for obj in objects_show.fields %}
-        <div class="field-pill" data-key="{{ obj.field_key }}">
-            <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
+    {% include "profile_user/show_actual_forms/sortable_list.html" %}
 
-            <div class="outer-wrapper">
-                <span class="field-name">{{ obj.label }}</span>
-
-                <!-- Кнопка удаления -->
-                <button type="button" class="btn" data-section-id="{{ objects_show.id }}"
-                    data-field-key="{% if obj.field_key %}{{ obj.field_key }}{% else %}{{ obj }}{% endif %}"
-                    onclick="DeleteClick(this)">
-                    <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
-                </button>
-
-                <!-- Кнопка редактирования поля -->
-                <button type="button" class="btn"
-                    hx-get="{% url 'get-individual-field-modal' %}?section_id={{ objects_show.id }}&field_key={{ obj.field_key }}&type_of_order_selected={{ form_order.type_of_order }}&category={{ objects_show.id }}"
-                    hx-target="#center-modal-container" onclick="openFieldModal()" title="Настройки поля">
-                    <i class="fa fa-cogs" aria-hidden="true"></i>
-                </button>
-            </div>
-        </div>
-        {% empty %}
-        <div class="empty-section-placeholder">В этой секции пока нет активных полей</div>
-        {% endfor %}
-
-        {% if not objects_show.fields|length|divisibleby:2 %}
-        <div id="slot-{{ objects_show.id }}-empty" class="placeholder-slot empty-grid-slot"
-            onclick="openSidebarForSlot('{{ objects_show.id }}', 'slot-{{ objects_show.id }}-empty')">
-            + Добавить поле
-        </div>
-        {% endif %}
-    </div>
-
-    <!-- Кнопка "+" -->
+    <!-- Кнопки "+" -->
     <div class="add-btn-wrapper">
         <div class="add-btn-container">
             <button type="button" class="btn-plus left"
-                hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=left&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-target="#right-sidebar-content" onclick="openSidebar()" title="Добавить поле слева">
-                +
-            </button>
-
-            <button type="button" class="btn-plus center"
-                hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=full&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-target="#right-sidebar-content" onclick="openSidebar()" title="Добавить поле на всю строку">
+                hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=left&type_of_order_selected={{ form_order.type_of_order }}&from_plus=1"
+                hx-target="#sidebar-content" hx-swap="innerHTML" onclick="openSidebar()" title="Добавить поле слева">
                 +
             </button>
 
             <button type="button" class="btn-plus right"
-                hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=right&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-target="#right-sidebar-content" onclick="openSidebar()" title="Добавить поле справа">
+                hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=right&type_of_order_selected={{ form_order.type_of_order }}&from_plus=1"
+                hx-target="#sidebar-content" hx-swap="innerHTML" onclick="openSidebar()" title="Добавить поле справа">
                 +
             </button>
         </div>
@@ -94,7 +53,6 @@
     function openSidebar() {
         const sidebar = document.getElementById('right-sidebar');
         sidebar.classList.remove('hidden');
-        showSaveBar();
     }
 
     function closeSidebar() {

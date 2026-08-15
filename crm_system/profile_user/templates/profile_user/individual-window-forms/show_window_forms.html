@@ -1,12 +1,23 @@
 {% if irrelevant_forms %}
-<div class="fields-selection-grid">
+<div class="sidebar-header d-flex justify-content-between align-items-center mb-3">
+    <h5>Выбор поля</h5>
+    <button type="button" class="btn-close" onclick="closeSidebar()"></button>
+</div>
+
+<div class="sidebar-body">
     {% for form in irrelevant_forms %}
-    <!-- Вызываем JS функцию при клике по карточке -->
-    <div class="field-checkbox-card"
-        style="cursor: pointer; padding: 10px; border: 1px solid #ccc; margin-bottom: 8px; border-radius: 6px;"
-        onclick="insertFieldIntoSlot('{{ objects_show }}', '{{ form.field_key }}', '{{ form.label }}')">
-        <span class="field-label">{{ form.label }}</span>
+    <div class="sidebar-item" hx-post="{% url 'form-editor' %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-vals='{
+             "selected_forms": ["{{ form.field_key }}"],
+             "objects_show": "{{ objects_show }}",
+             "type_of_order_selected": "{{ type_of_order_selected }}",
+             "position": "{{ position }}"
+         }' hx-target="#sortable-{{ objects_show }}" hx-swap="outerHTML" onclick="closeSidebar(); showSaveBar();">
+        <span>{{ form.label|default:form.field_key }}</span>
+        <i class="fa-solid fa-plus"></i>
     </div>
+    {% empty %}
+    <p>Все поля уже добавлены</p>
     {% endfor %}
 </div>
 {% else %}

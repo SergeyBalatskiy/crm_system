@@ -400,6 +400,8 @@
 
         let wasJustAdded = false;
 
+        showSaveBar();
+
         // 2. ВАЖНО: Если поле было только что добавлено в текущей сессии — удаляем его из addedMap
         if (addedMap.has(categoryId)) {
             let addedArr = addedMap.get(categoryId);
@@ -440,7 +442,6 @@
             pill.outerHTML = placeholderHTML;
         }
 
-        showSaveBar();
     }
 
     // Клик по пунктирному слоту для выбора нового поля
@@ -463,51 +464,51 @@
         });
     }
 
-    function initSortables() {
-        document.querySelectorAll('.fields-sortable-list').forEach(listEl => {
-            if (listEl._sortable) {
-                listEl._sortable.destroy();
+    function initSortable(container) {
+        new Sortable(container, {
+            animation: 0,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            filter: '.empty-grid-slot',
+            preventOnFilter: false,
+            swap: true,
+            swapClass: 'sortable-swap-highlight',
+
+            onEnd: function (evt) {
+                const sectionCard = evt.to.closest('.section-card');
+                const sectionId = sectionCard.id;
+
+                const orderedKeys = Array.from(evt.to.querySelectorAll('.field-pill'))
+                    .map(item => item.getAttribute('data-key'))
+                    .filter(key => key !== null);
+
+                htmx.ajax('POST', '{% url "form-editor" %}', {
+                    swap: 'none',
+                    values: {
+                        'ordered_keys': JSON.stringify(orderedKeys),
+                        'section_id': sectionId,
+                        'type_of_order_selected': '{{ form_order.type_of_order }}',
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                    }
+                });
             }
-
-            listEl._sortable = new Sortable(listEl, {
-                animation: 150,
-                handle: '.drag-handle',
-                draggable: '.field-pill',
-                onEnd: function (evt) {
-                    const sectionId = evt.to.dataset.sectionId;
-                    const typeOfOrderEl = document.getElementById('type_of_order_selected');
-                    const typeOfOrder = typeOfOrderEl ? typeOfOrderEl.value : '';
-
-                    // Собираем ключи полей в новом порядке
-                    const orderedKeys = Array.from(evt.to.children)
-                        .filter(child => child.classList.contains('field-pill'))
-                        .map(child => child.dataset.key);
-
-                    if (!sectionId || orderedKeys.length === 0) return;
-
-                    const formData = new FormData();
-                    formData.append('section_id', sectionId);
-                    formData.append('type_of_order_selected', type_of_order);
-
-                    orderedKeys.forEach(key => {
-                        formData.append('ordered_keys', key);
-                    });
-
-                    // Отправляем через fetch для корректной передачи FormData
-                    fetch('{% url "form-editor" %}', {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}'
-                        },
-                        body: formData
-                    });
-                }
-            });
         });
     }
 
+    // Инициализация при первой загрузке и при каждом подгрузе через HTMX
+    htmx.onLoad(function (target) {
+        if (target.classList && target.classList.contains('fields-sortable-list')) {
+            initSortable(target);
+        } else {
+            target.querySelectorAll('.fields-sortable-list').forEach(initSortable);
+        }
+    });
+
     // Выбор и вставка поля из сайдбара
     function insertFieldIntoSlot(categoryId, fieldKey, fieldLabel) {
+
+        showSaveBar();
+
         let wasRestored = false;
 
         // Если поле возвращают обратно из удаленных — убираем его из map
