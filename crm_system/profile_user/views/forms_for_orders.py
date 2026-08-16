@@ -115,7 +115,6 @@ class FormsForOrdersEdit(TemplateView):
                     irrelevant_forms = [
                         f for f in irrelevant_forms 
                         if isinstance(f, dict) and f.get('field_key') not in active_keys]
-                    
                 return render(
                     request, 
                     self.individual_window_forms, 

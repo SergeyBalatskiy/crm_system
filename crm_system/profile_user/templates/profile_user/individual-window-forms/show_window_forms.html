@@ -6,6 +6,12 @@
         style="cursor: pointer; padding: 10px; border: 1px solid #ccc; margin-bottom: 8px; border-radius: 6px;"
         onclick="insertFieldIntoSlot('{{ objects_show }}', '{{ form.field_key }}', '{{ form.label|default:form.field_key|escapejs }}')">
         <span class="field-label">{{ form.label|default:form.field_key }}</span>
+        {% if form.custom_form %}
+        <button type="button" class="btn" data-section-id="{{ form.field_key }}" data-field-key="{{ form.field_key }}"
+            onclick="event.stopPropagation(); DeleteCustomClick(this);">
+            <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
+        </button>
+        {% endif %}
     </div>
     {% empty %}
     <p>Все поля уже добавлены</p>
@@ -33,6 +39,30 @@
 </form>
 
 <script>
+
+    let objects_show = "{{ objects_show }}"; // Здесь секция
+
+    let type_of_order_selected = "{{ type_of_order_selected }}"; // Здесь у меня нужный параметр  warranty
+
+    let listToAddDeletedForms = []
+
+    function DeleteCustomClick(button) {
+
+        const fieldKey = button.dataset.sectionId; // Получаем 'field_key': 'custom-krytaya_forma....'
+
+        listToAddDeletedForms.push(
+            fieldKey
+        );
+
+        htmx.ajax('POST', '{% url "delete-custom-form" %}', {
+            values: {
+                'type_of_order_selected': type_of_order_selected,
+                'objects_show': objects_show,
+                'deleted_custom_forms': JSON.stringify(listToAddDeletedForms),
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            }
+        });
+    }
 
     // Функция, отвечающая за подсчет уже добавленных форм (+ пустышки)
     function ensureTrailingPlaceholder(sectionId) {

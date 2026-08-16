@@ -10,3 +10,4 @@ from .workers_info import WorkersAddView
 from .forms_for_orders import FormsForOrdersEdit
 from .get_individual_field_modal import EditIndividualCenterForm
 from .create_new_form import CreateNewFormInCategory
+from .delete_custom_form import DeleteCustomForm

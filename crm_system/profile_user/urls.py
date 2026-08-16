@@ -21,5 +21,7 @@ urlpatterns = [
     path('edit-individual-form', EditIndividualCenterForm.as_view(), name='get-individual-field-modal'),
     # Указываю на путь, чтобы можно было СОЗДАТЬ новую форму внутри определенной категории
     path('get-create-new-form', CreateNewFormInCategory.as_view(), name='create-new-form'),
+    # Указываю на путь, чтобы можно было УДАЛИТЬ кастомную форму
+    path('delete-custom-form', DeleteCustomForm.as_view(), name='delete-custom-form'),
     
 ]

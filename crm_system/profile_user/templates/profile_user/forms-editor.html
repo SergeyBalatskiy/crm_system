@@ -10,7 +10,7 @@
         max-width: 1400px;
         margin: 0 auto;
     }
-    
+
     .navigation-form-select {
         margin-bottom: 20px;
         display: flex;
@@ -187,7 +187,8 @@
     .sidebar-header {
         position: relative;
         display: flex;
-        justify-content: center; /* Центрирует содержимое (h3) */
+        justify-content: center;
+        /* Центрирует содержимое (h3) */
         align-items: center;
         margin-bottom: 16px;
         padding-bottom: 10px;
@@ -202,9 +203,9 @@
     }
 
     .sidebar-header .btn-close-sidebar {
-    position: absolute;
-    right: 0;
-}
+        position: absolute;
+        right: 0;
+    }
 
     .btn-close-sidebar {
         background: none;
@@ -303,8 +304,8 @@
     }
 
     .new_individual_form {
-    margin-top: 12px;
-    width: 100%;
+        margin-top: 12px;
+        width: 100%;
     }
 
     .new_individual_form button {
@@ -330,8 +331,6 @@
     .new_individual_form button svg {
         flex-shrink: 0;
     }
-
-
 </style>
 <div id="center-modal-container"></div>
 <div class="editor-page-wrapper">
@@ -489,7 +488,7 @@
                 'active_fields': JSON.stringify(activeFields) // Используем объявление выше
             }
         });
-}
+    }
 
     function initSortable(container) {
         new Sortable(container, {

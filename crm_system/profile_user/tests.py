@@ -205,13 +205,6 @@ crm = {
     ]
 }
 
-for section in x.get('sections', []):
-    if section['id'] == 'client_info':
-        lst_for_add_category = section['fields']
-print(lst_for_add_category)
-
-
-
-
-slug_value = slugify("Пример названия статьи!")
-print(slug_value)
+g = 'custom-chekhol'
+h = {'type': 'checkbox', 'hints': ['11212'], 'label': 'Чехол', 'order': 6, 'field_key': 'custom-chekhol', 'custom_form': 'True', 'is_required': None}    
+print(g in h['field_key'])
