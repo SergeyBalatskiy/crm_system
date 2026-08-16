@@ -10,7 +10,7 @@
         max-width: 1400px;
         margin: 0 auto;
     }
-
+    
     .navigation-form-select {
         margin-bottom: 20px;
         display: flex;
@@ -185,8 +185,9 @@
     }
 
     .sidebar-header {
+        position: relative;
         display: flex;
-        justify-content: space-between;
+        justify-content: center; /* Центрирует содержимое (h3) */
         align-items: center;
         margin-bottom: 16px;
         padding-bottom: 10px;
@@ -197,7 +198,13 @@
         margin: 0;
         font-size: 1rem;
         color: #1e293b;
+        text-align: center;
     }
+
+    .sidebar-header .btn-close-sidebar {
+    position: absolute;
+    right: 0;
+}
 
     .btn-close-sidebar {
         background: none;
@@ -294,6 +301,37 @@
         color: #4f46e5;
         background-color: #f0fdf4;
     }
+
+    .new_individual_form {
+    margin-top: 12px;
+    width: 100%;
+    }
+
+    .new_individual_form button {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background-color: rgb(106, 75, 216);
+        border-radius: 8px;
+        color: #ffffff;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .new_individual_form button:hover {
+        background-color: #45278b;
+    }
+
+    .new_individual_form button svg {
+        flex-shrink: 0;
+    }
+
+
 </style>
 <div id="center-modal-container"></div>
 <div class="editor-page-wrapper">
@@ -311,7 +349,9 @@
         <div class="info-alert">{{ message }}</div>
         {% endif %}
     </div>
+
     <div id="show_new_form_create"></div>
+
     <div class="editor-page-layout">
         <div class="builder-main-content">
             <div id="show-data-forms" class="builder-container">
@@ -427,12 +467,18 @@
     // Клик по пунктирному полю для выбора новой формы (Взаимодействие с определенным полем благодаря id`шнику в "Добавить поле +" )
     function openSidebarForSlot(categoryId, placeholderId) {
         activeSlotId = placeholderId;
-        globalAddPosition = null; // Здесь очищаю "ожидание от левого или правого источника" нажатия на + ('left' и 'right')
+        globalAddPosition = null;
+
         const currentTypeOfOrder = document.getElementById('type_of_order_selected').value;
         const deletedFormsForCategory = map.has(categoryId) ? map.get(categoryId) : [];
+
+        // ОБЯЗАТЕЛЬНО: объявляем переменную ДО её использования в htmx.ajax
+        const activeFields = getActiveFieldsForCategory(categoryId);
+
         const sidebar = document.getElementById('right-sidebar');
         sidebar.classList.remove('hidden');
         document.getElementById('right-sidebar-content').innerHTML = '<p class="placeholder-text">Загрузка...</p>';
+
         htmx.ajax('GET', '{% url "form-editor" %}', {
             target: '#right-sidebar-content',
             swap: 'innerHTML',
@@ -440,9 +486,10 @@
                 'type_of_order_selected': currentTypeOfOrder,
                 'objects_show': categoryId,
                 'deleted_forms_from_js': JSON.stringify(deletedFormsForCategory),
+                'active_fields': JSON.stringify(activeFields) // Используем объявление выше
             }
         });
-    }
+}
 
     function initSortable(container) {
         new Sortable(container, {

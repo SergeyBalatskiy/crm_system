@@ -55,6 +55,7 @@ class FormsForOrdersEdit(TemplateView):
         if request.headers.get('HX-Request') == 'true':
             type_of_order_selected = request.GET.get('type_of_order_selected')
             objects_show = request.GET.get('objects_show')
+            raw_active_fields = request.GET.get('active_fields', '[]')
             if objects_show and type_of_order_selected:
                 deleted_forms_str = request.GET.get('deleted_forms_from_js', '[]')
                 try:
@@ -104,6 +105,17 @@ class FormsForOrdersEdit(TemplateView):
                                 if isinstance(custom_field, dict) and 'field_key' in custom_field:
                                     if custom_field['field_key'] not in current_forms:
                                         irrelevant_forms.append(custom_field)
+                try:
+                    active_keys = set(json.loads(raw_active_fields))
+                except (json.JSONDecodeError, TypeError):
+                    active_keys = set()
+
+                # Фильтруем: убираем формы, ключи которых у пользователя УЖЕ есть на экране
+                if active_keys and irrelevant_forms:
+                    irrelevant_forms = [
+                        f for f in irrelevant_forms 
+                        if isinstance(f, dict) and f.get('field_key') not in active_keys]
+                    
                 return render(
                     request, 
                     self.individual_window_forms, 

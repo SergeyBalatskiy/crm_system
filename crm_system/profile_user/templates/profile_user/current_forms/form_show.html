@@ -56,13 +56,17 @@
         <div class="add-btn-container">
             <button type="button" class="btn-plus left"
                 hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=left&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-target="#right-sidebar-content" onclick="openSidebarGlobal('{{ objects_show.id }}', 'left')"
+                hx-vals="js:{ active_fields: JSON.stringify(getActiveFieldsForCategory('{{ objects_show.id }}')) }"
+                hx-target="#right-sidebar-content" 
+                onclick="openSidebarGlobal('{{ objects_show.id }}', 'left')"
                 title="Добавить поле слева">
                 +
             </button>
             <button type="button" class="btn-plus right"
                 hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=right&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-target="#right-sidebar-content" onclick="openSidebarGlobal('{{ objects_show.id }}', 'right')"
+                hx-vals="js:{ active_fields: JSON.stringify(getActiveFieldsForCategory('{{ objects_show.id }}')) }"
+                hx-target="#right-sidebar-content" 
+                onclick="openSidebarGlobal('{{ objects_show.id }}', 'right')"
                 title="Добавить поле справа">
                 +
             </button>
@@ -77,9 +81,25 @@
     var activeSlotId = null;       // Если кликнули по пунктиру
     var globalAddPosition = null;  // 'left' или 'right', если кликнули по нижним плюсам
 
-    // Функция для вызова нижних плюсов
+    // Функция сбора ключей полей, которые СЕЙЧАС находятся в DOM для данной категории
+    function getActiveFieldsForCategory(categoryId) {
+        const keys = [];
+        const container = document.querySelector(`.fields-sortable-list[data-section-id="${categoryId}"]`);
+        
+        if (container) {
+            container.querySelectorAll('.field-pill[data-key], .placeholder-slot[data-key]').forEach(item => {
+                const key = item.getAttribute('data-key');
+                if (key && key !== 'empty_place_for_add' && key !== 'empty_for_add') {
+                    keys.push(key);
+                }
+            });
+        }
+        return keys; // вернет массив, например: ["phone", "email"]
+    }
+
+    // Твоя функция
     function openSidebarGlobal(categoryId, position) {
-        activeSlotId = null; // Ставлю null так как это не вызов на добавление формы из пунктирного поля
+        activeSlotId = null;
         globalAddPosition = position;
 
         const sidebar = document.getElementById('right-sidebar');

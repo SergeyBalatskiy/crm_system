@@ -1,55 +1,61 @@
-<!-- create_individual_form.html -->
-<form hx-post="{% url 'create-new-form' %}" hx-swap="none" class="individual_window">
-    {% csrf_token %}
-    <!-- Передаем скрытые параметры прямо в форме -->
-    <!-- Тип заказа -->
-    <input type="hidden" name="type_of_order_selected" value="{{ type_of_order_selected }}">
-    <!-- Категория -->
-    <input type="hidden" name="category" value="{{ category }}">
-    <!-- Название только самой формы -->
-    <input type="text" name="label">
-    <div class="required_form">
-        <label>
-            <input type="checkbox" name="is_required" id="is_required"> Форма обязательна для заполнения?
-        </label>
-    </div>
-    <div class="div-type-of-form">
-        <label>
-            <input type="checkbox" name="checkbox1" id="checkbox1"> Тип формы: Текст
-        </label>
-        <label>
-            <input type="checkbox" name="checkbox2" id="checkbox2"> Тип формы: Условие
-        </label>
-        <label>
-            <input type="checkbox" name="checkbox3" id="checkbox3"> Тип формы: Большой текст
-        </label>
-    </div>
-    <!-- Кнопка отправки на создание -->
-    <button type="submit">Cоздать</button>
-</form>
+{% load static %}
+<link rel="stylesheet" href="{% static 'profile_user/css/create_individual_form.css' %}">
+
+<div class="modal-overlay">
+    <form hx-post="{% url 'create-new-form' %}" 
+          hx-swap="none" 
+          class="individual_window" 
+          hx-on::after-request="document.getElementById('show_new_form_create').innerHTML = ''">
+        {% csrf_token %}
+        
+        <!-- Шапка с крестиком -->
+        <div class="modal-header">
+            <h3>Создать новую форму</h3>
+            <button type="button" class="btn-close-modal" onclick="document.getElementById('show_new_form_create').innerHTML = ''">✕</button>
+        </div>
+
+        <!-- Скрытые параметры -->
+        <input type="hidden" name="type_of_order_selected" value="{{ type_of_order_selected }}">
+        <input type="hidden" name="category" value="{{ category }}">
+        
+        <!-- Поля формы -->
+        <div>
+            <label style="font-size: 0.85rem; color: #64748b; display: block; margin-bottom: 4px;">Название поля</label>
+            <input type="text" name="label" placeholder="Введите название..." required>
+        </div>
+
+        <div class="required_form">
+            <label>
+                <input type="checkbox" name="is_required" id="is_required"> Форма обязательна для заполнения?
+            </label>
+        </div>
+
+        <div class="div-type-of-form">
+            <label><input type="checkbox" name="checkbox1" id="checkbox1"> Тип формы: Текст</label>
+            <label><input type="checkbox" name="checkbox2" id="checkbox2"> Тип формы: Условие</label>
+            <label><input type="checkbox" name="checkbox3" id="checkbox3"> Тип формы: Большой текст</label>
+        </div>
+
+        <button type="submit">Создать</button>
+    </form>
+</div>
 
 <script>
     document.getElementById('checkbox1').addEventListener('click', function (event) {
-        // Явно снимаем отметку со второго чекбокса
         document.getElementById('checkbox2').checked = false;
         document.getElementById('checkbox3').checked = false;
-        // Ставим отметку на первом
         event.target.checked = true;
     });
 
     document.getElementById('checkbox2').addEventListener('click', function (event) {
-        // Явно снимаем отметку со второго чекбокса
         document.getElementById('checkbox1').checked = false;
         document.getElementById('checkbox3').checked = false;
-        // Ставим отметку на втором
         event.target.checked = true;
     });
 
     document.getElementById('checkbox3').addEventListener('click', function (event) {
-        // Явно снимаем отметку со второго чекбокса
         document.getElementById('checkbox1').checked = false;
         document.getElementById('checkbox2').checked = false;
-        // Ставим отметку на втором
         event.target.checked = true;
     });
 </script>

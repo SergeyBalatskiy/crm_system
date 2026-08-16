@@ -1,0 +1,102 @@
+/* 1. Оверлей на весь экран с размытием фона */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(15, 23, 42, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* Центрирование по горизонтали и вертикали */
+    z-index: 99999;
+}
+
+/* 2. Карточка формы */
+.modal-overlay .individual_window {
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-sizing: border-box;
+}
+
+/* 3. Шапка модалки */
+.individual_window .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 12px;
+}
+
+.individual_window .modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+
+.individual_window .btn-close-modal {
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    color: #94a3b8;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.individual_window .btn-close-modal:hover {
+    color: #0f172a;
+}
+
+/* 4. Инпуты и кнопка */
+.individual_window input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.individual_window input[type="text"]:focus {
+    border-color: #4f46e5;
+}
+
+.individual_window .required_form label,
+.individual_window .div-type-of-form label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #334155;
+    cursor: pointer;
+    margin-bottom: 6px;
+}
+
+.individual_window button[type="submit"] {
+    width: 100%;
+    padding: 10px 16px;
+    background: rgb(106, 75, 216);
+    color: #ffffff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 8px;
+}
+
+.individual_window button[type="submit"]:hover {
+    background: #45278b;
+}
