@@ -53,10 +53,13 @@ class FormsForOrdersEdit(TemplateView):
     # показ НЕ РЕЛЕВАНТНЫХ ФОРМ / показ "динамических" html (by HTMX)
     def get(self, request, *args, **kwargs):
         if request.headers.get('HX-Request') == 'true':
+            print("Вызвали гет запрос на отображение не релевантных форм")
             type_of_order_selected = request.GET.get('type_of_order_selected')
             objects_show = request.GET.get('objects_show')
             raw_active_fields = request.GET.get('active_fields', '[]')
+            print('Пришел:', type_of_order_selected, objects_show)
             if objects_show and type_of_order_selected:
+                print('Я получил objects_show и type_of_order_selected')
                 deleted_forms_str = request.GET.get('deleted_forms_from_js', '[]')
                 try:
                     deleted_forms_from_js = json.loads(deleted_forms_str)
@@ -115,6 +118,7 @@ class FormsForOrdersEdit(TemplateView):
                     irrelevant_forms = [
                         f for f in irrelevant_forms 
                         if isinstance(f, dict) and f.get('field_key') not in active_keys]
+                print(f'Отдаю ирелевантные формы: {irrelevant_forms}')
                 return render(
                     request, 
                     self.individual_window_forms, 
