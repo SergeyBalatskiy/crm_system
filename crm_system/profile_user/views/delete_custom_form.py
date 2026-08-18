@@ -18,6 +18,7 @@ class DeleteCustomForm(TemplateView):
         type_of_order_selected = request.POST.get('type_of_order_selected')
 
         objects_show = request.POST.get('objects_show')
+        print("1111212", objects_show)
 
         # ["custom-1"]
         deleted_custom_forms = request.POST.get('deleted_custom_forms')
@@ -34,7 +35,6 @@ class DeleteCustomForm(TemplateView):
         
         json_models_data = order_information.json_forms
 
-        print("Начало цикла")
         for section in json_models_data.get('sections', []):
             if section.get('id') == objects_show:
 
@@ -59,7 +59,19 @@ class DeleteCustomForm(TemplateView):
                 # Сохранение изменений в БД
                 order_information.json_forms = json_models_data
                 order_information.save()
-                return HttpResponse(status=204)
+                
+                # Для GET запроса
+                args_for_get_trigger = {
+                    "formCreated": {
+                    "objects_show": objects_show,
+                    "type_of_order_selected": type_of_order_selected
+                        }
+                    }
+                response = HttpResponse(status=204)
+                response["HX-Trigger"] = json.dumps(args_for_get_trigger)
+                return response
+
+
 
 
                         
