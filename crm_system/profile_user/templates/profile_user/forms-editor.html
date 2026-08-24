@@ -6,7 +6,6 @@
 <link rel="stylesheet" href="{% static 'profile_user/css/forms-editor.css' %}">
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
-<div id="center-modal-container"></div>
 <div class="editor-page-wrapper">
     <form method="get" class="navigation-form-select">
         <label for="page-select">Тип формы заказов:</label>
@@ -49,19 +48,46 @@
 <div id="bottom-save-bar" class="bottom-save-bar hidden">
     <div class="save-bar-content">
         <button class="btn btn-primary" onclick="saveChanges()">Сохранить</button>
-        <button type="button" class="btn btn-danger" hx-get="{% url 'form-editor' %}"
-            hx-include="[name='type_of_order_selected']" hx-target="#show-data-forms"
-            onclick="hideSaveBar(); closeSidebar();">
+
+        <!-- Обновленная кнопка Отмена -->
+        <button type="button" class="btn btn-danger" onclick="cancelChanges()">
             Отмена
         </button>
+
         <span class="save-bar-text">Форма была изменена.</span>
+    </div>
+</div>
+
+<!-- Оверлей модального окна для настройки авто-ответов -->
+<div id="field-settings-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeFieldModal()">
+    <div class="modal-card">
+        <button type="button" class="modal-close-btn" onclick="closeFieldModal()">&times;</button>
+        <div id="center-modal-container"></div>
     </div>
 </div>
 
 <script>
 
+    // 1. Создаем глобальный словарь для запоминания названий удаленных полей
+    const deletedLabelsMap = new Map();
+
     function cancelChanges() {
-        location.reload();
+        map.clear();
+        addedMap.clear();
+        closeSidebar();
+        hideSaveBar();
+        const selectElem = document.querySelector('select[name="type_of_order_selected"]');
+        const hiddenInput = document.getElementById('type_of_order_selected');
+        const selectedType = (selectElem && selectElem.value)
+            ? selectElem.value
+            : (hiddenInput ? hiddenInput.value : '');
+        if (selectedType) {
+            htmx.ajax('GET', '{% url "form-editor" %}', {
+                target: '#show-data-forms',
+                swap: 'innerHTML',
+                values: { 'type_of_order_selected': selectedType }
+            });
+        }
     }
 
     function hideSaveBar() {
@@ -70,15 +96,9 @@
 
     // Хранилище УДАЛЕННЫХ полей: { categoryId: ['manager', 'color'] }
     const map = new Map();
-
-    // Хранилище ДОБАВЛЕННЫХ полей: { categoryId: ['urgently'] }
     const addedMap = new Map();
-
-    // Вспомогательная функция для очистки мусора из Django-строки
     function extractFieldKey(rawObj) {
         if (typeof rawObj === 'string') {
-            // Если прилетела строка вида "{'field_key': 'manager', 'type': 'select'}"
-            // Вытаскиваем только то, что лежит внутри field_key
             const match = rawObj.match(/['"]field_key['"]\s*:\s*['"]([^'"]+)['"]/);
             if (match) {
                 return match[1]; // Вернет чистое слово, например "manager"
@@ -96,12 +116,14 @@
         const dataObj = typeof element.dataset.fieldKey !== 'undefined'
             ? { id: element.dataset.sectionId, key: element.dataset.fieldKey }
             : JSON.parse(element.getAttribute('data'));
-
         const categoryId = String(dataObj.id);
         const fieldKey = dataObj.key || extractFieldKey(dataObj.obj);
+        const pill = element.closest('.field-pill');
+        const fieldNameElem = pill ? pill.querySelector('.field-name') : null;
+        const fieldLabel = fieldNameElem ? fieldNameElem.innerText.trim() : fieldKey;
+        deletedLabelsMap.set(fieldKey, fieldLabel);
 
         let wasJustAdded = false;
-
         showSaveBar();
 
         if (addedMap.has(categoryId)) {
@@ -127,31 +149,125 @@
             }
         }
 
-        const pill = element.closest('.field-pill');
+        // ЕСЛИ САЙДБАР ОТКРЫТ — отправляем удаленную форму туда сразу
+        if (isSidebarOpen()) {
+            const isCustom = fieldKey.startsWith('custom-');
+            addCardToSidebar(categoryId, fieldKey, fieldLabel, isCustom);
+        }
+
+        // Замена удаленного поля на пунктирную заглушку "+ Добавить поле"
         const placeholderId = 'slot-' + Math.random().toString(36).substr(2, 9);
         const placeholderHTML = `
-        <div id="${placeholderId}" class="placeholder-slot" onclick="openSidebarForSlot('${categoryId}', '${placeholderId}')">
-            + Добавить поле
-        </div>
+    <div id="${placeholderId}" class="placeholder-slot" onclick="openSidebarForSlot('${categoryId}', '${placeholderId}')">
+        + Добавить поле
+    </div>
     `;
 
         if (pill) {
             pill.outerHTML = placeholderHTML;
         }
+    }
 
+    // Функция, проверяющая, открыт ли сейчас сайдбар с ирелевантными формами?
+    function isSidebarOpen() {
+        const sidebar = document.getElementById('right-sidebar');
+        return sidebar && !sidebar.classList.contains('hidden');
+    }
+
+    // Динамическое добавление карточки в открытый сайдбар
+    function addCardToSidebar(categoryId, fieldKey, fieldLabel, isCustom = true) {
+        const container = document.getElementById('right-sidebar-content');
+        if (!container) return;
+
+        let sidebarBody = container.querySelector('.sidebar-body');
+        if (!sidebarBody) {
+            sidebarBody = container;
+        }
+        const placeholder = container.querySelector('p.placeholder-text');
+        if (placeholder && placeholder.innerText.includes('добавлены')) {
+            placeholder.remove();
+        }
+
+        // Проверка на дубликаты
+        const existing = sidebarBody.querySelector(`[data-sidebar-field-key="${fieldKey}"]`);
+        if (existing) return;
+
+        const card = document.createElement('div');
+        card.className = 'field-checkbox-card';
+        card.setAttribute('data-sidebar-field-key', fieldKey);
+        card.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer;';
+
+        const safeLabel = fieldLabel.replace(/'/g, "\\'");
+        card.setAttribute('onclick', `insertFieldIntoSlot('${categoryId}', '${fieldKey}', '${safeLabel}')`);
+
+        // Вызов функции DeleteCustomClick
+        const trashButtonHTML = isCustom ? `
+    <button type="button" 
+        class="btn btn-delete-custom-field" 
+        data-section-id="${fieldKey}"
+        data-field-key="${fieldKey}"
+        onclick="event.stopPropagation(); DeleteCustomClick(this);" 
+        title="Удалить форму навсегда"
+        style="background-color: #f1f3f5; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+        <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
+    </button>
+` : '';
+
+        card.innerHTML = `
+        <span class="field-label">${fieldLabel}</span>
+        ${trashButtonHTML}
+    `;
+
+        sidebarBody.appendChild(card);
+    }
+
+    function deleteCustomFieldFromSidebar(fieldKey, buttonElem) {
+        if (!confirm('Вы уверены, что хотите полностью удалить эту форму?')) {
+            return;
+        }
+
+        // Удаляем карточку из сайдбара
+        const card = buttonElem.closest('.field-checkbox-card');
+        if (card) {
+            card.remove();
+        }
+        htmx.ajax('POST', '{% url "form-editor" %}', {
+            swap: 'none',
+            values: {
+                'action': 'delete_custom_field',
+                'field_key': fieldKey,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            }
+        });
+    }
+
+    // Удаление карточки из сайдбара при её выборе
+    function removeCardFromSidebar(fieldKey) {
+        const container = document.getElementById('right-sidebar-content');
+        if (!container) return;
+
+        // Ищем карточку по data-атрибуту или onclick
+        const cards = container.querySelectorAll('.field-checkbox-card');
+        cards.forEach(card => {
+            if (card.getAttribute('data-sidebar-field-key') === fieldKey || card.getAttribute('onclick')?.includes(`'${fieldKey}'`)) {
+                card.remove();
+            }
+        });
+
+        // Если в сайдбаре больше не осталось полей — выводим сообщение
+        const remainingCards = container.querySelectorAll('.field-checkbox-card');
+        if (remainingCards.length === 0) {
+            container.innerHTML = '<p class="placeholder-text">Все доступные поля уже добавлены в эту секцию.</p>';
+        }
     }
 
     // Клик по пунктирному полю для выбора новой формы (Взаимодействие с определенным полем благодаря id`шнику в "Добавить поле +" )
     function openSidebarForSlot(categoryId, placeholderId) {
         activeSlotId = placeholderId;
         globalAddPosition = null;
-
         const currentTypeOfOrder = document.getElementById('type_of_order_selected').value;
         const deletedFormsForCategory = map.has(categoryId) ? map.get(categoryId) : [];
-
-        // ОБЯЗАТЕЛЬНО: объявляем переменную ДО её использования в htmx.ajax
         const activeFields = getActiveFieldsForCategory(categoryId);
-
         const sidebar = document.getElementById('right-sidebar');
         sidebar.classList.remove('hidden');
         document.getElementById('right-sidebar-content').innerHTML = '<p class="placeholder-text">Загрузка...</p>';
@@ -163,7 +279,7 @@
                 'type_of_order_selected': currentTypeOfOrder,
                 'objects_show': categoryId,
                 'deleted_forms_from_js': JSON.stringify(deletedFormsForCategory),
-                'active_fields': JSON.stringify(activeFields) // Используем объявление выше
+                'active_fields': JSON.stringify(activeFields)
             }
         });
     }
@@ -212,15 +328,15 @@
     function saveChanges() {
         const mapAsObject = Object.fromEntries(map);
         const addedMapAsObject = Object.fromEntries(addedMap);
-        const currentTypeOfOrder = document.getElementById('type_of_order_selected').value;
-
-        // Сбор текущих форм
+        const selectElem = document.querySelector('select[name="type_of_order_selected"]');
+        const hiddenInput = document.getElementById('type_of_order_selected');
+        const currentTypeOfOrder = (selectElem && selectElem.value)
+            ? selectElem.value
+            : (hiddenInput ? hiddenInput.value : '');
         let fieldsOrder = {};
         document.querySelectorAll('.fields-sortable-list').forEach(container => {
             let sectionId = container.getAttribute('data-section-id');
             let keys = [];
-
-            // Считывание ключей, обычных полей и пустышек
             container.querySelectorAll('.field-pill[data-key], .placeholder-slot[data-key]').forEach(item => {
                 let key = item.getAttribute('data-key');
                 if (key) {
@@ -231,7 +347,7 @@
             fieldsOrder[sectionId] = keys;
         });
 
-        // Отправка на сервер через ajax
+        // Отправка сохранений на сервер
         htmx.ajax('POST', '{% url "form-editor" %}', {
             swap: 'none',
             values: {
@@ -245,9 +361,14 @@
             map.clear();
             addedMap.clear();
             hideSaveBar();
-
-            // Перезагрузка участка страницы
-            window.location.reload();
+            closeSidebar();
+            if (currentTypeOfOrder) {
+                htmx.ajax('GET', '{% url "form-editor" %}', {
+                    target: '#show-data-forms',
+                    swap: 'innerHTML',
+                    values: { 'type_of_order_selected': currentTypeOfOrder }
+                });
+            }
         });
     }
 

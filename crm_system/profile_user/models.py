@@ -133,6 +133,7 @@ def get_dict_for_json_forms():
             'label' : 'Ориентировочная цена',
             'type' : 'select',
             'is_required' : False,
+            'hints' : [],
             'order' : 1
          },
          {
@@ -140,6 +141,7 @@ def get_dict_for_json_forms():
             'label' : 'Мастер',
             'type' : 'select',
             'is_required' : False,
+            'hints' : [],
             'order' : 2
          },
          {
@@ -147,6 +149,7 @@ def get_dict_for_json_forms():
             'label' : 'Менеджер',
             'type' : 'select',
             'is_required' : False,
+            'hints' : [],
             'order' : 3
          },
          {
@@ -154,6 +157,7 @@ def get_dict_for_json_forms():
             'label' : 'Комментарий приемщика',
             'type' : 'textarea',
             'is_required' : False,
+            'hints' : [],
             'order' : 4
          }
         ], 

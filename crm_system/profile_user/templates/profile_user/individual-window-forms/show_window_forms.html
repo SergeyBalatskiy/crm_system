@@ -3,12 +3,12 @@
 <div class="sidebar-body">
     {% for form in irrelevant_forms %}
     <div class="field-checkbox-card"
-        style="cursor: pointer; padding: 10px; border: 1px solid #ccc; margin-bottom: 8px; border-radius: 6px;"
+        style="cursor: pointer; padding: 10px; border: 1px solid #ccc; margin-bottom: 8px; border-radius: 6px; display: flex; align-items: center; justify-content: space-between;"
         onclick="insertFieldIntoSlot('{{ objects_show }}', '{{ form.field_key }}', '{{ form.label|default:form.field_key|escapejs }}')">
         <span class="field-label">{{ form.label|default:form.field_key }}</span>
         {% if form.custom_form %}
-        <button type="button" class="btn" data-section-id="{{ form.field_key }}" data-field-key="{{ form.field_key }}"
-            onclick="event.stopPropagation(); DeleteCustomClick(this);">
+        <button type="button" class="btn" style="margin-left: auto;" data-section-id="{{ form.field_key }}"
+            data-field-key="{{ form.field_key }}" onclick="event.stopPropagation(); DeleteCustomClick(this);">
             <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
         </button>
         {% endif %}
@@ -41,18 +41,21 @@
 
     var type_of_order_selected = "{{ type_of_order_selected }}"; // Здесь у меня нужный параметр  warranty
 
-    var listToAddDeletedForms = []
+    var listToAddDeletedForms = [] // Здесь у меня есть возможность удалить кастомные формы из БД
 
     function DeleteCustomClick(button) {
+        const isConfirmed = confirm('Вы уверены, что хотите полностью удалить эту форму?');
+        if (!isConfirmed) {
+            return; // Пользователь нажал "Отмена"
+        }
 
-        const fieldKey = button.dataset.sectionId; // Получаем 'field_key': 'custom-krytaya_forma....'
+        const fieldKey = button.dataset.sectionId;
 
-        listToAddDeletedForms.push(
-            fieldKey
-        );
+        listToAddDeletedForms.push(fieldKey);
 
-        console.log(type_of_order_selected)
+        console.log(type_of_order_selected);
 
+        // Отправка AJAX-запроса только после подтверждения
         htmx.ajax('POST', '{% url "delete-custom-form" %}', {
             values: {
                 'type_of_order_selected': type_of_order_selected,
@@ -63,12 +66,53 @@
         });
     }
 
-    // Функция, отвечающая за подсчет уже добавленных форм (+ пустышки)
+    // Функция очистки сайдбара от уже активных на доске полей
+    function filterSidebarActiveFields() {
+        const activeKeysOnBoard = new Set();
+        document.querySelectorAll('.fields-sortable-list .field-pill[data-key]').forEach(pill => {
+            const key = pill.getAttribute('data-key');
+            if (key) activeKeysOnBoard.add(key);
+        });
+        if (typeof addedMap !== 'undefined') {
+            addedMap.forEach(keysArr => {
+                keysArr.forEach(k => activeKeysOnBoard.add(k));
+            });
+        }
+        const sidebarCards = document.querySelectorAll('#right-sidebar-content .field-checkbox-card');
+        sidebarCards.forEach(card => {
+            let fieldKey = card.getAttribute('data-sidebar-field-key');
+            if (!fieldKey) {
+                const onclickAttr = card.getAttribute('onclick') || '';
+                const match = onclickAttr.match(/'([^']+)'/g);
+                if (match && match[1]) {
+                    fieldKey = match[1].replace(/'/g, '');
+                }
+            }
+            if (fieldKey && activeKeysOnBoard.has(fieldKey)) {
+                card.remove();
+            }
+        });
+    }
+    document.body.addEventListener('htmx:afterSwap', function (evt) {
+        if (evt.detail.target.id === 'right-sidebar-content') {
+            filterSidebarActiveFields();
+            if (typeof map !== 'undefined') {
+                map.forEach((deletedKeysArray, categoryId) => {
+                    deletedKeysArray.forEach(fieldKey => {
+                        const label = deletedLabelsMap.get(fieldKey) || fieldKey;
+                        const isCustom = fieldKey.startsWith('custom-');
+                        addCardToSidebar(categoryId, fieldKey, label, isCustom);
+                    });
+                });
+            }
+        }
+    });
+
+    // Функция, отвечающая за подсчет уже добавленных форм (+ "пустышки")
     function ensureTrailingPlaceholder(sectionId) {
         const container = document.getElementById(`sortable-${sectionId}`);
         if (!container) return;
         const items = container.querySelectorAll('.field-pill, .placeholder-slot');
-        // Если элементов нечетное количество — пустышка закидывается в правую колонку
         if (items.length % 2 !== 0) {
             const trailingSlot = document.createElement('div');
             trailingSlot.id = `slot-${sectionId}-trailing`;
@@ -79,8 +123,10 @@
             container.appendChild(trailingSlot);
         }
     }
-    // Выбор определенной формы и вставка из правого сайдбара
+    // Выбор определенной формы и вставка/удаление из правого сайдбара
     function insertFieldIntoSlot(categoryId, fieldKey, fieldLabel) {
+        removeCardFromSidebar(fieldKey);
+
         showSaveBar();
         // Логика map с получением и просчетом длинны
         let wasRestored = false;
@@ -113,19 +159,24 @@
         const modalUrl = `{% url 'get-individual-field-modal' %}?section_id=${categoryId}&field_key=${fieldKey}&type_of_order_selected=${typeOfOrder}&category=${categoryId}&field_label=${encodeURIComponent(fieldLabel)}`;
         // Отрисовка только что созданной, но еще не прошедшей сохранение формы
         const pillHTML = `
-        <div class="field-pill" data-key="${fieldKey}">
-            <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
-            <div class="outer-wrapper">
-                <span class="field-name">${fieldLabel}</span>
-                <button type="button" class="btn" data-section-id="${categoryId}" data-field-key="${fieldKey}" onclick="DeleteClick(this)">
-                    <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
-                </button>
-                <button type="button" class="btn" hx-get="${modalUrl}" hx-target="#center-modal-container" onclick="openFieldModal()" title="Настройки поля">
-                    <i class="fa fa-cogs" aria-hidden="true"></i>
-                </button>
-            </div>
+<div class="field-pill" data-key="${fieldKey}">
+    <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
+    <div class="outer-wrapper">
+        <span class="field-name">${fieldLabel}</span>
+        
+        <!-- Обертка, которая держит кнопки вместе у правого края -->
+        <div class="field-actions">
+            <button type="button" class="btn" data-section-id="${categoryId}" data-field-key="${fieldKey}" onclick="DeleteClick(this)">
+                <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
+            </button>
+            <button type="button" class="btn" hx-get="${modalUrl}" hx-target="#center-modal-container" onclick="openFieldModal()" title="Настройки поля">
+                <i class="fa fa-cogs" aria-hidden="true"></i>
+            </button>
         </div>
-    `;
+        
+    </div>
+</div>
+`;
         // Прячу текст "В этой секции пока нет активных полей"
         const emptyText = container.querySelector('.empty-section-placeholder');
         if (emptyText) emptyText.remove();

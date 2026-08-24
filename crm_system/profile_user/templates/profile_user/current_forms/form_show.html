@@ -8,9 +8,7 @@
             {{ objects_show.title }}
         </h2>
     </div>
-    <!-- Скрытое поле должно быть в ОДНОМ экземпляре вне цикла -->
     <input type="hidden" id="type_of_order_selected" value="{{ form_order.type_of_order }}">
-    <!-- Добавлен data-section-id в контейнер списка для SortableJS -->
     <div class="fields-sortable-list" id="sortable-{{ objects_show.id }}" data-section-id="{{ objects_show.id }}">
         {% for obj in objects_show.fields %}
         {% if obj.field_key == 'empty_for_add' %}
@@ -25,18 +23,21 @@
             <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
             <div class="outer-wrapper">
                 <span class="field-name">{{ obj.label }}</span>
-                <!-- Кнопка удаления -->
-                <button type="button" class="btn" data-section-id="{{ objects_show.id }}"
-                    data-field-key="{% if obj.field_key %}{{ obj.field_key }}{% else %}{{ obj }}{% endif %}"
-                    onclick="DeleteClick(this)">
-                    <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
-                </button>
-                <!-- Кнопка редактирования поля -->
-                <button type="button" class="btn"
-                    hx-get="{% url 'get-individual-field-modal' %}?section_id={{ objects_show.id }}&field_key={{ obj.field_key }}&type_of_order_selected={{ form_order.type_of_order }}&category={{ objects_show.id }}"
-                    hx-target="#center-modal-container" onclick="openFieldModal()" title="Настройки поля">
-                    <i class="fa fa-cogs" aria-hidden="true"></i>
-                </button>
+                <div class="field-actions">
+                    <!-- Кнопка удаления -->
+                    <button type="button" class="btn" data-section-id="{{ objects_show.id }}"
+                        data-field-key="{% if obj.field_key %}{{ obj.field_key }}{% else %}{{ obj }}{% endif %}"
+                        onclick="DeleteClick(this)">
+                        <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
+                    </button>
+
+                    <!-- Кнопка редактирования поля -->
+                    <button type="button" class="btn"
+                        hx-get="{% url 'get-individual-field-modal' %}?section_id={{ objects_show.id }}&field_key={{ obj.field_key }}&type_of_order_selected={{ form_order.type_of_order }}&category={{ objects_show.id }}"
+                        hx-target="#center-modal-container" onclick="openFieldModal()" title="Настройки поля">
+                        <i class="fa fa-cogs" aria-hidden="true"></i>
+                    </button>
+                </div>
             </div>
         </div>
         {% endif %}
@@ -51,22 +52,25 @@
         <div class="empty-section-placeholder">В этой секции пока нет активных полей</div>
         {% endfor %}
     </div>
+
     <!-- Кнопка "+" -->
     <div class="add-btn-wrapper">
         <div class="add-btn-container">
             <button type="button" class="btn-plus left"
                 hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=left&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-vals="js:{ active_fields: JSON.stringify(getActiveFieldsForCategory('{{ objects_show.id }}')) }"
-                hx-target="#right-sidebar-content" 
-                onclick="openSidebarGlobal('{{ objects_show.id }}', 'left')"
+                hx-vals="js:{ 
+                active_fields: JSON.stringify(getActiveFieldsForCategory('{{ objects_show.id }}')),
+                deleted_forms_from_js: JSON.stringify(getDeletedFieldsForCategory('{{ objects_show.id }}'))
+            }" hx-target="#right-sidebar-content" onclick="openSidebarGlobal('{{ objects_show.id }}', 'left')"
                 title="Добавить поле слева">
                 +
             </button>
             <button type="button" class="btn-plus right"
                 hx-get="{% url 'form-editor' %}?objects_show={{ objects_show.id }}&position=right&type_of_order_selected={{ form_order.type_of_order }}"
-                hx-vals="js:{ active_fields: JSON.stringify(getActiveFieldsForCategory('{{ objects_show.id }}')) }"
-                hx-target="#right-sidebar-content" 
-                onclick="openSidebarGlobal('{{ objects_show.id }}', 'right')"
+                hx-vals="js:{ 
+                active_fields: JSON.stringify(getActiveFieldsForCategory('{{ objects_show.id }}')),
+                deleted_forms_from_js: JSON.stringify(getDeletedFieldsForCategory('{{ objects_show.id }}'))
+            }" hx-target="#right-sidebar-content" onclick="openSidebarGlobal('{{ objects_show.id }}', 'right')"
                 title="Добавить поле справа">
                 +
             </button>
@@ -77,15 +81,22 @@
 {% endfor %}
 
 <script>
-    // Для точного отслеживания взаимодействия на добавление форм
     var activeSlotId = null;       // Если кликнули по пунктиру
     var globalAddPosition = null;  // 'left' или 'right', если кликнули по нижним плюсам
+
+    // Показывает удаленные категории (для того чтобы при нажатии на "Добавить слева/справа
+    // у меня показывались не только те формы, которые не существуют в БД, но еще и те, которые
+    // удалены, но не отправлены на сохранение")
+    function getDeletedFieldsForCategory(categoryId) {
+        const id = String(categoryId);
+        return map.has(id) ? map.get(id) : [];
+    }
 
     // Функция сбора ключей полей, которые СЕЙЧАС находятся в DOM для данной категории
     function getActiveFieldsForCategory(categoryId) {
         const keys = [];
         const container = document.querySelector(`.fields-sortable-list[data-section-id="${categoryId}"]`);
-        
+
         if (container) {
             container.querySelectorAll('.field-pill[data-key], .placeholder-slot[data-key]').forEach(item => {
                 const key = item.getAttribute('data-key');
@@ -97,7 +108,6 @@
         return keys; // вернет массив, например: ["phone", "email"]
     }
 
-    // Твоя функция
     function openSidebarGlobal(categoryId, position) {
         activeSlotId = null;
         globalAddPosition = position;
@@ -160,12 +170,11 @@
                     })
                     .filter(key => key !== null);
 
-                // Формируем объект, который ожидает бэкенд: { "2": ["key1", "empty_for_add", ...] }
                 const fieldsOrder = {
                     [sectionId]: orderedKeys
                 };
 
-                // 3. Отправка ajax POST метода с отформатированным ранее fieldsOrder
+                // Отправка ajax POST метода с отформатированным ранее fieldsOrder
                 htmx.ajax('POST', '{% url "form-editor" %}', {
                     swap: 'none',
                     values: {

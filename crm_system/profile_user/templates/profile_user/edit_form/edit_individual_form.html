@@ -1,29 +1,24 @@
 <!-- # edit_individual_form.html -->
+<h3 style="margin-top: 0; margin-bottom: 16px;">Настройки поля</h3>
 
-<form hx-post="{% url 'get-individual-field-modal' %}" hx-swap="none" class="individual_window">
+<form hx-post="{% url 'get-individual-field-modal' %}" hx-swap="none" hx-on::after-request="closeFieldModal()"
+    class="individual_window">
 
     {% csrf_token %}
 
-    <!-- Передаем скрытые параметры прямо в форме -->
-    <!-- Тип заказа -->
     <input type="hidden" name="type_of_order_selected" value="{{ type_of_order_selected }}">
-    <!-- Категория -->
     <input type="hidden" name="category" value="{{ category }}">
-    <!-- Название только самого поля (phone, master etc) -->
     <input type="hidden" name="field_key" value="{{ individual_form.field_key }}">
-
-    <!-- Скрытое поле с названием на русском -->
     <input type="hidden" name="field_label" value="{{ individual_form.label }}">
 
+    <label style="font-weight: 600; font-size: 18px; color: #000000;">Авто-ответы:</label>
 
     <div class="place_ind_hints" id="hints-container">
         {% for one_hint in individual_form.hints %}
         <div class="hint-row">
             <input type="text" name="hints" value="{{ one_hint }}">
-
-            <!-- Кнопка "Удалить" -->
-            <button type='button' onclick="deleteCurrentHint(this)" value="{{ one_hint }}">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+            <button type="button" onclick="deleteCurrentHint(this)">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor"
                     class="bi bi-dash-square" style="color: rgb(248, 0, 0);" viewBox="0 0 16 16">
                     <path
                         d="M14 1a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z" />
@@ -34,26 +29,28 @@
         {% endfor %}
     </div>
 
-    <!-- Кнопка отправки авто-ответов -->
-    <button type="submit">Сохранить</button>
+    <!-- Кнопка добавления нового автоответа -->
+    <button type="button" onclick="addHintInput()"
+        style="display: inline-flex; align-items: center; gap: 6px; background: none; border: none; color: #7445e1; cursor: pointer; padding: 0; font-weight: 500; margin-bottom: 12px;">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus"
+            viewBox="0 0 16 16">
+            <path fill-rule="evenodd"
+                d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z" />
+            <path
+                d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
+            <path
+                d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
+        </svg>
+        <span style="color: #7445e1;">Создать автоответ</span>
+    </button>
 
+    <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 12px;">
+        <button type="button" onclick="closeFieldModal()"
+            style="padding: 8px 16px; border-radius: 6px; border: 1px solid #d1d5db; background: #fff; cursor: pointer;">Отмена</button>
+        <button type="submit"
+            style="padding: 8px 16px; border-radius: 6px; border: none; background: #7445e1; color: white; cursor: pointer;">Сохранить</button>
+    </div>
 </form>
-
-<!-- Кнопка добавления авто-ответов -->
-<button type='button' onclick="addHintInput()">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-clipboard-plus"
-        viewBox="0 0 16 16">
-        <path fill-rule="evenodd"
-            d="M8 7a.5.5 0 0 1 .5.5V9H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V10H6a.5.5 0 0 1 0-1h1.5V7.5A.5.5 0 0 1 8 7z" />
-        <path
-            d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z" />
-        <path
-            d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z" />
-    </svg>
-
-    <!-- Затем идет сам текст кнопки -->
-    <span>Создать автоответ</span>
-</button>
 
 <script>
 
@@ -74,7 +71,7 @@
         row.className = 'hint-row';
         row.style.cssText = 'display: flex; align-items: center; gap: 5px; margin-bottom: 5px;';
 
-        // 2. Создаю новый обьект который добавится в hints
+        // Создаю новый обьект который добавится в hints
         const newInput = document.createElement('input');
         newInput.type = 'text';
         newInput.name = 'hints';
@@ -103,4 +100,10 @@
 
         newInput.focus();
     }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeFieldModal();
+        }
+    });
 </script>

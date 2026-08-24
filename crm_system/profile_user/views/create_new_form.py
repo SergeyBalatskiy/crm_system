@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from profile_user.models import FormsForOrder
 from slugify import slugify
 import json
+from django.contrib import messages
 
 # Класс, который позволяет создать новую форму
 @method_decorator(login_required(), name='dispatch')
@@ -43,9 +44,9 @@ class CreateNewFormInCategory(TemplateView):
 
         if checkbox1:
             cur_type = 'text'
-        elif checkbox2:
+        if checkbox2:
             cur_type = 'checkbox'
-        else:
+        if checkbox3:
             cur_type = 'textarea'
 
         # Поле обязательно?
@@ -57,26 +58,35 @@ class CreateNewFormInCategory(TemplateView):
         # Получаю обьект из БД
         order_information = FormsForOrder.objects.filter(type_of_order = type_of_order_selected, user = self.request.user).first()
 
-        print('Пришел обьект', type_of_order_selected )
         # Беру JSON определенного типа заказа и для удобства записываю в переменную
         json_models_data = order_information.json_forms
 
         for section in json_models_data.get('sections', []):
                     if section['id'] == category:
                         lst_for_add_category = section['custom_forms']
-                        lst_for_add_category.append({'field_key' : f'custom-{slugify(label)}', 'label' : label, 'type' : cur_type, 'is_required' : is_required, 'order': len(lst_for_add_category)+1, 'custom_form' : 'True'})
-                        order_information.json_forms = json_models_data
-                        order_information.save()
-        
-                        # Для GET запроса
-                        objects_show = category
-                        args_for_get_trigger = {
-                        "formCreated": {
-                            "objects_show": objects_show,
-                            "type_of_order_selected": type_of_order_selected
-                        }
-                    }
-                        response = HttpResponse("")
-                        response["HX-Trigger"] = json.dumps(args_for_get_trigger)
-                        return response
+                        for custom_form in lst_for_add_category:
+                            if custom_form['label'] == label:
+                                messages.error(request, 'Название с такой формой уже существует!')
+                                print('Сработал только этот блок!')
+                                return render(request, self.create_individual_form, {'type_of_order_selected' : type_of_order_selected, 'category': category })
+                        else:
+                            try:
+                                lst_for_add_category.append({'field_key' : f'custom-{slugify(label)}', 'label' : label, 'type' : cur_type, 'is_required' : is_required, 'order': len(lst_for_add_category)+1, 'custom_form' : 'True'})
+                                order_information.json_forms = json_models_data
+                                order_information.save()
+                                # Для GET запроса
+                                objects_show = category
+                                args_for_get_trigger = {
+                                "formCreated": {
+                                    "objects_show": objects_show,
+                                    "type_of_order_selected": type_of_order_selected
+                                }
+                            }
+                                response = HttpResponse("")
+                                response["HX-Trigger"] = json.dumps(args_for_get_trigger)
+                                return response
+                            except:
+                                messages.error(request, 'Необходимо выбрать тип формы!')
+                                return render(request, self.create_individual_form, {'type_of_order_selected' : type_of_order_selected, 'category': category })
+                                 
 

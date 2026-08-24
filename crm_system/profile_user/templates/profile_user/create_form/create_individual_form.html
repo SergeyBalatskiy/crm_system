@@ -2,22 +2,27 @@
 <link rel="stylesheet" href="{% static 'profile_user/css/create_individual_form.css' %}">
 
 <div class="modal-overlay">
-    <form hx-post="{% url 'create-new-form' %}" 
-          hx-swap="none" 
-          class="individual_window" 
-          hx-on::after-request="document.getElementById('show_new_form_create').innerHTML = ''">
+    <form hx-post="{% url 'create-new-form' %}" hx-target="#show_new_form_create" hx-swap="innerHTML"
+        class="individual_window">
         {% csrf_token %}
-        
-        <!-- Шапка с крестиком -->
         <div class="modal-header">
             <h3>Создать новую форму</h3>
-            <button type="button" class="btn-close-modal" onclick="document.getElementById('show_new_form_create').innerHTML = ''">✕</button>
+            <button type="button" class="btn-close-modal"
+                onclick="document.getElementById('show_new_form_create').innerHTML = ''">✕</button>
         </div>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+        </div>
+        {% endfor %}
+        {% endif %}
 
         <!-- Скрытые параметры -->
         <input type="hidden" name="type_of_order_selected" value="{{ type_of_order_selected }}">
         <input type="hidden" name="category" value="{{ category }}">
-        
+
         <!-- Поля формы -->
         <div>
             <label style="font-size: 0.85rem; color: #64748b; display: block; margin-bottom: 4px;">Название поля</label>
@@ -57,5 +62,10 @@
         document.getElementById('checkbox1').checked = false;
         document.getElementById('checkbox2').checked = false;
         event.target.checked = true;
+    });
+
+    document.body.addEventListener('closeModal', function () {
+        // Очистка контейнера
+        document.getElementById('show_new_form_create').innerHTML = '';
     });
 </script>
