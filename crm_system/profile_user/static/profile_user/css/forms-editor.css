@@ -161,19 +161,18 @@
 
 .add-btn-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     background-color: #f8fafc;
     border: 1px dashed #cbd5e1;
     border-radius: 8px;
     height: 38px;
-    transition: all 0.25s ease;
+    padding: 0 20px;
+    transition: background-color 0.25s ease, border-color 0.25s ease;
 }
 
 .add-btn-container:hover {
     background-color: #f1f5f9;
-    justify-content: space-between;
-    padding: 0 20px;
     border-style: solid;
 }
 
@@ -184,7 +183,7 @@
     font-weight: bold;
     color: #64748b;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
 }
 
 .btn-plus.left,
@@ -364,7 +363,6 @@
     flex-shrink: 0;
 }
 
-/* Затемняющий оверлей с размытием */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -372,11 +370,8 @@
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.4);
-    /* Полупрозрачное затемнение */
     backdrop-filter: blur(8px);
-    /* Эффект размытия заднего фона */
     -webkit-backdrop-filter: blur(8px);
-    /* Поддержка Safari */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -385,12 +380,10 @@
     transition: opacity 0.25s ease-in-out;
 }
 
-/* Скрытие модального окна */
 .modal-overlay.hidden {
     display: none !important;
 }
 
-/* Белая карточка модального окна */
 .modal-card {
     background: #ffffff;
     border-radius: 12px;
@@ -404,7 +397,6 @@
     box-sizing: border-box;
 }
 
-/* Кнопка-крестик */
 .modal-close-btn {
     position: absolute;
     top: 14px;
@@ -458,4 +450,99 @@
     text-align: center;
     width: 100%;
     margin: 0 0 20px 0;
+}
+
+.form-editor-place {
+    width: 100%;
+    height: 100%;
+}
+
+.editor-page-wrapper-box {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 13px 13px 13px rgba(0, 0, 0, 0.364);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: left;
+    overflow-y: auto;
+}
+
+.editor-page-wrapper-box>* {
+    width: 100%;
+}
+
+.editor-page-wrapper-box h1 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #512da8;
+}
+
+.navigation-form-select label {
+    font-size: 19px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.navigation-form-select .custom-select {
+    padding: 7px 32px 7px 14px;
+    font-size: 18px;
+    color: #1a1a1a;
+    background-color: #ffffff;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.editor-page-layout {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    align-items: flex-start;
+}
+
+.builder-main-content {
+    flex: 0 0 78%;
+    max-width: 78%;
+    width: 78% !important;
+}
+
+.right-sidebar {
+    flex: 1;
+    width: auto !important;
+    max-width: none !important;
+}
+
+.new_individual_form {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #7445e1;
+    color: #ffffff !important;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+
+.new_individual_form:hover {
+    background-color: #623bbd;
+}
+
+.new_individual_form svg {
+    flex-shrink: 0;
+    fill: currentColor;
 }

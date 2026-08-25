@@ -70,5 +70,4 @@ class ShowDocumentView(TemplateView):
         # Если метод получения информации без HTMX, то сначала необходимо загрузить форму (только 1 раз)
         # потом отобразить текст и скрыто передать форму для "фальстарта"
         form = DocumentInfoForm()
-        html_fragment = "Пока что вы не выбрали ни одну форму"
-        return render(request, self.template_name, {'message': html_fragment, 'tiny_mce': form } )
+        return render(request, self.template_name, {'tiny_mce': form } )

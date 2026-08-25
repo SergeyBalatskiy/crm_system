@@ -6,7 +6,7 @@ from .garanty import ShowGarantyView
 from .profile import UserProfileView
 from .service_info import ServiceInfoView
 from .tinymce import ShowDocumentView
-from .workers_info import WorkersAddView
+from .workers import WorkersAddView
 from .forms_for_orders import FormsForOrdersEdit
 from .get_individual_field_modal import EditIndividualCenterForm
 from .create_new_form import CreateNewFormInCategory

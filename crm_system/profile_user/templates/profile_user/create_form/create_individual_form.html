@@ -1,7 +1,7 @@
 {% load static %}
-<link rel="stylesheet" href="{% static 'profile_user/css/create_individual_form.css' %}">
+<script src="{% static 'profile_user/js/create_individual_form.js' %}" defer></script>
 
-<div class="modal-overlay">
+<div class="create-modal-overlay">
     <form hx-post="{% url 'create-new-form' %}" hx-target="#show_new_form_create" hx-swap="innerHTML"
         class="individual_window">
         {% csrf_token %}
@@ -44,28 +44,3 @@
         <button type="submit">Создать</button>
     </form>
 </div>
-
-<script>
-    document.getElementById('checkbox1').addEventListener('click', function (event) {
-        document.getElementById('checkbox2').checked = false;
-        document.getElementById('checkbox3').checked = false;
-        event.target.checked = true;
-    });
-
-    document.getElementById('checkbox2').addEventListener('click', function (event) {
-        document.getElementById('checkbox1').checked = false;
-        document.getElementById('checkbox3').checked = false;
-        event.target.checked = true;
-    });
-
-    document.getElementById('checkbox3').addEventListener('click', function (event) {
-        document.getElementById('checkbox1').checked = false;
-        document.getElementById('checkbox2').checked = false;
-        event.target.checked = true;
-    });
-
-    document.body.addEventListener('closeModal', function () {
-        // Очистка контейнера
-        document.getElementById('show_new_form_create').innerHTML = '';
-    });
-</script>

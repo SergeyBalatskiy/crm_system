@@ -1,5 +1,5 @@
-from auth_registration.views import RegisterView, CustomLoginView, ShowForm
 from django.urls import path
+from .views import *
 
 urlpatterns = [
     # Ргеистрация пользователя

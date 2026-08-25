@@ -3,384 +3,69 @@
 {% load static %}
 
 {% block content %}
+<script>
+    window.FORM_EDITOR_URL = "{% url 'form-editor' %}";
+</script>
 <link rel="stylesheet" href="{% static 'profile_user/css/forms-editor.css' %}">
+<script src="{% static 'profile_user/js/forms-editor.js' %}" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+<div class="form-editor-place">
+    <div class="editor-page-wrapper-box">
+        <h1>Редактор форм</h1>
+        <form method="get" class="navigation-form-select">
+            <label for="page-select">Тип формы заказов:</label>
+            <select class="custom-select" name="type_of_order_selected" hx-trigger="change" hx-target="#show-data-forms"
+                hx-get="{% url 'form-editor' %}" hx-swap="innerHTML">
+                <option value="" disabled selected hidden>Выберите тип заказа...</option>
+                <option value="paid">Платный ремонт</option>
+                <option value="warranty">Гарантийный ремонт</option>
+            </select>
+        </form>
 
-<div class="editor-page-wrapper">
-    <form method="get" class="navigation-form-select">
-        <label for="page-select">Тип формы заказов:</label>
-        <select class="custom-select" name="type_of_order_selected" hx-trigger="change" hx-target="#show-data-forms"
-            hx-get="{% url 'form-editor' %}" hx-swap="innerHTML">
-            <option value="" disabled selected hidden>Выберите тип заказа...</option>
-            <option value="paid">Платный ремонт</option>
-            <option value="warranty">Гарантийный ремонт</option>
-        </select>
-    </form>
-    <div id="welcome-message">
-        {% if message %}
-        <div class="info-alert">{{ message }}</div>
-        {% endif %}
-    </div>
+        <div id="show_new_form_create"></div>
 
-    <div id="show_new_form_create"></div>
-
-    <div class="editor-page-layout">
-        <div class="builder-main-content">
-            <div id="show-data-forms" class="builder-container">
-                {% include "profile_user/current_forms/form_show.html" %}
+        <div class="editor-page-layout">
+            <div class="builder-main-content">
+                <div id="show-data-forms" class="builder-container">
+                    {% include "profile_user/current_forms/form_show.html" %}
+                </div>
             </div>
-        </div>
-        <aside id="right-sidebar" class="right-sidebar hidden">
-            <div class="sidebar-header">
-                <h3>Доступные поля</h3>
-                <button type="button" class="btn-close-sidebar" onclick="closeSidebar()">✕</button>
-            </div>
-            <div id="right-sidebar-content" hx-get="{% url 'form-editor' %}" hx-trigger="formCreated from:body" hx-vals='js:{
+            <aside id="right-sidebar" class="right-sidebar hidden">
+                <div class="sidebar-header">
+                    <h3>Доступные поля</h3>
+                    <button type="button" class="btn-close-sidebar" onclick="closeSidebar()">✕</button>
+                </div>
+                <div id="right-sidebar-content" hx-get="{% url 'form-editor' %}" hx-trigger="formCreated from:body"
+                    hx-vals='js:{
          objects_show: event?.detail?.objects_show || "",
          type_of_order_selected: event?.detail?.type_of_order_selected || ""
      }'>
-                {% include "profile_user/individual-window-forms/show_window_forms.html" %}
-                <p class="placeholder-text">Нажмите «+» в нужной секции, чтобы выбрать поле.</p>
-            </div>
-        </aside>
+                    {% include "profile_user/individual-window-forms/show_window_forms.html" %}
+                    <p class="placeholder-text">Нажмите «+» в нужной секции, чтобы выбрать поле.</p>
+                </div>
+            </aside>
+        </div>
+    </div>
+    <div id="bottom-save-bar" class="bottom-save-bar hidden">
+        <div class="save-bar-content">
+            <button class="btn btn-primary" onclick="saveChanges()">Сохранить</button>
+
+            <!-- Обновленная кнопка Отмена -->
+            <button type="button" class="btn btn-danger" onclick="cancelChanges()">
+                Отмена
+            </button>
+
+            <span class="save-bar-text">Форма была изменена.</span>
+        </div>
+    </div>
+
+    <!-- Оверлей модального окна для настройки авто-ответов -->
+    <div id="field-settings-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeFieldModal()">
+        <div class="modal-card">
+            <button type="button" class="modal-close-btn" onclick="closeFieldModal()">&times;</button>
+            <div id="center-modal-container"></div>
+        </div>
     </div>
 </div>
-<div id="bottom-save-bar" class="bottom-save-bar hidden">
-    <div class="save-bar-content">
-        <button class="btn btn-primary" onclick="saveChanges()">Сохранить</button>
 
-        <!-- Обновленная кнопка Отмена -->
-        <button type="button" class="btn btn-danger" onclick="cancelChanges()">
-            Отмена
-        </button>
-
-        <span class="save-bar-text">Форма была изменена.</span>
-    </div>
-</div>
-
-<!-- Оверлей модального окна для настройки авто-ответов -->
-<div id="field-settings-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeFieldModal()">
-    <div class="modal-card">
-        <button type="button" class="modal-close-btn" onclick="closeFieldModal()">&times;</button>
-        <div id="center-modal-container"></div>
-    </div>
-</div>
-
-<script>
-
-    // 1. Создаем глобальный словарь для запоминания названий удаленных полей
-    const deletedLabelsMap = new Map();
-
-    function cancelChanges() {
-        map.clear();
-        addedMap.clear();
-        closeSidebar();
-        hideSaveBar();
-        const selectElem = document.querySelector('select[name="type_of_order_selected"]');
-        const hiddenInput = document.getElementById('type_of_order_selected');
-        const selectedType = (selectElem && selectElem.value)
-            ? selectElem.value
-            : (hiddenInput ? hiddenInput.value : '');
-        if (selectedType) {
-            htmx.ajax('GET', '{% url "form-editor" %}', {
-                target: '#show-data-forms',
-                swap: 'innerHTML',
-                values: { 'type_of_order_selected': selectedType }
-            });
-        }
-    }
-
-    function hideSaveBar() {
-        document.getElementById('bottom-save-bar').classList.add('hidden');
-    }
-
-    // Хранилище УДАЛЕННЫХ полей: { categoryId: ['manager', 'color'] }
-    const map = new Map();
-    const addedMap = new Map();
-    function extractFieldKey(rawObj) {
-        if (typeof rawObj === 'string') {
-            const match = rawObj.match(/['"]field_key['"]\s*:\s*['"]([^'"]+)['"]/);
-            if (match) {
-                return match[1]; // Вернет чистое слово, например "manager"
-            }
-            return rawObj;
-        } else if (typeof rawObj === 'object' && rawObj !== null) {
-            return rawObj.field_key || rawObj;
-        }
-        return rawObj;
-    }
-
-    // Функция кнопки удаления (красная корзина)
-    // Удаление (после saveChanges() итоговая отправка действующих форм)
-    function DeleteClick(element) {
-        const dataObj = typeof element.dataset.fieldKey !== 'undefined'
-            ? { id: element.dataset.sectionId, key: element.dataset.fieldKey }
-            : JSON.parse(element.getAttribute('data'));
-        const categoryId = String(dataObj.id);
-        const fieldKey = dataObj.key || extractFieldKey(dataObj.obj);
-        const pill = element.closest('.field-pill');
-        const fieldNameElem = pill ? pill.querySelector('.field-name') : null;
-        const fieldLabel = fieldNameElem ? fieldNameElem.innerText.trim() : fieldKey;
-        deletedLabelsMap.set(fieldKey, fieldLabel);
-
-        let wasJustAdded = false;
-        showSaveBar();
-
-        if (addedMap.has(categoryId)) {
-            let addedArr = addedMap.get(categoryId);
-            const initialLength = addedArr.length;
-
-            addedArr = addedArr.filter(key => key !== fieldKey);
-            addedMap.set(categoryId, addedArr);
-
-            if (addedArr.length < initialLength) {
-                wasJustAdded = true;
-            }
-        }
-
-        if (!wasJustAdded) {
-            if (map.has(categoryId)) {
-                const existingArray = map.get(categoryId);
-                if (!existingArray.includes(fieldKey)) {
-                    existingArray.push(fieldKey);
-                }
-            } else {
-                map.set(categoryId, [fieldKey]);
-            }
-        }
-
-        // ЕСЛИ САЙДБАР ОТКРЫТ — отправляем удаленную форму туда сразу
-        if (isSidebarOpen()) {
-            const isCustom = fieldKey.startsWith('custom-');
-            addCardToSidebar(categoryId, fieldKey, fieldLabel, isCustom);
-        }
-
-        // Замена удаленного поля на пунктирную заглушку "+ Добавить поле"
-        const placeholderId = 'slot-' + Math.random().toString(36).substr(2, 9);
-        const placeholderHTML = `
-    <div id="${placeholderId}" class="placeholder-slot" onclick="openSidebarForSlot('${categoryId}', '${placeholderId}')">
-        + Добавить поле
-    </div>
-    `;
-
-        if (pill) {
-            pill.outerHTML = placeholderHTML;
-        }
-    }
-
-    // Функция, проверяющая, открыт ли сейчас сайдбар с ирелевантными формами?
-    function isSidebarOpen() {
-        const sidebar = document.getElementById('right-sidebar');
-        return sidebar && !sidebar.classList.contains('hidden');
-    }
-
-    // Динамическое добавление карточки в открытый сайдбар
-    function addCardToSidebar(categoryId, fieldKey, fieldLabel, isCustom = true) {
-        const container = document.getElementById('right-sidebar-content');
-        if (!container) return;
-
-        let sidebarBody = container.querySelector('.sidebar-body');
-        if (!sidebarBody) {
-            sidebarBody = container;
-        }
-        const placeholder = container.querySelector('p.placeholder-text');
-        if (placeholder && placeholder.innerText.includes('добавлены')) {
-            placeholder.remove();
-        }
-
-        // Проверка на дубликаты
-        const existing = sidebarBody.querySelector(`[data-sidebar-field-key="${fieldKey}"]`);
-        if (existing) return;
-
-        const card = document.createElement('div');
-        card.className = 'field-checkbox-card';
-        card.setAttribute('data-sidebar-field-key', fieldKey);
-        card.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; margin-bottom: 8px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer;';
-
-        const safeLabel = fieldLabel.replace(/'/g, "\\'");
-        card.setAttribute('onclick', `insertFieldIntoSlot('${categoryId}', '${fieldKey}', '${safeLabel}')`);
-
-        // Вызов функции DeleteCustomClick
-        const trashButtonHTML = isCustom ? `
-    <button type="button" 
-        class="btn btn-delete-custom-field" 
-        data-section-id="${fieldKey}"
-        data-field-key="${fieldKey}"
-        onclick="event.stopPropagation(); DeleteCustomClick(this);" 
-        title="Удалить форму навсегда"
-        style="background-color: #f1f3f5; border: none; padding: 6px 10px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
-        <i class="fa-solid fa-trash" style="color: rgb(248, 0, 0);"></i>
-    </button>
-` : '';
-
-        card.innerHTML = `
-        <span class="field-label">${fieldLabel}</span>
-        ${trashButtonHTML}
-    `;
-
-        sidebarBody.appendChild(card);
-    }
-
-    function deleteCustomFieldFromSidebar(fieldKey, buttonElem) {
-        if (!confirm('Вы уверены, что хотите полностью удалить эту форму?')) {
-            return;
-        }
-
-        // Удаляем карточку из сайдбара
-        const card = buttonElem.closest('.field-checkbox-card');
-        if (card) {
-            card.remove();
-        }
-        htmx.ajax('POST', '{% url "form-editor" %}', {
-            swap: 'none',
-            values: {
-                'action': 'delete_custom_field',
-                'field_key': fieldKey,
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            }
-        });
-    }
-
-    // Удаление карточки из сайдбара при её выборе
-    function removeCardFromSidebar(fieldKey) {
-        const container = document.getElementById('right-sidebar-content');
-        if (!container) return;
-
-        // Ищем карточку по data-атрибуту или onclick
-        const cards = container.querySelectorAll('.field-checkbox-card');
-        cards.forEach(card => {
-            if (card.getAttribute('data-sidebar-field-key') === fieldKey || card.getAttribute('onclick')?.includes(`'${fieldKey}'`)) {
-                card.remove();
-            }
-        });
-
-        // Если в сайдбаре больше не осталось полей — выводим сообщение
-        const remainingCards = container.querySelectorAll('.field-checkbox-card');
-        if (remainingCards.length === 0) {
-            container.innerHTML = '<p class="placeholder-text">Все доступные поля уже добавлены в эту секцию.</p>';
-        }
-    }
-
-    // Клик по пунктирному полю для выбора новой формы (Взаимодействие с определенным полем благодаря id`шнику в "Добавить поле +" )
-    function openSidebarForSlot(categoryId, placeholderId) {
-        activeSlotId = placeholderId;
-        globalAddPosition = null;
-        const currentTypeOfOrder = document.getElementById('type_of_order_selected').value;
-        const deletedFormsForCategory = map.has(categoryId) ? map.get(categoryId) : [];
-        const activeFields = getActiveFieldsForCategory(categoryId);
-        const sidebar = document.getElementById('right-sidebar');
-        sidebar.classList.remove('hidden');
-        document.getElementById('right-sidebar-content').innerHTML = '<p class="placeholder-text">Загрузка...</p>';
-
-        htmx.ajax('GET', '{% url "form-editor" %}', {
-            target: '#right-sidebar-content',
-            swap: 'innerHTML',
-            values: {
-                'type_of_order_selected': currentTypeOfOrder,
-                'objects_show': categoryId,
-                'deleted_forms_from_js': JSON.stringify(deletedFormsForCategory),
-                'active_fields': JSON.stringify(activeFields)
-            }
-        });
-    }
-
-    function initSortable(container) {
-        new Sortable(container, {
-            animation: 0,
-            handle: '.drag-handle',
-            ghostClass: 'sortable-ghost',
-            filter: '.empty-grid-slot',
-            preventOnFilter: false,
-            swap: true,
-            swapClass: 'sortable-swap-highlight',
-
-            onEnd: function (evt) {
-                const sectionCard = evt.to.closest('.section-card');
-                const sectionId = sectionCard.id;
-
-                const orderedKeys = Array.from(evt.to.querySelectorAll('.field-pill, .placeholder-slot'))
-                    .map(item => item.getAttribute('data-key'))
-                    .filter(key => key !== null);
-
-                htmx.ajax('POST', '{% url "form-editor" %}', {
-                    swap: 'none',
-                    values: {
-                        'ordered_keys': JSON.stringify(orderedKeys),
-                        'section_id': sectionId,
-                        'type_of_order_selected': '{{ form_order.type_of_order }}',
-                        'csrfmiddlewaretoken': '{{ csrf_token }}'
-                    }
-                });
-            }
-        });
-    }
-
-    // Этот ВАЖНЫЙ кусок кода отвечает за грамотное взаимодействие между Динамическим отображением форм(в реальном времени, благодаря HTMX) и SortableJS
-    htmx.onLoad(function (target) {
-        if (target.classList && target.classList.contains('fields-sortable-list')) {
-            initSortable(target);
-        } else {
-            target.querySelectorAll('.fields-sortable-list').forEach(initSortable);
-        }
-    });
-
-    // Кнопка сохранения изменений на сервер
-    function saveChanges() {
-        const mapAsObject = Object.fromEntries(map);
-        const addedMapAsObject = Object.fromEntries(addedMap);
-        const selectElem = document.querySelector('select[name="type_of_order_selected"]');
-        const hiddenInput = document.getElementById('type_of_order_selected');
-        const currentTypeOfOrder = (selectElem && selectElem.value)
-            ? selectElem.value
-            : (hiddenInput ? hiddenInput.value : '');
-        let fieldsOrder = {};
-        document.querySelectorAll('.fields-sortable-list').forEach(container => {
-            let sectionId = container.getAttribute('data-section-id');
-            let keys = [];
-            container.querySelectorAll('.field-pill[data-key], .placeholder-slot[data-key]').forEach(item => {
-                let key = item.getAttribute('data-key');
-                if (key) {
-                    keys.push(key);
-                }
-            });
-
-            fieldsOrder[sectionId] = keys;
-        });
-
-        // Отправка сохранений на сервер
-        htmx.ajax('POST', '{% url "form-editor" %}', {
-            swap: 'none',
-            values: {
-                'type_of_order_selected': currentTypeOfOrder,
-                'list_deleted_forms': JSON.stringify(mapAsObject),
-                'list_added_forms': JSON.stringify(addedMapAsObject),
-                'fields_order': JSON.stringify(fieldsOrder),
-                'csrfmiddlewaretoken': '{{ csrf_token }}'
-            }
-        }).then(() => {
-            map.clear();
-            addedMap.clear();
-            hideSaveBar();
-            closeSidebar();
-            if (currentTypeOfOrder) {
-                htmx.ajax('GET', '{% url "form-editor" %}', {
-                    target: '#show-data-forms',
-                    swap: 'innerHTML',
-                    values: { 'type_of_order_selected': currentTypeOfOrder }
-                });
-            }
-        });
-    }
-
-    // Сортировщик, который распределяет правильно формы
-    function initSortables() {
-    }
-    document.addEventListener('DOMContentLoaded', initSortables);
-    document.body.addEventListener('htmx:afterSwap', function (evt) {
-        if (evt.detail.target.id === 'show-data-forms') {
-            initSortables();
-        }
-    });
-
-</script>
 {% endblock %}

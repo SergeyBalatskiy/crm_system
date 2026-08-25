@@ -2,6 +2,8 @@
 {% load static %}
 
 {% block content %}
+
+<link rel="stylesheet" href="{% static 'profile_user/css/tinymce.css' %}">
 <form method="get" class="navigation-select">
     <label for="page-select">Выберите документ</label>
     <select id="page-select" onchange="location.href=this.value;">
@@ -14,7 +16,7 @@
         <option value="{% url 'cancell_doc' %}" disabled selected>Акт о отказе</option>
         <!-- # Отвечает за показ АКТА О ВЫПОЛНЕННЫХ РАБОТАХ -->
         <option value="{% url 'complete_doc' %}" disabled selected>Акт о выполненных работах</option>
-</select>
+    </select>
 
 </form>
 

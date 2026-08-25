@@ -1,14 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.views.generic.edit import CreateView
-from .forms import CustomUserCreationForm, LoginForm
-from django.contrib.auth.views import LoginView
-from django.contrib.auth import authenticate, login, logout
-from django.views.generic import TemplateView
-from django.contrib import messages
+from auth_registration.forms import CustomUserCreationForm
+from django.contrib.auth import login
 from profile_user.models import StatusCategory, DocumentInformation, FormsForOrder
-import csv
-from django.contrib.staticfiles import finders
-from django.conf import settings
 from pathlib import Path
 
 # Create your views here.
@@ -63,7 +57,7 @@ class RegisterView(CreateView):
         for document, name in zip(documents, names):          
 
             # Указываю путь к каждому из 4 документов
-            flie_path = BASE_DIR / 'auth_registration' / 'static' / 'auth_registration' / 'txt' / document
+            flie_path = BASE_DIR / 'static' / 'auth_registration' / 'txt' / document
 
             # Открываю каждый файл отдельно, читаю что там, упаковываю в переменную
             with open(flie_path, 'r', encoding='utf-8') as file:
@@ -109,52 +103,4 @@ class RegisterView(CreateView):
         login(self.request, user)
 
         return redirect('profile')
-    
-class CustomLoginView(LoginView):
-    form_class = LoginForm
-    template_name = 'auth_registration/auth.html'
-    
-    # Очень важное уточнение ЗДЕСЬ! ТАК как я использую LoginView, то
-    # важно его писать именно обращаясь к классу с унаследованием функции супер
-    # form_valid! Так как если этого не делать, то из за того, что ты напишешь так:
-    #
-    #    def form_valid(self, form):
-    #    return redirect('profile')
-    #
-    # Получится так, что ты в текущей функции ПЕРЕЗАПИШЕШЬ ВСЮ ТУ МЕХАНИКУ, КОТОРАЯ
-    # ПО дефолту реализована была уже!
-
-    def form_valid(self, form):
-        # Обязательно сначала "наследуюсь от супер функции form_valid"
-        super().form_valid(form)
-        return redirect('profile')
-
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('profile')
-        return super().dispatch(request, *args, **kwargs)
-
-    def form_invalid(self, form):
-        return self.render_to_response({'login_form':form, 'registration_form': CustomUserCreationForm()})
-
-# Темплейт вью отвечает за отображение всех элементов на сайте
-class ShowForm(TemplateView):
-    # Гоыворим, где нам применять темплейт вью
-    template_name = 'auth_registration/auth.html'
-
-    def dispatch(self, request, *args, **kwargs):
-        # Тут редирект в случае того что пользователь авторизирован
-        if request.user.is_authenticated:
-            return redirect('profile')
-        return super().dispatch(request, *args, **kwargs)
-    
-    # Функция которая отвечает за отображение даннных в самом шаблоне сайта .html
-    def get_context_data(self, **kwargs):
-        # Это обязательно!!!
-        context = super().get_context_data(**kwargs)
-        # Передаем формы как регистрации так и логирования
-        context['registration_form'] = CustomUserCreationForm()
-        context['login_form'] = LoginForm()
-        # Обязательно передается в виде словаря
-        return context
     

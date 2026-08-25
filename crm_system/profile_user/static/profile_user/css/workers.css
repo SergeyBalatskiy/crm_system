@@ -1,0 +1,240 @@
+.workers-page-container {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.main-page-title {
+    font-size: 38px;
+    font-weight: 700;
+    color: #512da8;
+    margin: 0 0 16px 0;
+    text-align: left;
+    align-self: flex-start;
+}
+
+.add-worker-card {
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px 24px;
+    flex-shrink: 0;
+    align-self: flex-start;
+    width: 100%;
+    max-width: 780px;
+    box-sizing: border-box;
+}
+
+.section-title {
+    margin: 0 0 16px 0;
+    font-size: 29px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.worker-form-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.field_input_name {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.workers-form {
+    display: flex;
+    gap: 12px;
+    background: #ffffff;
+    padding: 12px 16px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.workers-form p {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+    flex: 1;
+}
+
+.workers-form input {
+    padding: 8px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.workers-form input:focus {
+    border-color: #6f42c1;
+}
+
+.form-buttons {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: -20px;
+    height: 73px;
+
+}
+
+.btn-submit {
+    width: 220px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.btn-add-field {
+    background-color: #e2e8f0;
+    color: #334155;
+}
+
+.btn-add-field:hover {
+    background-color: #cbd5e1;
+}
+
+.btn-submit {
+    background-color: #6f42c1;
+    color: #ffffff;
+}
+
+.btn-submit:hover {
+    background-color: #59329d;
+}
+
+.dark-divider {
+    border: none;
+    height: 3px;
+    background-color: #334155;
+    margin: 24px 0;
+    border-radius: 2px;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.active-workers-title {
+    font-size: 33px;
+    font-weight: 600;
+    color: #512da8;
+    margin: 0 0 16px 0;
+    text-align: left;
+    padding-bottom: 7px;
+    padding-top: 7px;
+}
+
+.workers-list-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    width: 100%;
+}
+
+.workers-list {
+    columns: 340px;
+    column-gap: 16px;
+    width: 100%;
+}
+
+.worker-place {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #ffffff;
+    border: 2px solid #512da8;
+    border-radius: 14px;
+    padding: 14px 18px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    margin-bottom: 12px;
+    break-inside: avoid;
+}
+
+.worker-place:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 12px -2px rgba(0, 0, 0, 0.1);
+}
+
+.btn-submit {
+    font-size: 20px;
+    font-weight: 600;
+    padding: 12px 32px;
+}
+
+.worker-details {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.worker-name {
+    font-size: 21px;
+    font-weight: 600;
+    color: #1e293b;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+.worker-patronymic {
+    font-size: 14px;
+    color: #64748b;
+}
+
+.btn-delete-worker {
+    background-color: #6f42c1;
+    color: #ffffff;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 0;
+    flex-shrink: 0;
+    align-self: center;
+    transition: background-color 0.2s;
+    transform: translateY(-14px);
+}
+
+.btn-delete-worker:hover {
+    background-color: #59329d;
+}
+
+.empty-workers-text {
+    color: #94a3b8;
+    font-size: 15px;
+    text-align: left;
+    margin-top: 10px;
+}
+
+.workers-form p label {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.workers-form input {
+    font-size: 24px;
+    padding: 10px 14px;
+    height: 44px;
+    box-sizing: border-box;
+}

@@ -1,0 +1,64 @@
+{% extends "profile_user/base.html" %}
+{% load static %}
+
+{% block content %}
+<script src="{% static 'profile_user/js/workers.js' %}" defer></script>
+<link rel="stylesheet" href="{% static 'profile_user/css/workers.css' %}">
+
+<div class="div-place">
+    <div class="div-box workers-page-container">
+
+        <!-- Заголовок страницы слева сверху -->
+        <h1 class="main-page-title">Сотрудники</h1>
+
+        <!-- ВЕРХНИЙ БЛОК: Форма добавления сотрудника (компактная слева) -->
+        <div class="add-worker-card">
+            <h3 class="section-title">Добавить сотрудника</h3>
+
+            <form id="form-container" method="POST" class="worker-form-inline">
+                {% csrf_token %}
+                {{ workers_formset.management_form }}
+
+                <div class="field_input_name">
+                    {% for form in workers_formset %}
+                    <div class="workers-form">
+                        {{ form.as_p }}
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-submit">Создать</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ТЕМНО-СЕРАЯ РАЗДЕЛИТЕЛЬНАЯ ПОЛОСА -->
+        <hr class="dark-divider">
+
+        <!-- НИЖНИЙ БЛОК: Список сотрудников -->
+        <div class="workers-list-wrapper">
+            <h2 class="active-workers-title">Активные сотрудники:</h2>
+
+            {% if workers_information %}
+            <div class="workers-list">
+                {% for worker in workers_information %}
+                <div class="worker-place" data-name="{{ worker.name }}" data-surname="{{ worker.surname }}">
+                    <div class="worker-details">
+                        <span class="worker-name">{{ worker.name }} {{ worker.surname }}</span>
+                        {% if worker.patronymic %}
+                        <span class="worker-patronymic">{{ worker.patronymic }}</span>
+                        {% endif %}
+                    </div>
+                    <button type="button" class="btn-delete-worker">Удалить</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="empty-workers-text">Список сотрудников пока пуст</p>
+            {% endif %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

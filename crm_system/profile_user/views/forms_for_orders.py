@@ -133,8 +133,7 @@ class FormsForOrdersEdit(TemplateView):
                 user=self.request.user
             ).first()
             return render(request, self.form_orders_file, {'form_order': order_information})
-        message = "Вы еще не выбрали ни один тип заказов."
-        return render(request, self.template_name, {'message': message})
+        return render(request, self.template_name)
     
     # Здесь, пожалуй, самый сложный участок. Тут написана логика удаления, добавления, изменения порядка
     # форм в БД
