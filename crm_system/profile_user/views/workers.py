@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from profile_user.forms import WorkersFormSet
+from django.contrib import messages
 from profile_user.models import WorkersInfo
 
 
@@ -23,21 +24,30 @@ class WorkersAddView(TemplateView):
 
 
     # Здесь активируется функция, которая проходится списком и сохраняет в каждой форме нашего "хозяина"
-    def form_valid(self, formset):
+    def form_valid(self, formset, request):
         # Беру каждую форму индивидуально и ПРИНУДИТЕЛЬНО останавливаю "автосохранение",
         # чтобы сначала сохранить ссылку на "хозяина", а потом и все остальные данные!
         for form in formset:
             # Если форма заполнена:
             if form.cleaned_data:
+                print('Форма не пустая!')
                 # Остановка сохранения
                 workers_info = form.save(commit=False)
+                # Беру номер телефона
+                phone = form.cleaned_data.get("phone")
+                # Если номер телефона есть, то выдаем замечание!
+                if WorkersInfo.objects.filter(phone=phone, user=self.request.user).exists():
+                    messages.error(request, 'Такой номер телефона уже есть у другого вашего сотрудника!')
+                    # Получаю все обьекты из БД:
+                    workers_information = WorkersInfo.objects.filter(user=self.request.user).all()
+                    # Отдаю обьекты + форму
+                    return render(request, self.template_name, {'workers_formset' : formset, "workers_information" : workers_information })
                 # Запись ссылки на хозяина
                 workers_info.user = self.request.user
                 # Сохранение всего остального
+                print('Сохранен обьект!')
                 workers_info.save()
-                
-        #  Думаю, будет лучше если здесь добавить кнопку которая сначала позволяет создать только 1
-        # человека, потом все это сохраняется (и редиректится) + (показывается текущие сотрудники) и уже только потом позволяет сохранить другого
+        print('Сработало это')
         return redirect("workers")
 
     # Метод, который показывает нам нашу форму
@@ -80,7 +90,7 @@ class WorkersAddView(TemplateView):
         formset = WorkersFormSet(data=self.request.POST)
         # Вызываем функцию при правильной валидации
         if formset.is_valid():
-            return self.form_valid(formset)
+            return self.form_valid(formset, request)
 
         # Показываем на текущем сайте форму, в случае если она не валидна
                 # Получаю объект из БД для показа уже "активных" сотрудников

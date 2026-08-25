@@ -13,7 +13,21 @@
 
         <!-- ВЕРХНИЙ БЛОК: Форма добавления сотрудника (компактная слева) -->
         <div class="add-worker-card">
-            <h3 class="section-title">Добавить сотрудника</h3>
+
+            {% if messages %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            <h3 class="section-title"><svg style="position: relative; top: 5px; display: inline-block;"
+                    xmlns="http://www.w3.org/2000/svg" width="27" height="29" fill="currentColor"
+                    class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                    <path d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                    <path fill-rule="evenodd"
+                        d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
+                </svg> Добавить сотрудника</h3>
 
             <form id="form-container" method="POST" class="worker-form-inline">
                 {% csrf_token %}
@@ -36,21 +50,30 @@
         <!-- ТЕМНО-СЕРАЯ РАЗДЕЛИТЕЛЬНАЯ ПОЛОСА -->
         <hr class="dark-divider">
 
-        <!-- НИЖНИЙ БЛОК: Список сотрудников -->
         <div class="workers-list-wrapper">
             <h2 class="active-workers-title">Активные сотрудники:</h2>
 
             {% if workers_information %}
+            <!-- Шапка таблицы с названиями колонок -->
+            <div class="workers-table-header">
+                <div>Имя</div>
+                <div>Фамилия</div>
+                <div>Роль</div>
+                <div>Телефон</div>
+                <div class="header-action">Действие</div>
+            </div>
+
+            <!-- Строки с сотрудниками -->
             <div class="workers-list">
                 {% for worker in workers_information %}
                 <div class="worker-place" data-name="{{ worker.name }}" data-surname="{{ worker.surname }}">
-                    <div class="worker-details">
-                        <span class="worker-name">{{ worker.name }} {{ worker.surname }}</span>
-                        {% if worker.patronymic %}
-                        <span class="worker-patronymic">{{ worker.patronymic }}</span>
-                        {% endif %}
+                    <div class="worker-col">{{ worker.name }}</div>
+                    <div class="worker-col">{{ worker.surname }}</div>
+                    <div class="worker-col">{{ worker.role }}</div>
+                    <div class="worker-col">{{ worker.phone }}</div>
+                    <div class="worker-action">
+                        <button type="button" class="btn-delete-worker">Удалить</button>
                     </div>
-                    <button type="button" class="btn-delete-worker">Удалить</button>
                 </div>
                 {% endfor %}
             </div>

@@ -36,9 +36,11 @@ class ServiceInfoForm(forms.ModelForm):
 
 # Переменная которая содержит в себе форму и добавление ее динамически
 WorkersFormSet = modelformset_factory(
-    WorkersInfo, fields=("name", "surname"), labels={
+    WorkersInfo, fields=("name", "surname", "role", "phone" ), labels={
         "name": "Имя",
         "surname": "Фамилия",
+        "role" : "Роль",
+        "phone" : "Телефон"
     }, extra=1)
 
 # Переменная которая содержит в себе форму для добавления категорий 
