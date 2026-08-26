@@ -15,32 +15,25 @@ from profile_user.models import StatusCategory, DocumentInformation
 class ServiceInfoView(TemplateView):
     template_name = 'profile_user/service_info.html'
 
-    # Сохранение информации о сервисе 
-    def form_valid(self, form):
-        service_info = form.save(commit=False)
-        service_info.user = self.request.user
-        service_info.save()
-        return redirect('workers_info')
-
-    # Метод, который показывает нам нашу форму
     def get(self, request, *args, **kwargs):
+        user = request.user
+        service_instance = ServiceInfo.objects.filter(user=user).first()
+        service_info = ServiceInfoForm(instance=service_instance)
+        return render(request, self.template_name, {'service_info': service_info})
 
-        # GET запрос для показа формы в 2 вариантах: если данные есть, и если их нет!
-        user = self.request.user
-        if ServiceInfo.objects.filter(user = user).exists():
-            service_info = ServiceInfoForm(instance=ServiceInfo.objects.filter(user = user))
-        else:
-            service_info = ServiceInfoForm()
-        return render(request, self.template_name, {'service_info' : service_info})
-
-    # Метод, который принимает нашу форму методом POST на странице
     def post(self, request, *args, **kwargs):
+        user = request.user
+        # 1. Получаем существующую запись пользователя из БД
+        service_instance = ServiceInfo.objects.filter(user=user).first()
 
-        formset = ServiceInfoForm(self.request.POST)
+        # 2. Передаем и данные из формы (request.POST), и найденный instance
+        form = ServiceInfoForm(request.POST, instance=service_instance)
 
-        # Вызываем функцию при правильной валидации
-        if formset.is_valid():
-            return self.form_valid(formset)
+        if form.is_valid():
+            service_info = form.save(commit=False)
+            service_info.user = user
+            service_info.save()
+            return redirect('workers')
 
-        # Показываем на текущем сайте форму, в случае если она не валидна
-        return render(request, self.template_name, {'service_info' : formset})
+        # Если валидация не прошла, возвращаем форму с ошибками
+        return render(request, self.template_name, {'service_info': form})

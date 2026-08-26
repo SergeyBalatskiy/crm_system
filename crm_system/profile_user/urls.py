@@ -8,7 +8,7 @@ urlpatterns = [
     # Выход пользователя из авторизации
     path('logout', LogoutView.as_view(next_page="auth"), name='logout'),
     # Отображение сайта для настройки данных сервиса
-    path('service_info', ServiceInfoView.as_view(), name = 'service_info'), # Осталось доделать визуал названия сервиса и его адрес А ПОТОМ переходить к складу + УСЛУГИ
+    path('service_information', ServiceInfoView.as_view(), name = 'service_info'), # Осталось доделать визуал названия сервиса и его адрес А ПОТОМ переходить к складу + УСЛУГИ
     # Отображение формы для ввода данных сотрудников
     path('workers', WorkersAddView.as_view(), name='workers'),
     # Показ категорий для заказов

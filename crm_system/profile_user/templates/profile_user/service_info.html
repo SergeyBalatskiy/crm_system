@@ -3,21 +3,36 @@
 {% block content %}
 <div class="div-place">
     <div class="div-box">
-        <h1>Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</h1>
-        <p>Давайте настроим все так, как вам хочется!</p>
-        <p>Как называется ваш сервисный центр?</p>
+        <h1 class="main-page-title">Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</h1>
+        <p class="subtitle">Давайте настроим все так, как вам хочется!</p>
+
         <div class="form-container div_service_name">
-            <form method="post">
-                <div class="field_input_name">
-                    {% csrf_token %}
+            <form method="post" class="worker-form-inline">
+                {% csrf_token %}
+
+                <div class="field-group">
+                    <label for="{{ service_info.name_service.id_for_label }}">Как называется ваш сервисный
+                        центр?</label>
                     {{ service_info.name_service }}
-                    <p>Пожалуйста, введите адрес вашего сервиса</p>
+                    {% if service_info.name_service.errors %}
+                    <div class="form-error">{{ service_info.name_service.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="field-group">
+                    <label for="{{ service_info.address.id_for_label }}">Пожалуйста, введите адрес вашего
+                        сервиса</label>
                     {{ service_info.address }}
-                    <button>Далее</button>
+                    {% if service_info.address.errors %}
+                    <div class="form-error">{{ service_info.address.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-submit">Далее</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
 {% endblock %}
