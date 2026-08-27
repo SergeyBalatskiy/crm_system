@@ -14,14 +14,13 @@ class WorkersAddView(TemplateView):
     template_name = 'profile_user/workers.html'
 
     # Функция, которая отвечает за удаление сотрудника из БД
-    def delete_worker(self, name, surname):
+    def delete_worker(self, name, surname, request):
         delete_worker = WorkersInfo.objects.filter(
             user=self.request.user, name = name, surname = surname
         ).first()
-            
         delete_worker.delete()
+        messages.success(request, 'Сотрудник успешно удален из Базы данных!')
         return redirect("workers")
-
 
     # Здесь активируется функция, которая проходится списком и сохраняет в каждой форме нашего "хозяина"
     def form_valid(self, formset, request):
@@ -30,7 +29,6 @@ class WorkersAddView(TemplateView):
         for form in formset:
             # Если форма заполнена:
             if form.cleaned_data:
-                print('Форма не пустая!')
                 # Остановка сохранения
                 workers_info = form.save(commit=False)
                 # Беру номер телефона
@@ -38,21 +36,15 @@ class WorkersAddView(TemplateView):
                 # Если номер телефона есть, то выдаем замечание!
                 if WorkersInfo.objects.filter(phone=phone, user=self.request.user).exists():
                     messages.error(request, 'Такой номер телефона уже есть у другого вашего сотрудника!')
-                    # Получаю все обьекты из БД:
-                    workers_information = WorkersInfo.objects.filter(user=self.request.user).all()
-                    # Отдаю обьекты + форму
-                    return render(request, self.template_name, {'workers_formset' : formset, "workers_information" : workers_information })
+                    return redirect('workers')
                 # Запись ссылки на хозяина
+                messages.success(request, 'Новый сотрудник успешно добавлен!')
                 workers_info.user = self.request.user
-                # Сохранение всего остального
-                print('Сохранен обьект!')
                 workers_info.save()
-        print('Сработало это')
-        return redirect("workers")
+        return redirect('workers')
 
     # Метод, который показывает нам нашу форму
     def get(self, request, *args, **kwargs):
-
         # queryset нужен для того, чтобы при обращении к БД, нам в форму не подставлялись
         # уже существующие обьекты...
         # Почему? Потому что я сначала обращаюсь к ФОРМЕ, а в АРГУМЕНЫ ФОРМЫ указываю обьект
@@ -63,7 +55,6 @@ class WorkersAddView(TemplateView):
 
         # ХОЧУ ОТМЕТИТЬ ОДИН НЬЮАНС: В БУДУЩЕМ СЛЕДУЕТ ДОБАВИТЬ СЮДА ВЫБОРКУ, ГДЕ У МЕНЯ
         # БУДЕТ В виде словаря отображаться все пользователи созданные
-
         # Получаю объект из БД для показа уже "активных" сотрудников
         workers_information = WorkersInfo.objects.filter(
             user=self.request.user
@@ -82,7 +73,7 @@ class WorkersAddView(TemplateView):
         delete_surname = request.POST.get('delete_surname')
         # Вызов функции на удаление
         if delete_name and delete_surname:
-            return self.delete_worker(delete_name, delete_surname)
+            return self.delete_worker(delete_name, delete_surname, request)
 
         # Переменная, которая хранит в себе то, с чем придет пользователь, обращаясь к нам
         # с методом пост (введенные данные внутри формы)
@@ -90,12 +81,12 @@ class WorkersAddView(TemplateView):
         formset = WorkersFormSet(data=self.request.POST)
         # Вызываем функцию при правильной валидации
         if formset.is_valid():
+
+            if not formset.has_changed():
+                messages.error(request, 'Изменений не обнаружено.')
+                return redirect('workers')
+
             return self.form_valid(formset, request)
 
         # Показываем на текущем сайте форму, в случае если она не валидна
-                # Получаю объект из БД для показа уже "активных" сотрудников
-        workers_information = WorkersInfo.objects.filter(
-            user=self.request.user
-        ).all()
-        return render(request, self.template_name, {'workers_formset': formset, "workers_information" : workers_information})
-    
+        return redirect('workers')

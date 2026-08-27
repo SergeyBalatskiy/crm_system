@@ -1,14 +1,11 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.urls import path
-from profile_user.forms import ServiceInfoForm, WorkersFormSet, DocumentInfoForm
+from profile_user.forms import ServiceInfoForm
 from profile_user.models import ServiceInfo
-from django.views.generic.edit import CreateView
-from django.urls import reverse_lazy
-from profile_user.models import StatusCategory, DocumentInformation
+from django.contrib import messages
 
 # Класс который включает в себя метод GET и POST для отображения формы и ее принятия
 @method_decorator(login_required(), name='dispatch')
@@ -23,17 +20,25 @@ class ServiceInfoView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        # 1. Получаем существующую запись пользователя из БД
         service_instance = ServiceInfo.objects.filter(user=user).first()
-
-        # 2. Передаем и данные из формы (request.POST), и найденный instance
         form = ServiceInfoForm(request.POST, instance=service_instance)
 
         if form.is_valid():
-            service_info = form.save(commit=False)
-            service_info.user = user
-            service_info.save()
-            return redirect('workers')
+
+            if not form.has_changed():
+                messages.error(request, 'Изменений не обнаружено.')
+                return redirect('service_info')
+
+            try:
+                service_info = form.save(commit=False)
+                service_info.user = user
+                service_info.save()
+                messages.success(request, 'Информация о сервисе успешно сохранена!')
+                return redirect('service_info')
+            
+            except Exception as e:
+                messages.error(request, f'Ошибка типа: {e}.')
+                return redirect('service_info')
 
         # Если валидация не прошла, возвращаем форму с ошибками
-        return render(request, self.template_name, {'service_info': form})
+        return redirect('service_info')

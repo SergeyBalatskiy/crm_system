@@ -1,5 +1,4 @@
 // Относится к create_workers.html
-
 // Ищет все формы, которые существуют
 let WorkersdForm = document.querySelectorAll(".workers-form")
 

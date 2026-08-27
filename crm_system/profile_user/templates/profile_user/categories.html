@@ -8,15 +8,12 @@
 <div class="categories-place">
     <div class="categories-box">
 
-        <!-- Шапка страницы -->
+        <!-- Шапка страницы (остался только заголовок) -->
         <div class="categories-header">
             <h1>Статусы заказов</h1>
-            <button class="btn btn-primary" onclick="openModalForAdd()">
-                <span>+</span> Добавить категорию
-            </button>
         </div>
 
-        <!-- Скроллируемая область со списками -->
+        <!-- Скроллируемая область со списками (прокрутка внутри) -->
         <div class="categories-content">
 
             {% if in_process %}
@@ -79,6 +76,23 @@
             </div>
             {% endif %}
 
+        </div>
+
+        <!-- Подвал страницы (новое место для кнопок с верхней серой полосой) -->
+        <div class="categories-footer">
+            <div class="footer-actions">
+                <a href="{% url 'workers' %}" class="btn btn-primary btn-next">Назад</a>
+                <button class="btn btn-primary" onclick="openModalForAdd()">
+                    <span><svg xmlns="http://www.w3.org/2000/svg" style="transform: translate(-2px, 1px);" width="21"
+                            stroke="currentColor" stroke-width="0.6" height="21" fill="currentColor"
+                            class="bi bi-plus-circle" viewBox="0 0 16 16">
+                            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z" />
+                            <path
+                                d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z" />
+                        </svg> </span>Добавить категорию
+                </button>
+                <a href="{% url 'tiny_mce' %}" class="btn btn-primary btn-next">Далее</a>
+            </div>
         </div>
 
         <!-- Модальное окно -->
