@@ -16,7 +16,6 @@
         <!-- Скроллируемая область со списками (прокрутка внутри) -->
         <div class="categories-content">
 
-            {% if in_process %}
             <div class="category-section">
                 <h3 class="section-title">В работе</h3>
                 <div class="category-grid">
@@ -29,9 +28,7 @@
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
 
-            {% if deferred %}
             <div class="category-section">
                 <h3 class="section-title">Отложенные</h3>
                 <div class="category-grid">
@@ -44,9 +41,8 @@
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
 
-            {% if success %}
+
             <div class="category-section">
                 <h3 class="section-title">Готовые</h3>
                 <div class="category-grid">
@@ -59,9 +55,8 @@
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
 
-            {% if finished %}
+
             <div class="category-section">
                 <h3 class="section-title">Выданные</h3>
                 <div class="category-grid">
@@ -74,7 +69,6 @@
                     {% endfor %}
                 </div>
             </div>
-            {% endif %}
 
         </div>
 

@@ -15,6 +15,8 @@ urlpatterns = [
     path('categories', ShowCategoriesView.as_view(), name='categories'),
     # Указываю на путь к редактированию документов
     path('documents', ShowDocumentView.as_view(), name='tiny_mce'),
+    # Указываю на путь к восстановлению документа по умолчанию
+    path('backup_default_doc', BackupDocumentView.as_view(), name='backup_default_doc'),
     # Указываю на путь к редактированию форм для заказа
     path('form-editor', FormsForOrdersEdit.as_view(), name='form-editor'),
     # Указываю на путь, где лежит центральное окно с возможностью корректировки каждой формы индивидуально

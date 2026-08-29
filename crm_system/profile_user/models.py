@@ -46,7 +46,7 @@ class StatusCategory(models.Model):
 # Создаю информацию о дефолтной форме (уже заполненной в static/txt/.txt)
 class DocumentInformation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='document_info')
-    content = HTMLField()
+    content = HTMLField(blank=True, null=True)
     name = models.CharField(max_length=110, null=False, blank=False)
 
     def __str__(self):

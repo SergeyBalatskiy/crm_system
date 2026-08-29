@@ -7,12 +7,8 @@
 <div class="document-show-place">
     <div class="document-show-box">
         <h1>Печатные формы</h1>
-
-        <hr class="custom-divider">
-
         <form method="get" class="navigation-select">
             <div class="selected-document">
-                <label for="page-select">Выберите документ</label>
                 <select class="custom-select mb-4" name="documents" id="page-select" hx-trigger="change"
                     hx-target="#hidden-data-container" hx-get="{% url 'tiny_mce' %}" hx-swap="innerHTML">
                     <option value="" disabled selected hidden>Выберите документ...</option>
@@ -23,6 +19,11 @@
                 </select>
             </div>
         </form>
+
+        <!-- Кнопка восставновления по умолчанию выбранного документа (работает через hx-swap-oob='true')-->
+        <div id="reset-btn-container"></div>
+
+        <hr class="custom-divider">
 
         <div id="hidden-data-container" style="display: none;"></div>
 
@@ -52,6 +53,8 @@
 </div>
 
 <script>
+
+    // НЕ УДАЛЯТЬ ЭТОТ БЛОК ТАК КАК TinyMCE НЕ В СОСТОЯНИИ ПО ДРУГОМУ РАБОТАТЬ С JS ЕСЛИ ОН НЕ В style
     document.body.addEventListener('htmx:afterSwap', function (event) {
         if (event.detail.target.id === 'hidden-data-container') {
             const fetchedContent = document.getElementById('fetched-content');
@@ -71,4 +74,6 @@
         }
     });
 </script>
+
+
 {% endblock %}

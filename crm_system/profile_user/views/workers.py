@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from profile_user.forms import WorkersFormSet
 from django.contrib import messages
 from profile_user.models import WorkersInfo
+from auth_registration.models import Users
 
 
 # Класс который включает в себя метод GET и POST для отображения формы и ее принятия

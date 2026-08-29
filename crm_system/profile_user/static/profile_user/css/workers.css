@@ -314,3 +314,17 @@
     text-align: left;
     margin-top: 10px;
 }
+
+.btn-delete-worker.btn-disabled,
+.btn-delete-worker:disabled {
+    background-color: #94a3b8 !important;
+    color: #ffffff !important;
+    cursor: not-allowed;
+    opacity: 0.8;
+}
+
+/* Отмена эффекта наведения для неактивной кнопки */
+.btn-delete-worker.btn-disabled:hover,
+.btn-delete-worker:disabled:hover {
+    background-color: #94a3b8 !important;
+}

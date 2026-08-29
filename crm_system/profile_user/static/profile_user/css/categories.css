@@ -94,9 +94,9 @@
 
 .section-title {
     margin: 0;
-    font-size: 13px;
-    font-weight: 700;
-    color: #64748b;
+    font-size: 18px;
+    font-weight: 800;
+    color: #91959b;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -115,7 +115,7 @@
     border-radius: 12px;
     color: #ffffff;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 20px;
     cursor: pointer;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
     transition: transform 0.15s ease, box-shadow 0.15s ease;

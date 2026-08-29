@@ -1,3 +1,12 @@
 <!-- Здесь все просто приходит и вставляется -->
 <div id="fetched-content">{{ content|safe }}</div>
 <input type="hidden" id="fetched-doc-type" value="{{ cur_doc }}">
+
+<div id="reset-btn-container" hx-swap-oob="true">
+    <form method="POST" action="{% url 'backup_default_doc' %}" style="margin: 0;">
+        {% csrf_token %}
+        <input type="hidden" name="current_document" value="{{ cur_doc }}">
+        <button type="submit" class="btn-delete-worker">По умолчанию для {{ cur_doc }}</button>
+        <h1>{{ cur_doc }}</h1>
+    </form>
+</div>

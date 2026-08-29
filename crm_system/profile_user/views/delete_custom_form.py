@@ -14,7 +14,6 @@ class DeleteCustomForm(TemplateView):
 
     def post(self, request, *args, **kwargs):
 
-        print('Вызвана функция!')
         type_of_order_selected = request.POST.get('type_of_order_selected')
 
         objects_show = request.POST.get('objects_show')
