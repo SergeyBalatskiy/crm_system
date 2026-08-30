@@ -4,14 +4,15 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from profile_user.models import DocumentInformation
 from django.http import HttpResponse
-import json
-from django.urls import reverse
+from django.shortcuts import render
 from django.contrib.staticfiles import finders
 
 
 # Данный класс отвечает за возвращение ТЕКУЩЕГО  выбранного документа в "дефолтное" состояние
 @method_decorator(login_required(), name='dispatch') 
 class BackupDocumentView(TemplateView):
+
+    documents_form = 'profile_user/documents_form/document.html'
 
     def post(self, request, *args, **kwargs):
 
@@ -43,24 +44,23 @@ class BackupDocumentView(TemplateView):
         # Открываю, записываю в переменную, внедряю текущий документ в базу данных и сохраняю:
         with open(file_path_txt, 'r', encoding='utf-8') as file:
             clear_document = file.read()
-        document_data.content = clear_document
-        document_data.save()
+            document_data.content = clear_document
+            document_data.save()
 
-        # Сначала получаю URL для запроса с GET-параметром (куда буду обращаться)
-        base_url = reverse('tiny_mce')
+        # Отдаю контент (Размету документа)
+        content = document_data.content
 
-        # Конфигурация для HTMX-запроса типа GET для отображения определенного HTML-куска
-        location_data = {
-            'path' : f'{base_url}',
-            'target' : '#hidden-data-container',
-            'swap' : 'innerHTML'
-        }
+        # Название документа на eng
+        document_selected = cur_doc
 
-        response = HttpResponse()
+        # ОТДАЮ И название, и текст и сообщение
+        response = render(
+            request, 
+            self.documents_form, 
+            {'content': content, 'cur_doc': document_selected}, 
+            status=200
+        )
+        response['HX-Trigger'] = 'backup_success' 
 
-        response['HX-LOCATION'] = json.dumps(location_data)
         return response
-
-
-
-
+                    

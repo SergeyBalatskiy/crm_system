@@ -4,11 +4,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.urls import path
-from profile_user.forms import ServiceInfoForm, WorkersFormSet, DocumentInfoForm
-from django.views.generic.edit import CreateView
-from django.urls import reverse_lazy
-from django.contrib import messages
-from profile_user.models import StatusCategory, DocumentInformation, WorkersInfo
+from profile_user.forms import DocumentInfoForm
+from profile_user.models import DocumentInformation
 from django.http import HttpResponse
 
 
@@ -17,12 +14,6 @@ from django.http import HttpResponse
 class ShowDocumentView(TemplateView):
     documents_form = 'profile_user/documents_form/document.html'
     template_name = 'profile_user/tinymce.html'
-
-    def form_valid(self, document_info, name):
-        upd_doc = DocumentInformation.objects.get(user = self.request.user, name = name)
-        upd_doc.content = document_info.cleaned_data["content"]
-        upd_doc.save()
-        return HttpResponse(status=204)
 
     def post(self, request, *args, **kwargs):
         cur_doc = request.POST.get('document')
@@ -35,10 +26,23 @@ class ShowDocumentView(TemplateView):
         }
 
         name = document_names.get(cur_doc)
-        document_info = DocumentInfoForm(self.request.POST)
+        document_object = DocumentInformation.objects.get(user = self.request.user, name = name)
+        document_info = DocumentInfoForm(self.request.POST, instance=document_object)
+
         if document_info.is_valid():
-                # Здесь активируется функция, которая отвечает за главное сохранение
-                return self.form_valid(document_info, name)
+            if document_info.has_changed():
+
+                # Здесь активируется главное сохранение
+                document_info.save()
+                response = HttpResponse(status=204)
+                response['HX-Trigger'] = 'success_save_doc'
+                return response
+        
+            response = HttpResponse(status=204)
+            response['HX-Trigger'] = 'no_changes_doc' 
+            return response
+        
+        return HttpResponse(status=400)
 
     # Передаю в сайт методом GET форму самого tinymce
     def get(self, request, *args, **kwargs):

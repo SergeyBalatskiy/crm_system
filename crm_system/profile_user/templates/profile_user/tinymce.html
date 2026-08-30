@@ -2,51 +2,52 @@
 {% load static %}
 
 {% block content %}
-<link rel="stylesheet" href="{% static 'profile_user/css/tinymce.css' %}">
 
 <div class="document-show-place">
     <div class="document-show-box">
-        <h1>Печатные формы</h1>
-        <form method="get" class="navigation-select">
-            <div class="selected-document">
-                <select class="custom-select mb-4" name="documents" id="page-select" hx-trigger="change"
-                    hx-target="#hidden-data-container" hx-get="{% url 'tiny_mce' %}" hx-swap="innerHTML">
-                    <option value="" disabled selected hidden>Выберите документ...</option>
-                    <option value="garanty_doc">Акт о гарантии</option>
-                    <option value="adoption_doc">Акт о принятии</option>
-                    <option value="cancell_doc">Акт о отказе</option>
-                    <option value="complete_doc">Акт о выполненных работах</option>
-                </select>
-            </div>
-        </form>
+        <div id="toast-container"></div>
 
-        <!-- Кнопка восставновления по умолчанию выбранного документа (работает через hx-swap-oob='true')-->
-        <div id="reset-btn-container"></div>
+        <!-- Шапка: Заголовок, Выбор, Сохранить, По умолчанию -->
+        <div class="header-row">
+            <h1>Печатные формы</h1>
+
+            <form method="get" class="navigation-select">
+                <div class="selected-document">
+                    <select class="custom-select" name="documents" id="page-select" hx-trigger="change"
+                        hx-target="#hidden-data-container" hx-get="{% url 'tiny_mce' %}" hx-swap="innerHTML">
+                        <option value="" disabled selected hidden>Выберите документ...</option>
+                        <option value="garanty_doc">Акт о гарантии</option>
+                        <option value="adoption_doc">Акт о принятии</option>
+                        <option value="cancell_doc">Акт о отказе</option>
+                        <option value="complete_doc">Акт о выполненных работах</option>
+                    </select>
+                </div>
+            </form>
+
+            <!-- Кнопка «Сохранить документ» связывается с формой через form="editor-form" -->
+            <button type="button" class="btn-action btn-save"
+                onclick="tinymce.triggerSave(); htmx.trigger('#editor-form', 'submit');">
+                Сохранить документ
+            </button>
+
+            <!-- Контейнер для кнопки «По умолчанию» (приходит через hx-swap-oob) -->
+            <div id="reset-btn-container"></div>
+        </div>
 
         <hr class="custom-divider">
 
         <div id="hidden-data-container" style="display: none;"></div>
 
         <div id="editor-container" style="display: none;">
-            <form method="post" action="">
+            <form id="editor-form" hx-post="{% url 'tiny_mce' %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
                 {% csrf_token %}
                 <input type="hidden" name="document" id="current-document-input" value="">
-
                 {{ tiny_mce.media }}
                 {{ tiny_mce.as_p }}
-
-                <!-- Добавить выход из создания категории через esc! (.js) -->
-
-                <!-- Необходимо изменить и подкорректировать визуал чтобы он был ровным, чтобы сначала появлялись 2 кнопки вперед и назад, а потом, после выбора
-                появлялась посередине кнопка. Также нужно сделать ограничитель с серой "полосой" снизу + добавить кнопку которая "восстанавливает" документ до дефолтного
-                состояния ("По умолчанию") <- Скорее всего, сделать эту кнопку нужно сверху правее от самого выбора формы -->
-
-                <!-- В БУДУЩЕМ ДОБАВИТЬ СПРАВА ОКНО КОТОРОЕ БУДЕТ ОТВЕЧАТЬ ЗА ВСТАВКУ ЭЛЕМЕНТОВ
-                 КАК ЭТО СДЕЛАТЬ - ПОКА ЧТО Я НЕ ЗНАЮ, НО УВЕРЕН ЧТО ЭТО ЭТО НЕНАДОЛГО... -->
-
-                <a href="{% url 'categories' %}" class="btn btn-primary btn-next">Назад</a>
-                <button type="submit">Сохранить документ</button>
-                <a href="{% url 'form-editor' %}" class="btn btn-primary btn-next">Далее</a>
+                <div class="bottom-actions">
+                    <a href="{% url 'categories' %}" class="btn btn-primary btn-next">Назад</a>
+                    <a href="{% url 'form-editor' %}" class="btn btn-primary btn-next">Далее</a>
+                </div>
             </form>
         </div>
     </div>
@@ -73,6 +74,52 @@
             }
         }
     });
+
+    // Функция создания красивого всплывающего уведомления
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toast-container');
+
+        // Создаем элемент alert
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} fade-in`;
+
+        // SVG-иконка в зависимости от типа
+        const icon = type === 'success'
+            ? `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z"/>
+           </svg>`
+            : `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
+           </svg>`;
+
+        alertDiv.innerHTML = `${icon}<span>${message}</span>`;
+        container.appendChild(alertDiv);
+
+        // Автоматическое удаление через 3.5 секунды с плавной анимацией
+        setTimeout(() => {
+            alertDiv.style.opacity = '0';
+            alertDiv.style.transition = 'opacity 0.4s ease';
+            setTimeout(() => alertDiv.remove(), 400);
+        }, 3500);
+    }
+
+    // Слушатели HTMX-событий с сервера
+    document.body.addEventListener('success_save_doc', function () {
+        showToast('Изменения успешно сохранены!', 'success');
+    });
+
+    document.body.addEventListener('no_changes_doc', function () {
+        showToast('Изменения не обнаружены.', 'danger');
+    });
+
+    document.body.addEventListener('backup_success', function () {
+        showToast('Документ восстановлен!', 'success');
+    });
+
+    document.body.addEventListener('htmx:configRequest', function (event) {
+        event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
+    });
+
 </script>
 
 

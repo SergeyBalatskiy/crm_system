@@ -31,7 +31,7 @@
 
 .navigation-select {
     flex-shrink: 0;
-    margin-bottom: 16px;
+    margin-top: 6px;
 }
 
 #editor-container {
@@ -93,8 +93,7 @@
 }
 
 .document-show-box h1 {
-    margin-top: 0;
-    margin-bottom: 20px;
+    margin: 0;
     color: #512da8;
 }
 
@@ -102,7 +101,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
-    margin-top: 12px;
+    margin-top: 0;
 }
 
 .selected-document label {
@@ -114,12 +113,112 @@
 
 .selected-document select.custom-select {
     padding: 7px 32px 7px 14px;
-    font-size: 18px;
+    font-size: 21px;
     color: #1a1a1a;
     background-color: #ffffff;
     border: 1px solid #d0d7de;
     border-radius: 8px;
     outline: none;
     cursor: pointer;
+    margin-bottom: 0;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Контейнер теперь позиционируется относительно белого блока .document-show-box */
+#toast-container {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 385px;
+    pointer-events: none;
+}
+
+/* Общий стиль для всех плашек */
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    pointer-events: auto;
+}
+
+.alert-icon {
+    flex-shrink: 0;
+}
+
+/* Зеленый цвет — Изменения успешно сохранены */
+.alert-success {
+    background-color: #e6f4ea;
+    color: #137333;
+    border: 1px solid #ceead6;
+}
+
+/* Красный цвет — Изменения не обнаружены */
+.alert-danger {
+    background-color: #fce8e6;
+    color: #c5221f;
+    border: 1px solid #fad2cf;
+}
+
+.header-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.btn-action,
+#reset-btn-container button,
+#reset-btn-container a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+    white-space: nowrap;
+}
+
+.btn-save {
+    background-color: #6f42c1;
+    color: #ffffff;
+}
+
+.btn-save:hover {
+    background-color: #59339d;
+}
+
+/* Красная кнопка "По умолчанию" */
+.btn-reset,
+#reset-btn-container button,
+#reset-btn-container a {
+    background-color: #dc3545;
+    color: #ffffff;
+}
+
+.btn-reset:hover,
+#reset-btn-container button:hover,
+#reset-btn-container a:hover {
+    background-color: #bb2d3b;
+}
+
+/* Нижний блок навигации (Назад / Далее) */
+.bottom-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
 }
