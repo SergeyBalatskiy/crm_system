@@ -21,12 +21,17 @@
 }
 
 .custom-divider {
-    border: none;
-    height: 1px;
-    background-color: #eef0f3;
     width: 100%;
-    margin: 26px 0;
-    margin-top: -4px;
+    border-top: 2px solid #c0c0c0;
+    margin: 16px 0;
+    display: block;
+    clear: both;
+    margin-top: -1px;
+    flex-shrink: 0;
+}
+
+.bottom-actions {
+    margin-top: auto;
 }
 
 .navigation-select {
@@ -62,6 +67,8 @@
     height: 100% !important;
     min-height: 0 !important;
     width: 100% !important;
+    margin-bottom: 10px !important;
+    margin-top: -7.6px;
 }
 
 .tox-editor-container {
@@ -196,6 +203,8 @@
 .btn-save {
     background-color: #6f42c1;
     color: #ffffff;
+    font-size: 17px;
+    margin-top: 6.5px;
 }
 
 .btn-save:hover {
@@ -208,6 +217,8 @@
 #reset-btn-container a {
     background-color: #dc3545;
     color: #ffffff;
+    font-size: 17px;
+    margin-top: 6.5px;
 }
 
 .btn-reset:hover,
@@ -219,6 +230,48 @@
 /* Нижний блок навигации (Назад / Далее) */
 .bottom-actions {
     display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.btn-primary {
+    background-color: #6f42c1;
+    color: #ffffff;
+    font-size: 19px;
+    border-radius: 12px;
+    border: none;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #59329d;
+    transform: translateY(-1px);
+    color: #ffffff;
+}
+
+/* Добавлен display: inline-flex для точного центрирования текста */
+.btn-next {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 160px;
+    font-size: 21px;
+    height: 46.5px;
+    box-sizing: border-box;
+}
+
+.bottom-section {
+    margin-top: auto;
+    flex-shrink: 0;
+    width: 100%;
+}
+
+/* Нижняя навигация */
+.bottom-actions {
+    display: flex;
+    justify-content: space-between;
+    /* Расставляет стрелки по краям */
     gap: 12px;
     margin-top: 16px;
 }

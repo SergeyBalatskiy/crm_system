@@ -13,8 +13,9 @@
 
             <form method="get" class="navigation-select">
                 <div class="selected-document">
-                    <select class="custom-select" name="documents" id="page-select" hx-trigger="change"
-                        hx-target="#hidden-data-container" hx-get="{% url 'tiny_mce' %}" hx-swap="innerHTML">
+                    <select class="custom-select" name="documents" id="page-select" autocomplete="off"
+                        hx-trigger="change" hx-target="#hidden-data-container" hx-get="{% url 'tiny_mce' %}"
+                        hx-swap="innerHTML">
                         <option value="" disabled selected hidden>Выберите документ...</option>
                         <option value="garanty_doc">Акт о гарантии</option>
                         <option value="adoption_doc">Акт о принятии</option>
@@ -24,38 +25,71 @@
                 </div>
             </form>
 
-            <!-- Кнопка «Сохранить документ» связывается с формой через form="editor-form" -->
-            <button type="button" class="btn-action btn-save"
+            <button type="button" id='save-doc-btn' style="display: none;" class="btn-action btn-save"
                 onclick="tinymce.triggerSave(); htmx.trigger('#editor-form', 'submit');">
                 Сохранить документ
             </button>
 
-            <!-- Контейнер для кнопки «По умолчанию» (приходит через hx-swap-oob) -->
             <div id="reset-btn-container"></div>
         </div>
 
-        <hr class="custom-divider">
+        <div class="custom-divider"></div>
 
         <div id="hidden-data-container" style="display: none;"></div>
 
+        <!-- Только редактор скрывается до выбора документа -->
         <div id="editor-container" style="display: none;">
             <form id="editor-form" hx-post="{% url 'tiny_mce' %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
                 {% csrf_token %}
                 <input type="hidden" name="document" id="current-document-input" value="">
                 {{ tiny_mce.media }}
                 {{ tiny_mce.as_p }}
-                <div class="bottom-actions">
-                    <a href="{% url 'categories' %}" class="btn btn-primary btn-next">Назад</a>
-                    <a href="{% url 'form-editor' %}" class="btn btn-primary btn-next">Далее</a>
-                </div>
             </form>
+        </div>
+
+        <!-- Линия и кнопки вынесены наружу — они всегда видимы -->
+        <div class="bottom-section">
+            <div class="custom-divider"></div>
+
+            <div class="bottom-actions">
+                <a href="{% url 'categories' %}" class="btn btn-primary btn-next">
+                    <svg class="arrow-left-4" style="height: 25px; fill: white; transform: rotate(180deg);"
+                        viewBox="0 0 100 85">
+                        <polygon
+                            points="58.263,0.056 100,41.85 58.263,83.641 30.662,83.641 62.438,51.866 0,51.866 0,31.611 62.213,31.611 30.605,0 58.263,0.056" />
+                    </svg>
+                </a>
+                <a href="{% url 'form-editor' %}" class="btn btn-primary btn-next">
+                    <svg class="arrow-right-4" viewBox="0 0 100 85" style="height: 25px; fill: white;">
+                        <polygon
+                            points="58.263,0.056 100,41.85 58.263,83.641 30.662,83.641 62.438,51.866 0,51.866 0,31.611 62.213,31.611 30.605,0 58.263,0.056" />
+                    </svg>
+                </a>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const selectElement = document.getElementById('page-select');
+        const saveBtn = document.getElementById('save-doc-btn');
+        const editorContainer = document.getElementById('editor-container');
 
-    // НЕ УДАЛЯТЬ ЭТОТ БЛОК ТАК КАК TinyMCE НЕ В СОСТОЯНИИ ПО ДРУГОМУ РАБОТАТЬ С JS ЕСЛИ ОН НЕ В style
+        if (selectElement) selectElement.selectedIndex = 0;
+        if (editorContainer) editorContainer.style.display = 'none';
+        if (saveBtn) saveBtn.style.display = 'none';
+
+        if (selectElement) {
+            selectElement.addEventListener('change', function () {
+                if (!this.value) {
+                    saveBtn.style.display = 'none';
+                    editorContainer.style.display = 'none';
+                }
+            });
+        }
+    });
+
     document.body.addEventListener('htmx:afterSwap', function (event) {
         if (event.detail.target.id === 'hidden-data-container') {
             const fetchedContent = document.getElementById('fetched-content');
@@ -69,21 +103,17 @@
                     inputDoc.value = fetchedDocType.value;
                 }
 
-                // 3. Ставим 'flex' вместо 'block', чтобы не ломать Flexbox-сетку
-                document.getElementById('editor-container').style.display = 'flex';
+                document.getElementById('editor-container').style.display = 'block';
+                document.getElementById('save-doc-btn').style.display = 'block';
             }
         }
     });
 
-    // Функция создания красивого всплывающего уведомления
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container');
-
-        // Создаем элемент alert
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} fade-in`;
 
-        // SVG-иконка в зависимости от типа
         const icon = type === 'success'
             ? `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
             <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z"/>
@@ -95,7 +125,6 @@
         alertDiv.innerHTML = `${icon}<span>${message}</span>`;
         container.appendChild(alertDiv);
 
-        // Автоматическое удаление через 3.5 секунды с плавной анимацией
         setTimeout(() => {
             alertDiv.style.opacity = '0';
             alertDiv.style.transition = 'opacity 0.4s ease';
@@ -103,7 +132,6 @@
         }, 3500);
     }
 
-    // Слушатели HTMX-событий с сервера
     document.body.addEventListener('success_save_doc', function () {
         showToast('Изменения успешно сохранены!', 'success');
     });
@@ -119,8 +147,6 @@
     document.body.addEventListener('htmx:configRequest', function (event) {
         event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';
     });
-
 </script>
-
 
 {% endblock %}
