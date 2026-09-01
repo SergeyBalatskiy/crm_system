@@ -13,64 +13,71 @@ import json
 class DeleteCustomForm(TemplateView):
 
     def post(self, request, *args, **kwargs):
-
         type_of_order_selected = request.POST.get('type_of_order_selected')
-
         objects_show = request.POST.get('objects_show')
         print("1111212", objects_show)
 
-        # ["custom-1"]
-        deleted_custom_forms = request.POST.get('deleted_custom_forms')
+        # Безопасный парсинг JSON с формами на удаление
+        raw_deleted_forms = request.POST.get('deleted_custom_forms', '[]')
+        try:
+            deleted_custom_forms = json.loads(raw_deleted_forms)
+        except (json.JSONDecodeError, TypeError):
+            deleted_custom_forms = []
 
-        deleted_custom_forms = json.loads(deleted_custom_forms)
-
-        for object_custom_form in deleted_custom_forms:
-            deleted_custom_forms = object_custom_form
+        # Если пришел одиночный элемент строкой, оборачиваем в список
+        if isinstance(deleted_custom_forms, str):
+            deleted_custom_forms = [deleted_custom_forms]
 
         order_information = FormsForOrder.objects.filter(
-                type_of_order=type_of_order_selected, 
-                user=self.request.user
-            ).first()
+            type_of_order=type_of_order_selected, 
+            user=self.request.user
+        ).first()
+
+        if not order_information or not order_information.json_forms:
+            return HttpResponse(status=400)
         
         json_models_data = order_information.json_forms
 
         for section in json_models_data.get('sections', []):
             if section.get('id') == objects_show:
 
-                custom_forms = section.get('custom_forms')
-                saved_hints = section.get('saved_hints')
-                for selected_form in custom_forms:
+                # Защита от None: если ключа нет или он None, используем дефолтные типы
+                custom_forms = section.get('custom_forms') or []
+                saved_hints = section.get('saved_hints') or {}
 
-                    if deleted_custom_forms in selected_form['field_key']:
-                        custom_forms.remove(selected_form)
-                        print(custom_forms)
-                        print('Удалена форма')
-                        break
+                for form_key_to_delete in deleted_custom_forms:
+                    # 1. Удаляем форму из custom_forms через list comprehension
+                    section['custom_forms'] = [
+                        form for form in custom_forms 
+                        if form_key_to_delete not in form.get('field_key', '')
+                    ]
 
-                for hint_obj_to_delete in saved_hints:
-                    if deleted_custom_forms in hint_obj_to_delete:
-                        del saved_hints[hint_obj_to_delete]
-                        print('Удален автоответ')
-                        print(saved_hints)
-                        break
+                    # 2. Безопасно удаляем автоответы из saved_hints
+                    if isinstance(saved_hints, dict):
+                        keys_to_remove = [
+                            key for key in saved_hints 
+                            if form_key_to_delete in key
+                        ]
+                        for key in keys_to_remove:
+                            del saved_hints[key]
+                            print('Удален автоответ:', key)
 
-                print("Сохранение в БД!")
-                # Сохранение изменений в БД
+                # Сохраняем обновленный объект в БД
                 order_information.json_forms = json_models_data
                 order_information.save()
                 
-                # Для GET запроса
+                # Формируем HTMX триггер
                 args_for_get_trigger = {
                     "formCreated": {
-                    "objects_show": objects_show,
-                    "type_of_order_selected": type_of_order_selected
-                        }
+                        "objects_show": objects_show,
+                        "type_of_order_selected": type_of_order_selected
                     }
+                }
                 response = HttpResponse(status=204)
                 response["HX-Trigger"] = json.dumps(args_for_get_trigger)
                 return response
 
-
+        return HttpResponse(status=200)
 
 
                         

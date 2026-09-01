@@ -82,7 +82,7 @@ class CustomUserCreationForm(forms.ModelForm):
             raise forms.ValidationError("Номер должен начинаться с 7 или 8!")
 
         # Форматирование номера
-        formatted_number = '+7 ({}) {}-{}-{}'.format(
+        formatted_number = '+7 {} {}-{}-{}'.format(
         digits[1:4], digits[4:7], digits[7:9], digits[9:11]
         )
 

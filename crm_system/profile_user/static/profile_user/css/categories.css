@@ -298,7 +298,7 @@
 
 .categories-footer {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     margin-top: 24px;
     padding-top: 16px;
@@ -307,6 +307,7 @@
 
 .footer-actions {
     display: flex;
-    gap: 12px;
+    justify-content: space-between;
+    width: 100%;
     align-items: center;
 }

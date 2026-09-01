@@ -1,4 +1,3 @@
-<!-- forms-editor.html -->
 {% extends "profile_user/base.html" %}
 {% load static %}
 
@@ -11,19 +10,27 @@
 <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 <div class="form-editor-place">
     <div class="editor-page-wrapper-box">
-        <h1>Редактор форм</h1>
-        <form method="get" class="navigation-form-select">
-            <label for="page-select">Тип формы заказов:</label>
-            <select class="custom-select" name="type_of_order_selected" hx-trigger="change" hx-target="#show-data-forms"
-                hx-get="{% url 'form-editor' %}" hx-swap="innerHTML">
-                <option value="" disabled selected hidden>Выберите тип заказа...</option>
-                <option value="paid">Платный ремонт</option>
-                <option value="warranty">Гарантийный ремонт</option>
-            </select>
-        </form>
+
+        <!-- Заголовок и селект выстроены в одну строку -->
+        <div class="form-editor-header">
+            <h1>Редактор форм</h1>
+            <form method="get" class="navigation-form-select">
+                <select class="custom-select" id="page-select" name="type_of_order_selected" autocomplete="off"
+                    hx-trigger="change" hx-target="#show-data-forms" hx-get="{% url 'form-editor' %}"
+                    hx-swap="innerHTML" onchange="hideSaveBar()">
+                    <option value="" disabled selected hidden>Выберите тип заказа...</option>
+                    <option value="paid">Платный ремонт</option>
+                    <option value="warranty">Гарантийный ремонт</option>
+                </select>
+            </form>
+        </div>
+
+        <hr class="top-custom-divider">
+
 
         <div id="show_new_form_create"></div>
 
+        <!-- Область с формой и сайдбаром (будет скроллиться только она) -->
         <div class="editor-page-layout">
             <div class="builder-main-content">
                 <div id="show-data-forms" class="builder-container">
@@ -45,7 +52,30 @@
                 </div>
             </aside>
         </div>
+
+        <!-- Разделительная полоса и футер со стрелками (зафиксированы внизу) -->
+        <hr class="custom-divider">
+
+        <div class="categories-footer">
+            <div class="footer-actions">
+                <a href="{% url 'tiny_mce' %}" class="btn btn-primary btn-next">
+                    <svg class="arrow-left-4" style="height: 25px; fill: white; transform: rotate(180deg);"
+                        viewBox="0 0 100 85">
+                        <polygon
+                            points="58.263,0.056 100,41.85 58.263,83.641 30.662,83.641 62.438,51.866 0,51.866 0,31.611 62.213,31.611 30.605,0 58.263,0.056" />
+                    </svg>
+                </a>
+                <a href="#" class="btn btn-primary btn-next">
+                    <svg class="arrow-right-4" viewBox="0 0 100 85" style="height: 25px; fill: white;">
+                        <polygon
+                            points="58.263,0.056 100,41.85 58.263,83.641 30.662,83.641 62.438,51.866 0,51.866 0,31.611 62.213,31.611 30.605,0 58.263,0.056" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+
     </div>
+
     <div id="bottom-save-bar" class="bottom-save-bar hidden">
         <div class="save-bar-content">
             <button class="btn btn-primary" onclick="saveChanges()">Сохранить</button>
@@ -67,5 +97,4 @@
         </div>
     </div>
 </div>
-
 {% endblock %}

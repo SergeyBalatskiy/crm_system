@@ -140,7 +140,6 @@
     border-radius: 12px;
     font-size: 16px;
     font-weight: 600;
-    margin-bottom: 24px;
 
     max-width: 720px;
     width: 100%;
@@ -148,6 +147,24 @@
 
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
     animation: alertSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Плавные переходы для исчезновения и уменьшения высоты */
+    max-height: 100px;
+    opacity: 1;
+    overflow: hidden;
+    box-sizing: border-box;
+    transition: opacity 0.4s ease, max-height 0.4s ease, margin 0.4s ease, padding 0.4s ease, border-width 0.4s ease;
+}
+
+.alert.fade-out {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-top-width: 0;
+    border-bottom-width: 0;
 }
 
 .custom-divider {
