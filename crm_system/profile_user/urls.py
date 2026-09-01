@@ -25,5 +25,10 @@ urlpatterns = [
     path('get-create-new-form', CreateNewFormInCategory.as_view(), name='create-new-form'),
     # Указываю на путь, чтобы можно было УДАЛИТЬ кастомную форму
     path('delete-custom-form', DeleteCustomForm.as_view(), name='delete-custom-form'),
-    
+    # Указываю на путь к СКЛАДУ (Там хранятся все АКТУАЛЬНЫЕ ТОВАРЫ)
+    path('storage', StorageCustomView.as_view(), name='main-storage'),
+    # Указываю на путь к СКЛАДУ-ПОСТУПЛЕНИЮ (Там можно добавить новое поступление на склад)
+    path('storage/acceptable', StorageAcceptableCustomView.as_view(), name='acceptance-storage'),
+    # Указываю на путь к СКЛАДУ-ИЗЬЯТИЮ (Там можно изьять товары на складе)
+    path('storage/removal', StorageRemovalCustomView.as_view(), name='removal-storage'),
 ]

@@ -100,6 +100,23 @@ function DeleteClick(element) {
     }
 }
 
+function resetFormEditorState() {
+    // 1. Очищаем карты с временными данными
+    if (typeof map !== 'undefined' && map.clear) map.clear();
+    if (typeof addedMap !== 'undefined' && addedMap.clear) addedMap.clear();
+    if (typeof deletedLabelsMap !== 'undefined' && deletedLabelsMap.clear) deletedLabelsMap.clear();
+
+    // 2. Сбрасываем активные позиции и слоты
+    activeSlotId = null;
+    globalAddPosition = null;
+
+    // 3. Закрываем правый сайдбар
+    closeSidebar();
+
+    // 4. Скрываем нижнюю панель сохранения
+    hideSaveBar();
+}
+
 // Функция, проверяющая, открыт ли сейчас сайдбар с ирелевантными формами?
 function isSidebarOpen() {
     const sidebar = document.getElementById('right-sidebar');

@@ -17,7 +17,7 @@
             <form method="get" class="navigation-form-select">
                 <select class="custom-select" id="page-select" name="type_of_order_selected" autocomplete="off"
                     hx-trigger="change" hx-target="#show-data-forms" hx-get="{% url 'form-editor' %}"
-                    hx-swap="innerHTML" onchange="hideSaveBar()">
+                    hx-swap="innerHTML" onchange="resetFormEditorState()">
                     <option value="" disabled selected hidden>Выберите тип заказа...</option>
                     <option value="paid">Платный ремонт</option>
                     <option value="warranty">Гарантийный ремонт</option>
@@ -26,7 +26,6 @@
         </div>
 
         <hr class="top-custom-divider">
-
 
         <div id="show_new_form_create"></div>
 
