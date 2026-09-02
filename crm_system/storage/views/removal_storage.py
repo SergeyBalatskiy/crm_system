@@ -12,7 +12,7 @@ from django.contrib.staticfiles import finders
 @method_decorator(login_required(), name='dispatch') 
 class StorageRemovalCustomView(TemplateView):
 
-    template_name = 'profile_user/storage/removal-storage.html'
+    template_name = 'storage/removal-storage.html'
 
     def post(self, request, *args, **kwargs):
 
@@ -66,5 +66,5 @@ class StorageRemovalCustomView(TemplateView):
         ...
         
     def get(self, request, *args, **kwargs):
-            ...
-                        
+        return render(self.request, self.template_name)
+                                 

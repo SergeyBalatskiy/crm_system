@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 # Применение новых приложений
 INSTALLED_APPS = [
+    'storage',
     'tinymce',
     'profile_user',
     'auth_registration',

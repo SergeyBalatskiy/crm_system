@@ -6,4 +6,5 @@ urlpatterns = [
     path('auth/', include('auth_registration.urls')),
     path('profile/', include('profile_user.urls')),
     path('tinymce/', include('tinymce.urls')),
+    path('storage/', include('storage.urls')),
 ]
