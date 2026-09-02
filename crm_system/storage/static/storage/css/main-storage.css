@@ -1,0 +1,21 @@
+.div-place-storage {
+    width: 100%;
+    height: 100%;
+}
+
+.div-box-storage {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 13px 13px 13px rgba(0, 0, 0, 0.364);
+    padding: 40px;
+
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
