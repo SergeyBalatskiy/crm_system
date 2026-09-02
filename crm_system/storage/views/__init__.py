@@ -1,0 +1,3 @@
+from .main_storage import StorageCustomView
+from .acceptable_storage import StorageAcceptableCustomView
+from .removal_storage import StorageRemovalCustomView

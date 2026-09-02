@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 # Применение новых приложений
 INSTALLED_APPS = [
+    'storage',
     'profile_user',
     'auth_registration',
     'django.contrib.admin',

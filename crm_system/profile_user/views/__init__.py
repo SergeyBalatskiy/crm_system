@@ -12,6 +12,3 @@ from .get_individual_field_modal import EditIndividualCenterForm
 from .create_new_form import CreateNewFormInCategory
 from .delete_custom_form import DeleteCustomForm
 from .backup_default_doc import BackupDocumentView
-from .main_storage import StorageCustomView
-from .acceptable_storage import StorageAcceptableCustomView
-from .removal_storage import StorageRemovalCustomView
