@@ -45,7 +45,7 @@ WorkersFormSet = modelformset_factory(
 
 # Переменная которая содержит в себе форму для добавления категорий 
 StatusesFormSet = modelformset_factory(
-    StatusCategory, fields=("name", "color", "category"), extra=1)
+    StatusCategory, fields=("name", "color", "category"))
 
 class DocumentInfoForm(forms.ModelForm):
     """Форма для получения данных документа"""

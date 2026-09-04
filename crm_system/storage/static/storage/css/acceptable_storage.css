@@ -19,3 +19,18 @@
     flex-direction: column;
     overflow: hidden;
 }
+
+.django-form input[type=number]::-webkit-outer-spin-button,
+.django-form input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0;
+}
+
+.django-form input[type=number] {
+    -moz-appearance: textfield !important;
+}
+
+.django-form input {
+    -webkit-appearance: none;
+    appearance: none;
+}

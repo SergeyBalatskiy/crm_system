@@ -7,7 +7,31 @@
 
 <div class="div-place-storage-acceptable">
     <div class="div-box-storage-acceptable">
+        <div class="field_input_name">
+            <form id="form-container" method="POST" class="storage-acceptable-form">
+                {% csrf_token %}
+                {{ form_acceptable.management_form }}
 
+                <div id="acceptable-div-form">
+                    {% for form in form_acceptable %}
+                    <div class="django-form">
+                        {{ form.as_p }}
+                    </div>
+                    {% endfor %}
+                </div>
+
+
+                <button type="submit" class="btn btn-primary btn-submit">Создать</button>
+                <button type="button" id="add-new-form-acceptable">Новое поступление</button>
+            </form>
+
+            <div id="empty-form-acceptable" style="display: none;">
+                <div class="django-form">
+                    {{ form_acceptable.empty_form.as_p }}
+                </div>
+            </div>
+
+        </div>
     </div>
 </div>
 {% endblock %}

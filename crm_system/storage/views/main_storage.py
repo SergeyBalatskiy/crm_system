@@ -2,7 +2,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from profile_user.models import DocumentInformation
+from storage.models import StorageInfo
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.staticfiles import finders
@@ -14,9 +14,15 @@ class StorageCustomView(TemplateView):
 
     template_name = 'storage/main-storage.html'
 
-    def post(self, request, *args, **kwargs):
-        ...
-        
     def get(self, request, *args, **kwargs):
-        return render(self.request, self.template_name)
+
+        # Получаю объект из БД для показа уже созданных когда-либо товаров, в том числе актуальных
+        storage_actual_items = StorageInfo.objects.filter(
+            user=self.request.user
+        ).all()
+
+        if storage_actual_items:
+            return render(request, self.template_name, {"storage_actual_items" : storage_actual_items })
+
+        return render(request, self.template_name)
                         
