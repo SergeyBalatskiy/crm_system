@@ -9,6 +9,7 @@ from django.contrib.staticfiles import finders
 from storage.forms import StorageAcceptableForm
 from storage.models import StorageInfo
 from django.contrib import messages
+from datetime import datetime
 
 
 # Данный класс отвечает за показ сайта где можно добавить новые поступления на склад
@@ -28,12 +29,14 @@ class StorageAcceptableCustomView(TemplateView):
 
             # Остановка сохранения 
             instances = formset.save(commit=False)
+            current_time = datetime.now()
 
             # Беру каждый обьект из формсета и индивидуально в каждом записываю юзера и сохраняю
             for instance in instances:
                 instance.user = request.user
                 instance.individual_code = instance.id
                 instance.remainder = instance.quantity_at_the_purchase
+                instance.created_at = current_time.strftime("%d.%m.%Y, %H:%M:%S")
                 instance.save()
             messages.success(request, 'Новый товар успешно добавлен на склад!')
             return redirect('main-storage')

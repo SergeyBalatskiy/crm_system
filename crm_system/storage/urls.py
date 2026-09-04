@@ -10,4 +10,7 @@ urlpatterns = [
     path('acceptable', StorageAcceptableCustomView.as_view(), name='acceptance-storage'),
     # Указываю на путь к СКЛАДУ-ИЗЬЯТИЮ (Там можно изьять товары на складе)
     path('removal', StorageRemovalCustomView.as_view(), name='removal-storage'),
+    # Указываю на путь к показу историй создания/списания товаров на складе
+    path('history', StorageHistoryCustomView.as_view(), name='history-storage'),
+    
 ]
