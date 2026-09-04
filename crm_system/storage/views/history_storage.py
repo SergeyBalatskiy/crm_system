@@ -21,5 +21,7 @@ class StorageHistoryCustomView(TemplateView):
     def get(self, request, *args, **kwargs):
 
         # Здесь мне нужно получить всю базу внесения/списания товаров из БД HistoryStorageInfo
+
+        # А также создать новый обьект в БД HistoryStorageInfo когда "вносят" новый товар на склад и когда его списывают
         ...
         # HistoryStorageInfo
