@@ -34,16 +34,15 @@ class StorageInfo(models.Model):
 class HistoryStorageInfo(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='history_storage')
-    type_of_operation = models.CharField(max_length=100) # Тип операции? (Поступление, списание)
-    individual_code_history = models.IntegerField() # Код самого товара
-    name_product_history = models.CharField(max_length=120) # Название товара
-    quantity_at_the_purchase_history = models.IntegerField() # Количество на момент закупки
-    buy_price_history = models.IntegerField() # Стоимость закупки (1 шт.)
-    retail_price_history = models.IntegerField() # Цена для продажи (1 шт.)
-    supplier_history = models.CharField(max_length=120) # Поставщик
-    remainder_history = models.IntegerField(null=True, blank=True) # Остаток на складе
-    time_of_operation_history = models.DateTimeField() # Время проведения операции ("создание"\"списание")
-    created_at_history = models.DateTimeField() # Время добавления самого товара
+    type_of_operation_history = models.CharField(max_length=120, null=True, blank=True) # Тип операции? (Поступление, списание, возврат)
+    name_product_history = models.CharField(max_length=120, null=True, blank=True) # Название товара
+    individual_code_history = models.IntegerField(null=True, blank=True)  # id (Код товара)
+    quantity_history = models.IntegerField(null=True, blank=True) # Количество, которое учавствует в операции (Добавление, списание, возврат)
+    buy_price_history = models.IntegerField(null=True, blank=True) # Стоимость закупки (1 шт.)
+    supplier_history = models.CharField(max_length=120, null=True, blank=True) # Поставщик
+    remainder_history = models.IntegerField(null=True, blank=True) # Остаток на складе (После проведения операции)
+    time_of_operation_history = models.DateTimeField(null=True, blank=True) # Время проведения операции ("создание"\"списание"\"возврат")
+    time_created_history = models.DateTimeField(null=True, blank=True) # Время проведения операции (Появления самого товара)
 
     def __str__(self):
         return f'История товара: {self.name_product_history}, Кол-во: {self.remainder_history}, связан с {self.user.get_full_name()}'

@@ -35,11 +35,13 @@ class StorageAcceptableCustomView(TemplateView):
                 instance.remainder = instance.quantity_at_the_purchase
                 instance.save()
 
+                print('Индивидуальный код:', instance.individual_code)
+
                 # Создаю обьект (один) в HistoryStorageInfo чтобы можно было отследить, что я добавил!
-                HistoryStorageInfo.objects.create(type_of_operation = 'Поступление', individual_code_history = instance.individual_code, 
-                name_product_history = instance.name_product, quantity_at_the_purchase_history = instance.quantity_at_the_purchase, 
-                buy_price_history = instance.buy_price, retail_price_history = instance.retail_price, supplier_history = instance.supplier, 
-                remainder_history = instance.remainder, time_of_operation_history = timezone.now(), created_at_history = instance.created_at, user = request.user)
+                HistoryStorageInfo.objects.create(type_of_operation_history = 'Поступление', individual_code_history = instance.individual_code, 
+                name_product_history = instance.name_product, quantity_history = instance.quantity_at_the_purchase, 
+                buy_price_history = instance.buy_price, supplier_history = instance.supplier, 
+                remainder_history = instance.remainder, time_of_operation_history = timezone.now(), time_created_history = instance.created_at, user = request.user)
 
             messages.success(request, 'Новый товар успешно добавлен на склад!')
             return redirect('main-storage')

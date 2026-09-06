@@ -25,6 +25,12 @@ class StorageHistoryCustomView(TemplateView):
             user=self.request.user
         ).all()
 
+        for item in storage_history_items:
+            print(f"ID: {item.id}")
+            print(f"time_of_operation_history: {item.time_of_operation_history}")
+            print(f"Тип поля: {type(item.time_of_operation_history)}")
+            print("-" * 50)
+
         if storage_history_items:
             return render(request, self.template_name, {"storage_history_items" : storage_history_items })
 

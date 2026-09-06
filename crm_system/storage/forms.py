@@ -11,7 +11,7 @@ StorageAcceptableForm = modelformset_factory(
         "quantity_at_the_purchase": "Кол-во на момент закупки",
         "supplier" : "Поставщик",
         "buy_price" : "Стоимость в закупке (шт.)", 
-        "retail_price" : "Стоимость в продаж", 
+        "retail_price" : "Стоимость в продажу (шт.) - Это просто напоминание для себя за сколько планируют продать", 
         "minimum_items_for_notification" : "Напоминание о маленьком кол-ве (шт.)"
     })
 
