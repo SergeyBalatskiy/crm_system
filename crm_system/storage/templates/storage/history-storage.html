@@ -21,10 +21,10 @@
             <div class="worker-col">Стоимость для продажи (штука): {{ item_history.retail_price_history }}</div>
             <div class="worker-col">Поставщик: {{ item_history.supplier_history }}</div>
             <div class="worker-col">Действующий остаток: {{ item_history.remainder_history }}</div>
-            <div class="worker-col">Время проведения операции (Добавление/Списание): {{
-                item_history.time_of_operation_history }}</div>
+            <div class="worker-col">Время проведения операции (Добавление/Списание):
+                {{ item_history.time_of_operation_history }}</div>
             <div class="worker-col">Товар был добавлен в базу: {{ item_history.created_at_history }}</div>
-
+            <h1>----------------------</h1>
         </div>
         {% endfor %}
 

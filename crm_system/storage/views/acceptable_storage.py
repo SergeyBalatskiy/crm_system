@@ -40,7 +40,6 @@ class StorageAcceptableCustomView(TemplateView):
                 name_product_history = instance.name_product, quantity_at_the_purchase_history = instance.quantity_at_the_purchase, 
                 buy_price_history = instance.buy_price, retail_price_history = instance.retail_price, supplier_history = instance.supplier, 
                 remainder_history = instance.remainder, time_of_operation_history = timezone.now(), created_at_history = instance.created_at, user = request.user)
-                print()
 
             messages.success(request, 'Новый товар успешно добавлен на склад!')
             return redirect('main-storage')
