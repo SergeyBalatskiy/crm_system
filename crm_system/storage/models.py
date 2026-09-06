@@ -38,11 +38,11 @@ class HistoryStorageInfo(models.Model):
     individual_code_history = models.IntegerField() # Код самого товара
     name_product_history = models.CharField(max_length=120) # Название товара
     quantity_at_the_purchase_history = models.IntegerField() # Количество на момент закупки
-    buy_price = models.IntegerField() # Стоимость закупки (1 шт.)
-    retail_price = models.IntegerField() # Цена для продажи (1 шт.)
+    buy_price_history = models.IntegerField() # Стоимость закупки (1 шт.)
+    retail_price_history = models.IntegerField() # Цена для продажи (1 шт.)
     supplier_history = models.CharField(max_length=120) # Поставщик
     remainder_history = models.IntegerField(null=True, blank=True) # Остаток на складе
-    time_of_operation_history = models.DateTimeField(default=timezone.now()) # Время проведения операции ("создание"\"списание")
+    time_of_operation_history = models.DateTimeField() # Время проведения операции ("создание"\"списание")
     created_at_history = models.DateTimeField() # Время добавления самого товара
 
     def __str__(self):

@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib.staticfiles import finders
 from storage.forms import StorageAcceptableForm
-from storage.models import StorageInfo
+from storage.models import HistoryStorageInfo
 from django.contrib import messages
 from datetime import datetime
 
@@ -17,11 +17,16 @@ from datetime import datetime
 class StorageHistoryCustomView(TemplateView):
 
     template_name = 'storage/history-storage.html'
-        
+
     def get(self, request, *args, **kwargs):
 
-        # Здесь мне нужно получить всю базу внесения/списания товаров из БД HistoryStorageInfo
+        # Получаю объект из БД для показа уже созданных когда-либо товаров, в том числе актуальных
+        storage_history_items = HistoryStorageInfo.objects.filter(
+            user=self.request.user
+        ).all()
 
-        # А также создать новый обьект в БД HistoryStorageInfo когда "вносят" новый товар на склад и когда его списывают
-        ...
-        # HistoryStorageInfo
+        if storage_history_items:
+            return render(request, self.template_name, {"storage_history_items" : storage_history_items })
+
+        return render(request, self.template_name)
+                        

@@ -1,0 +1,34 @@
+{% extends "storage/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'storage/css/history-storage.css' %}">
+<script src="{% static 'storage/js/history-storage.js' %}" defer></script>
+
+<div class="div-place-storage-history">
+    <div class="div-box-storage-history">
+
+        <!-- Строки с остальными сотрудниками -->
+        {% for item_history in storage_history_items %}
+        <div class="item-place" data-id="{{ item.individual_code }}">
+
+            <div class="worker-col">Тип операции: {{ item_history.type_of_operation }}</div>
+            <div class="worker-col">Код товара: {{ item_history.individual_code_history }}</div>
+            <div class="worker-col">Название товара: {{ item_history.name_product_history }}</div>
+            <div class="worker-col">Количество на момент закупки: {{ item_history.quantity_at_the_purchase_history }}
+            </div>
+            <div class="worker-col">Стоимость закупки (штука): {{ item_history.buy_price_history }}</div>
+            <div class="worker-col">Стоимость для продажи (штука): {{ item_history.retail_price_history }}</div>
+            <div class="worker-col">Поставщик: {{ item_history.supplier_history }}</div>
+            <div class="worker-col">Действующий остаток: {{ item_history.remainder_history }}</div>
+            <div class="worker-col">Время проведения операции (Добавление/Списание): {{
+                item_history.time_of_operation_history }}</div>
+            <div class="worker-col">Товар был добавлен в базу: {{ item_history.created_at_history }}</div>
+
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+{% endblock %}
