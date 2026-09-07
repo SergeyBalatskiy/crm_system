@@ -2,10 +2,7 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from profile_user.models import DocumentInformation
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from django.contrib.staticfiles import finders
 from storage.forms import StorageAcceptableForm
 from storage.models import StorageInfo, HistoryStorageInfo
 from django.contrib import messages

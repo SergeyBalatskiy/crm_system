@@ -8,9 +8,10 @@ urlpatterns = [
     path('', StorageCustomView.as_view(), name='main-storage'),
     # Указываю на путь к СКЛАДУ-ПОСТУПЛЕНИЮ (Там можно добавить новое поступление на склад)
     path('acceptable', StorageAcceptableCustomView.as_view(), name='acceptance-storage'),
-    # Указываю на путь к СКЛАДУ-ИЗЬЯТИЮ (Там можно изьять товары на складе)
+    # Указываю на путь к СКЛАДУ-списанию (Там можно изьять товары на складе)
     path('removal', StorageRemovalCustomView.as_view(), name='removal-storage'),
     # Указываю на путь к показу историй создания/списания товаров на складе
     path('history', StorageHistoryCustomView.as_view(), name='history-storage'),
-    
+    # Указываю на путь к показу формы Гарантийного возврата
+    path('garanty', StorageGarantyCustomView.as_view(), name='garanty-storage'),   
 ]
