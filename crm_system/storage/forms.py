@@ -20,6 +20,7 @@ RemovalHistoryForm = modelformset_factory(
         "name_product_history": "Название товара",
         "individual_code_history": "Код товара",
         "quantity_history" : "Количество",
+        "supplier_history" : "Поставщик"
     })
 
 GarantyHistoryForm = modelformset_factory(

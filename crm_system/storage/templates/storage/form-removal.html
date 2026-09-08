@@ -1,0 +1,28 @@
+{% extends "storage/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'storage/css/form-removal.css' %}">
+<script src="{% static 'storage/js/form-removal.js' %}" defer></script>
+
+<div class="div-place-form-removal">
+    <div class="div-box-form-removal">
+        <h1>Списание товара</h1>
+        <!-- Заголовок и селект выстроены в одну строку -->
+        <div class="form-editor-header">
+            <form method="get" class="navigation-form-select">
+                <select class="custom-select" id="page-select" name="type_of_form_selected" autocomplete="off"
+                    hx-trigger="change" hx-target="#show-removal-forms" hx-get="{% url 'removal-form-storage' %}"
+                    hx-swap="innerHTML">
+                    <option value="" disabled selected hidden>Выберите тип списания товара...</option>
+                    <option value="warranty_form">Гарантийное списание (возврат с возмещением средств)</option>
+                    <option value="removal_form">Списание</option>
+                </select>
+            </form>
+        </div>
+
+        <div id="show-removal-forms" class="builder-container"></div>
+
+    </div>
+</div>
+{% endblock %}

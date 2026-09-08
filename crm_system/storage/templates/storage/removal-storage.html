@@ -1,14 +1,28 @@
-{% extends "storage/base.html" %}
 {% load static %}
-
-{% block content %}
+<script src="{% static 'profile_user/js/removal_storage.js' %}" defer></script>
 <link rel="stylesheet" href="{% static 'storage/css/removal_storage.css' %}">
-<script src="{% static 'storage/js/removal_storage.js' %}" defer></script>
 
-<div class="div-place-storage-removal">
-    <div class="div-box-storage-removal">
+<form hx-post="{% url 'removal-storage' %}" class="removal-form-storage">
+    {% csrf_token %}
+    {{ form_removal.management_form }}
 
+    <div id="removal-div-form">
+        {% for form in form_removal %}
+        <div class="django-form">
+            {{ form.as_p }}
+        </div>
+        {% endfor %}
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-submit">Создать</button>
+    <button type="button" id="add-new-form-removal">Новое гарантийное списание</button>
+</form>
+
+<div id="empty-form-removal" style="display: none;">
+    <div class="django-form">
+        {{ form_removal.empty_form.as_p }}
     </div>
 </div>
 
-{% endblock %}
+<button type="submit">Создать</button>
+</form>

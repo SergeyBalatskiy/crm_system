@@ -2,11 +2,11 @@ from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from profile_user.models import DocumentInformation
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.contrib.staticfiles import finders
-
+from storage.models import HistoryStorageInfo, StorageInfo
+from django.shortcuts import render, redirect
+from storage.forms import RemovalHistoryForm
+from django.contrib import messages
+from django.utils import timezone
 
 # Данный класс отвечает за показ сайта, где можно изьять/удалить товары на складе (имеющиеся)
 @method_decorator(login_required(), name='dispatch') 
@@ -15,8 +15,40 @@ class StorageRemovalCustomView(TemplateView):
     template_name = 'storage/removal-storage.html'
 
     def post(self, request, *args, **kwargs):
-        ...
         
+        # Получаю все формсеты, которые есть
+        formset = RemovalHistoryForm(request.POST)
+        
+        # Валидация форм (пропуск не важных полей) + сохранение важных
+        if formset.is_valid():
+        
+            # Остановка сохранения 
+            instances = formset.save(commit=False)
+    
+            # Беру каждый обьект из формсета и индивидуально в каждом записываю юзера и сохраняю
+            for instance in instances:
+                history_data = StorageInfo.objects.filter(individual_code=instance.individual_code_history).first()
+                instance.user = request.user
+                instance.type_of_operation_history = "Возврат без возмещения денежных средств"
+                instance.individual_code_history = history_data.individual_code
+                current_remainder_instance = instance.quantity_history
+                instance.remainder_history = history_data.remainder - current_remainder_instance
+                history_data.remainder = history_data.remainder - current_remainder_instance
+                instance.time_created_history = history_data.created_at
+                instance.buy_price_history = 0
+                instance.time_of_operation_history = timezone.now()
+                instance.save()
+    
+                # Обновляю обьект (один) в StorageInfo, чтобы его впоследствии и брать, и взаимодействовать.
+                history_data.save()
+        
+            messages.success(request, 'Товары были успешно списаны со склада, компенсация за товар не была возвращена!')
+            return redirect('history-storage')
+        
+        return redirect('removal-form-storage')
+            
     def get(self, request, *args, **kwargs):
-        return render(self.request, self.template_name)
-                                 
+        # Получаю форму для добавления товара
+        formset = RemovalHistoryForm(queryset=HistoryStorageInfo.objects.none())
+        return render(request, self.template_name, {'form_removal' : formset})
+                                            

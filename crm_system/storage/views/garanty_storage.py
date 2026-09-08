@@ -42,10 +42,10 @@ class StorageGarantyCustomView(TemplateView):
                     # Обновляю обьект (один) в StorageInfo, чтобы его впоследствии и брать, и взаимодействовать.
                     history_data.save()
     
-                messages.success(request, 'Товары были успешно списаны со склада, компенсация за товар также была возвращена!')
+                messages.success(request, 'Товары были успешно списаны со склада, компенсация за товар была возвращена!')
                 return redirect('history-storage')
     
-            return redirect('acceptance-storage')
+            return redirect('removal-form-storage')
         
     def get(self, request, *args, **kwargs):
         # Получаю форму для добавления товара
