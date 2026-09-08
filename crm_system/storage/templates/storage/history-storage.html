@@ -8,26 +8,49 @@
 <div class="div-place-storage-history">
     <div class="div-box-storage-history">
 
-        <!-- Строки с остальными сотрудниками -->
         {% for item_history in storage_history_items %}
-        <div class="item-place" data-id="{{ item.individual_code }}">
-
+        <div class="item-place" data-id="{{ item_history.individual_code_history }}">
+            {% if item_history.type_of_operation_history == 'Возврат без возмещения денежных средств' %}
             <div class="worker-col">Тип операции: {{ item_history.type_of_operation_history }}</div>
             <div class="worker-col">Код товара: {{ item_history.individual_code_history }}</div>
             <div class="worker-col">Название товара: {{ item_history.name_product_history }}</div>
-            <div class="worker-col">Количество на момент закупки: {{ item_history.quantity_history }}
+            <div class="worker-col">Количество на момент списания: {{ item_history.quantity_history }}</div>
+            <div class="worker-col">Компенсация за списание товара: {{ item_history.buy_price_history }} ₽</div>
+            <div class="worker-col">Поставщик: {{ item_history.supplier_history }}</div>
+            <div class="worker-col">Действующий остаток: {{ item_history.remainder_history }}</div>
+            <div class="worker-col">Время проведения операции списания: {{ item_history.time_of_operation_history }}
             </div>
+            <div class="worker-col">Товар был добавлен в базу: {{ item_history.time_created_history }}</div>
+            <h1>----------------------</h1>
+            {% elif item_history.type_of_operation_history == 'Гарантийный возврат' %}
+            <div class="worker-col">Тип операции: {{ item_history.type_of_operation_history }}</div>
+            <div class="worker-col">Код товара: {{ item_history.individual_code_history }}</div>
+            <div class="worker-col">Название товара: {{ item_history.name_product_history }}</div>
+            <div class="worker-col">Количество на момент списания: {{ item_history.quantity_history }}</div>
+            <div class="worker-col">Компенсация за гарантийный возврат (шт.): {{ item_history.buy_price_history }} ₽
+            </div>
+            <div class="worker-col">Поставщик: {{ item_history.supplier_history }}</div>
+            <div class="worker-col">Действующий остаток: {{ item_history.remainder_history }}</div>
+            <div class="worker-col">Время проведения операции возврата: {{ item_history.time_of_operation_history }}
+            </div>
+            <div class="worker-col">Товар был добавлен в базу: {{ item_history.time_created_history }}</div>
+            <h1>----------------------</h1>
+            {% else %}
+            <div class="worker-col">Тип операции: {{ item_history.type_of_operation_history }}</div>
+            <div class="worker-col">Код товара: {{ item_history.individual_code_history }}</div>
+            <div class="worker-col">Название товара: {{ item_history.name_product_history }}</div>
+            <div class="worker-col">Количество на момент закупки: {{ item_history.quantity_history }}</div>
             <div class="worker-col">Стоимость закупки (штука): {{ item_history.buy_price_history }}</div>
             <div class="worker-col">Поставщик: {{ item_history.supplier_history }}</div>
             <div class="worker-col">Действующий остаток: {{ item_history.remainder_history }}</div>
-            <div class="worker-col">Время проведения операции (Добавление/Списание):
-                {{ item_history.time_of_operation_history }}</div>
+            <div class="worker-col">Время проведения операции добавления: {{ item_history.time_of_operation_history }}
+            </div>
             <div class="worker-col">Товар был добавлен в базу: {{ item_history.time_created_history }}</div>
             <h1>----------------------</h1>
+            {% endif %}
         </div>
         {% endfor %}
 
     </div>
 </div>
-
 {% endblock %}

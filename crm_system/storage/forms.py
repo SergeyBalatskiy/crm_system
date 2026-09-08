@@ -27,7 +27,7 @@ GarantyHistoryForm = modelformset_factory(
     HistoryStorageInfo, fields=("name_product_history", "individual_code_history", "buy_price_history", "quantity_history", "supplier_history"), labels={
         "name_product_history": "Название товара",
         "individual_code_history": "Код товара",
-        "buy_price_history" : "Закупочная цена (шт.)",
+        "buy_price_history" : "Компенсация за гарантийный возврат (шт., ₽)",
         "quantity_history" : "Количество",
         "supplier_history" : "Поставщик",
     })
