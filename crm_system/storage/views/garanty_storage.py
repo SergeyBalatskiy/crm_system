@@ -13,8 +13,6 @@ from django.contrib import messages
 @method_decorator(login_required(), name='dispatch') 
 class StorageGarantyCustomView(TemplateView):
 
-    template_name = 'storage/garanty-storage.html'
-
     def post(self, request, *args, **kwargs):
     
             # Получаю все формсеты, которые есть
@@ -47,8 +45,3 @@ class StorageGarantyCustomView(TemplateView):
     
             return redirect('removal-form-storage')
         
-    def get(self, request, *args, **kwargs):
-        # Получаю форму для добавления товара
-        formset = GarantyHistoryForm(queryset=HistoryStorageInfo.objects.none())
-        return render(request, self.template_name, {'form_garanty' : formset})
-                                        

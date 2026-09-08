@@ -12,8 +12,6 @@ from django.utils import timezone
 @method_decorator(login_required(), name='dispatch') 
 class StorageRemovalCustomView(TemplateView):
 
-    template_name = 'storage/removal-storage.html'
-
     def post(self, request, *args, **kwargs):
         
         # Получаю все формсеты, которые есть
@@ -47,8 +45,3 @@ class StorageRemovalCustomView(TemplateView):
         
         return redirect('removal-form-storage')
             
-    def get(self, request, *args, **kwargs):
-        # Получаю форму для добавления товара
-        formset = RemovalHistoryForm(queryset=HistoryStorageInfo.objects.none())
-        return render(request, self.template_name, {'form_removal' : formset})
-                                            

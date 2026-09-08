@@ -1,6 +1,6 @@
 {% load static %}
-<script src="{% static 'profile_user/js/removal_storage.js' %}" defer></script>
-<link rel="stylesheet" href="{% static 'storage/css/removal_storage.css' %}">
+<script src="{% static 'storage/js/removal-storage.js' %}" defer></script>
+<link rel="stylesheet" href="{% static 'storage/css/removal-storage.css' %}">
 
 <form hx-post="{% url 'removal-storage' %}" class="removal-form-storage">
     {% csrf_token %}
@@ -23,6 +23,4 @@
         {{ form_removal.empty_form.as_p }}
     </div>
 </div>
-
-<button type="submit">Создать</button>
 </form>
