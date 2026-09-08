@@ -34,14 +34,15 @@
         <div class="item-place" data-id="{{ item.individual_code }}">
 
             <div class="worker-col">Айдишник: {{ item.id }}</div>
-            <div class="worker-col">{{ item.name_product }}</div>
-            <div class="worker-col">{{ item.quantity_at_the_purchase }}</div>
-            <div class="worker-col">{{ item.supplier }}</div>
-            <div class="worker-col">{{ item.buy_price }}</div>
-            <div class="worker-col">{{ item.retail_price }}</div>
-            <div class="worker-col">{{ item.minimum_items_for_notification }}</div>
-            <div class="worker-col">{{ item.remainder }}</div>
-
+            <div class="worker-col">Название товара: {{ item.name_product }}</div>
+            <div class="worker-col">Количество на момент покупки: {{ item.quantity_at_the_purchase }}</div>
+            <div class="worker-col">Поставщик: {{ item.supplier }}</div>
+            <div class="worker-col">Цена закупки товара: {{ item.buy_price }}</div>
+            <div class="worker-col">Цена для продажи: {{ item.retail_price }}</div>
+            <div class="worker-col">Минимальное количество товара для напоминания:
+                {{ item.minimum_items_for_notification }}</div>
+            <div class="worker-col">Осталось товара на складе: {{ item.remainder }}</div>
+            <h1> </h1>
         </div>
         {% endfor %}
 

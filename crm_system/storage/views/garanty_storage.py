@@ -27,6 +27,7 @@ class StorageGarantyCustomView(TemplateView):
                 # Беру каждый обьект из формсета и индивидуально в каждом записываю юзера и сохраняю
                 for instance in instances:
                     history_data = StorageInfo.objects.filter(individual_code=instance.individual_code_history).first()
+                    print('Обьект:', history_data)
                     instance.user = request.user
                     instance.type_of_operation_history = "Гарантийный возврат"
                     instance.individual_code_history = history_data.individual_code
