@@ -4,3 +4,4 @@ from .removal_storage import StorageRemovalCustomView
 from .history_storage import StorageHistoryCustomView
 from .garanty_storage import StorageGarantyCustomView
 from .form_removal import FormRemovalCustomView
+from .select_django_autocomplete import CountryAutocomplete

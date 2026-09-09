@@ -1,6 +1,4 @@
 {% load static %}
-<script src="{% static 'storage/js/garanty-storage.js' %}" defer></script>
-<link rel="stylesheet" href="{% static 'storage/css/garanty-storage.css' %}">
 
 <form hx-post="{% url 'garanty-storage' %}" class="garanty-form-storage">
     {% csrf_token %}

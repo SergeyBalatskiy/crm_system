@@ -35,6 +35,8 @@ ALLOWED_HOSTS = []
 # Application definition
 # Применение новых приложений
 INSTALLED_APPS = [
+    'dal',
+    'dal_select2', 
     'storage',
     'profile_user',
     'auth_registration',

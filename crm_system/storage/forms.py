@@ -1,8 +1,7 @@
 from django import forms
-from django.contrib.auth import get_user_model
 from django.forms import modelformset_factory
 from .models import StorageInfo, HistoryStorageInfo
-from tinymce.widgets import TinyMCE
+from dal_select2.widgets import Select2
 
 
 StorageAcceptableForm = modelformset_factory(
@@ -23,6 +22,8 @@ RemovalHistoryForm = modelformset_factory(
         "supplier_history" : "Поставщик"
     })
 
+
+
 GarantyHistoryForm = modelformset_factory(
     HistoryStorageInfo, fields=("name_product_history", "individual_code_history", "buy_price_history", "quantity_history", "supplier_history"), labels={
         "name_product_history": "Название товара",
@@ -30,5 +31,10 @@ GarantyHistoryForm = modelformset_factory(
         "buy_price_history" : "Компенсация за гарантийный возврат (шт., ₽)",
         "quantity_history" : "Количество",
         "supplier_history" : "Поставщик",
-    })
+    }, 
+    widgets = {
+        'name_product_history': Select2(url='storage-autocomplete')
+        })
+
+
 

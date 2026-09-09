@@ -16,4 +16,7 @@ urlpatterns = [
     path('history', StorageHistoryCustomView.as_view(), name='history-storage'),
     # Указываю на путь к показу формы Гарантийного возврата
     path('garanty', StorageGarantyCustomView.as_view(), name='garanty-storage'),   
+    # Указываю на путь к обращению чтобы отрбражать авто ответы для подсказок из БД
+    path('storage-autocomplete', CountryAutocomplete.as_view(), name='storage-autocomplete'),   
+    
 ]

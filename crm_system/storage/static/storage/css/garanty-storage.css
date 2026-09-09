@@ -1,0 +1,53 @@
+/* Растягиваем выпадающий список DAL на всю ширину поля */
+.select2-container {
+    width: 100% !important;
+}
+
+/* Окно подсказок поверх всех остальный элементов */
+.select2-container--open {
+    z-index: 9999;
+}
+
+/* Разрешаем родительскому контейнеру выходить за рамки (чтобы список не обрезался) */
+.django-form {
+    position: relative;
+    overflow: visible !important;
+}
+
+/* Фикс сжатого поля Select2 */
+.django-form .select2-container {
+    width: 100% !important;
+    display: inline-block !important;
+    box-sizing: border-box !important;
+}
+
+.django-form .select2-container .select2-selection--single {
+    height: 36px !important;
+    border: 1px solid #767676 !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    padding: 0 8px !important;
+}
+
+.django-form .select2-container .select2-selection__rendered {
+    line-height: 36px !important;
+    padding-left: 0 !important;
+    color: #333 !important;
+}
+
+.django-form .select2-container .select2-selection__arrow {
+    height: 34px !important;
+    position: absolute !important;
+    top: 1px !important;
+    right: 6px !important;
+}
+
+/* Принудительно растягиваем виджет Select2 */
+.select2-container {
+    width: 100% !important;
+}
+
+.select2-container--open {
+    z-index: 9999;
+}

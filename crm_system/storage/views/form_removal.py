@@ -1,7 +1,6 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
 from storage.models import StorageInfo, HistoryStorageInfo
 from django.http import HttpResponse
 from django.shortcuts import render

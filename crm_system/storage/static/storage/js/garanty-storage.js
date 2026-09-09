@@ -1,23 +1,31 @@
-document.addEventListener('DOMContentLoaded', function () {
-    const addFormBtn = document.getElementById('add-new-form-garanty');
-    const formsList = document.getElementById('garanty-div-form');
+// garanty-storage.js
+document.addEventListener('click', function (e) {
+    if (e.target && e.target.id === 'add-new-form-garanty') {
+        const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
+        const emptyFormContainer = document.getElementById('empty-form-garanty');
+        const formsList = document.getElementById('garanty-div-form');
 
-    // Элемент управления количеством форм (имя зависит от префикса formset)
-    const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
-    const emptyFormTemplate = document.getElementById('empty-form-garanty').innerHTML;
+        if (totalFormsInput && emptyFormContainer && formsList) {
+            let currentFormCount = parseInt(totalFormsInput.value);
+            let newFormHtml = emptyFormContainer.innerHTML.replace(/__prefix__/g, currentFormCount);
 
-    addFormBtn.addEventListener('click', function () {
-        // 1. Получаем текущее количество форм
-        let currentFormCount = parseInt(totalFormsInput.value);
+            // Очищаем HTML от авто-сгенерированных следов Select2
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = newFormHtml;
+            tempDiv.querySelectorAll('.select2-container').forEach(el => el.remove());
+            tempDiv.querySelectorAll('select').forEach(select => {
+                select.removeAttribute('data-select2-id');
+                select.classList.remove('select2-hidden-accessible');
+                select.style.display = '';
+            });
 
-        // 2. Заменяем __prefix__ в шаблоне на текущий индекс
-        const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, currentFormCount);
+            formsList.insertAdjacentHTML('beforeend', tempDiv.innerHTML);
+            totalFormsInput.value = currentFormCount + 1;
 
-        // 3. Вставляем новую форму в конец списка
-        formsList.insertAdjacentHTML('beforeend', newFormHtml);
-
-        // 4. Увеличиваем счетчик TOTAL_FORMS на 1
-        totalFormsInput.value = currentFormCount + 1;
-    });
+            // Запускаем DAL для нового поля
+            if (window.jQuery) {
+                window.jQuery(document).trigger('dal-init-function');
+            }
+        }
+    }
 });
-
