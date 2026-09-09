@@ -36,9 +36,10 @@ class StorageRemovalCustomView(TemplateView):
                 instance.buy_price_history = 0
                 instance.time_of_operation_history = timezone.now()
                 instance.save()
-    
                 # Обновляю обьект (один) в StorageInfo, чтобы его впоследствии и брать, и взаимодействовать.
                 history_data.save()
+                if history_data.remainder == 0:
+                    history_data.delete()
         
             messages.success(request, 'Товары были успешно списаны со склада, компенсация за товар не была возвращена!')
             return redirect('history-storage')
