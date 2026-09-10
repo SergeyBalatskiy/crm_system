@@ -33,7 +33,9 @@ GarantyHistoryForm = modelformset_factory(
         "supplier_history" : "Поставщик",
     }, 
     widgets = {
-        'name_product_history': Select2(url='storage-autocomplete')
+        'name_product_history': Select2(url='storage-autocomplete'),
+        'individual_code_history': Select2(url='storage-autocomplete'),
+        'supplier_history': Select2(url='storage-autocomplete')
         })
 
 

@@ -29,3 +29,19 @@ document.addEventListener('click', function (e) {
         }
     }
 });
+
+$(document).on('select2:select', 'select[data-autocomplete-light-function]', function (e) {
+    const data = e.params.data; // Данные, которые приходят из views.py (get_results) 
+    const $formRow = $(this).closest('.django-form') // Назходит контейнер текущей формы
+
+    // Автозаполнение в зависимости от указанных полей
+    if (data.code !== undefined) {
+        $formRow.find('input[name$="-individual_code_history"]').val(data.code);
+    }
+    if (data.code !== undefined) {
+        $formRow.find('input[name$="-supplier_history"]').val(data.supplier);
+    }
+    if (data.code !== undefined) {
+        $formRow.find('input[name$="-buy_price_history"]').val(data.price);
+    }
+});
