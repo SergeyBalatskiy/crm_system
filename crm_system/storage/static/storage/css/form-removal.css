@@ -34,3 +34,41 @@ a .django-form input[type=number]::-webkit-outer-spin-button,
     -webkit-appearance: none;
     appearance: none;
 }
+
+/* Выравниваем заголовок и селект в один ряд */
+.page-header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.navigation-form-select {
+    margin-top: 3px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #111827;
+}
+
+/* Стилизация выпадающего списка */
+.custom-select {
+    padding: 8px 12px;
+    font-size: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    min-width: 320px;
+}
+
+.custom-select:focus {
+    border-color: #512da8;
+    box-shadow: 0 0 0 2px rgba(70, 24, 117, 0.1);
+}

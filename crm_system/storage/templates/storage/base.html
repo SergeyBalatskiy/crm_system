@@ -17,11 +17,13 @@
     <script type="text/javascript" src="{% static 'autocomplete_light/autocomplete_light.js' %}"></script>
     <script type="text/javascript" src="{% static 'autocomplete_light/select2.js' %}"></script>
 
-    <!-- Статика JS для гарантийной формы и основного шаблона сайта form-removal -->
+    <!-- Статика JS для гарантийной формы + удаления товаров и основного шаблона сайта form-removal -->
     <script src="{% static 'storage/js/form-removal.js' %}" defer></script>
     <script src="{% static 'storage/js/garanty-storage.js' %}" defer></script>
+    <script src="{% static 'storage/js/removal-storage.js' %}" defer></script>
 
-    <!-- Статика CSS для гарантийной формы -->
+    <!-- Статика CSS для гарантийной формы + на удаление -->
+    <link rel="stylesheet" href="{% static 'storage/css/removal-storage.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="{% static 'profile_user/css/stylesheet.css' %}" type="text/css">
     <link rel="stylesheet" href="{% static 'storage/css/garanty-storage.css' %}" type="text/css">

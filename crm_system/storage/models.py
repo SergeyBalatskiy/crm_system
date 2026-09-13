@@ -35,7 +35,7 @@ class HistoryStorageInfo(models.Model):
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='history_storage')
     type_of_operation_history = models.CharField(max_length=120, null=True, blank=True) # Тип операции? (Поступление, списание, возврат)
-    name_product_history = models.CharField(max_length=120, null=True, blank=True) # Название товара
+    name_product_history = models.CharField(max_length=120) # Название товара
     individual_code_history = models.IntegerField(null=True, blank=True)  # id (Код товара)
     quantity_history = models.IntegerField(null=True, blank=True) # Количество, которое учавствует в операции (Добавление, списание, возврат)
     buy_price_history = models.IntegerField(null=True, blank=True) # Стоимость закупки (1 шт.)

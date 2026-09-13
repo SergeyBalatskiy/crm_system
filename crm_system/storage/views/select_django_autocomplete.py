@@ -13,7 +13,7 @@ class CountryAutocomplete(Select2QuerySetView):
     # Обязательная функция, которая выдает результатом "готовые обьекты" на автозаполнение
     def get_queryset(self):
         # Переменная, которая если не заполнена, то выдает ВСЕ обьекты
-        qs = StorageInfo.objects.filter(user=self.request.user)
+        qs = StorageInfo.objects.filter(user=self.request.user).order_by('-individual_code')
         # Если имеется хоть 1 символ в поле, то выдается результат с учетом поля _istartswith без
         # зависимости от регистра
         if self.q:
@@ -28,11 +28,12 @@ class CountryAutocomplete(Select2QuerySetView):
         return [
             {
             'id' : self.get_result_value(result), 
-            'text' : f"{result.name_product} | Код: {result.individual_code or '-'} | Поставщик: {result.supplier or '-'}",
+            'text' : f"Код: {result.individual_code or '-'} | Товар: {result.name_product} | Поставщик: {result.supplier or '-'}",
             'name' : result.name_product,
             'code' : result.individual_code or '-',
             'supplier' : result.supplier or '',
             'price' : result.buy_price or 0,
+            'remainder' : result.remainder,
             }
             for result in context['object_list']
         ]

@@ -20,23 +20,40 @@ RemovalHistoryForm = modelformset_factory(
         "individual_code_history": "Код товара",
         "quantity_history" : "Количество",
         "supplier_history" : "Поставщик"
-    })
-
-
+    },
+    widgets = {
+            'name_product_history': Select2(url='storage-autocomplete', attrs = {
+                'data-placeholder' : 'Начните вводить название, код или поставщика...'}
+                ), 
+            # Эти поля заблокированы от ручного ввода 
+            'individual_code_history': forms.TextInput(attrs={'class': 'form-control readonly-input', 'readonly': 'readonly'}),
+            'supplier_history': forms.TextInput(attrs={'class': 'form-control readonly-input', 'readonly': 'readonly'}),
+            
+            # Одно поле позволяет менять "данные"
+            'quantity_history': forms.NumberInput(attrs={'class': 'form-control', 'value': 1, 'min': 1}),
+        })
 
 GarantyHistoryForm = modelformset_factory(
     HistoryStorageInfo, fields=("name_product_history", "individual_code_history", "buy_price_history", "quantity_history", "supplier_history"), labels={
         "name_product_history": "Название товара",
         "individual_code_history": "Код товара",
-        "buy_price_history" : "Компенсация за гарантийный возврат (шт., ₽)",
+        "buy_price_history" : "Компенсация (₽)",
         "quantity_history" : "Количество",
         "supplier_history" : "Поставщик",
     }, 
     widgets = {
-        'name_product_history': Select2(url='storage-autocomplete'),
-        'individual_code_history': Select2(url='storage-autocomplete'),
-        'supplier_history': Select2(url='storage-autocomplete')
-        })
+        'name_product_history': Select2(url='storage-autocomplete', attrs = {
+            'data-placeholder' : 'Начните вводить название, код или поставщика...'}
+            ), 
+        # Эти поля заблокированы от ручного ввода 
+        'individual_code_history': forms.TextInput(attrs={'class': 'form-control readonly-input', 'readonly': 'readonly'}),
+        'supplier_history': forms.TextInput(attrs={'class': 'form-control readonly-input', 'readonly': 'readonly'}),
+        
+        # Два поля которые допускают изменять данные для редактирования полей
+        'buy_price_history': forms.NumberInput(attrs={'class': 'form-control', 'value': 1, 'min': 1}),
+        'quantity_history': forms.NumberInput(attrs={'class': 'form-control', 'value': 1, 'min': 1}),
+    }
+)
 
 
 
