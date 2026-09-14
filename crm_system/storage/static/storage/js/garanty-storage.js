@@ -1,6 +1,4 @@
-// garanty-storage.js
-
-// 1. Настройка Select2: отображение только имени в выбранном поле
+// Настройка Select2: отображение только названия в выбранном поле
 if (window.jQuery && window.jQuery.fn.select2) {
     window.jQuery.fn.select2.defaults.set('templateSelection', function (item) {
         if (!item.id) {
@@ -16,7 +14,7 @@ if (window.jQuery && window.jQuery.fn.select2) {
     });
 }
 
-// 2. Добавление и удаление строк в таблице
+// Добавление и удаление строк в таблице
 document.addEventListener('click', function (e) {
     // Добавление новой строки
     if (e.target && (e.target.id === 'add-new-form-garanty' || e.target.closest('#add-new-form-garanty'))) {
@@ -31,6 +29,7 @@ document.addEventListener('click', function (e) {
             const tempTbody = document.createElement('tbody');
             tempTbody.innerHTML = newFormHtml;
 
+            // Очистка Select2 атрибутов для корректной инициализации нового поля
             tempTbody.querySelectorAll('.select2-container').forEach(el => el.remove());
             tempTbody.querySelectorAll('select').forEach(select => {
                 select.removeAttribute('data-select2-id');
@@ -38,7 +37,7 @@ document.addEventListener('click', function (e) {
                 select.style.display = '';
             });
 
-            // Расчет визуального номера строки по факту имеющихся элементов
+            // Расчет визуального номера строки
             const visualRowIndex = formsList.querySelectorAll('tr').length + 1;
             const rowNumberCell = tempTbody.querySelector('.row-number .hash');
             if (rowNumberCell) {
@@ -70,7 +69,7 @@ document.addEventListener('click', function (e) {
     }
 });
 
-// 3. Блокировка выпадающего списка при клике на крестик сброса
+// Блокировка выпадающего списка при клике на крестик сброса
 $(document).on('select2:unselecting', 'select[data-autocomplete-light-function]', function (e) {
     $(this).data('unselecting', true);
 });
@@ -82,18 +81,18 @@ $(document).on('select2:opening', 'select[data-autocomplete-light-function]', fu
     }
 });
 
-// 4. Очистка смежных полей при сбросе выбора
+// Очистка смежных полей при сбросе выбора
 $(document).on('select2:clear select2:unselect', 'select[data-autocomplete-light-function]', function (e) {
     const $formRow = $(this).closest('.django-form');
 
     $formRow.find('input[name$="-individual_code_history"]').val('');
-    $formRow.find('.stock-remainder-input').val(''); // Очищаем поле остатка
+    $formRow.find('.stock-remainder-input').val('');
     $formRow.find('input[name$="-supplier_history"]').val('');
     $formRow.find('input[name$="-buy_price_history"]').val('');
     $formRow.find('input[name$="-quantity_history"]').val('');
 });
 
-// 5. Автозаполнение смежных полей при выборе товара
+// Автозаполнение смежных полей при выборе товара
 $(document).on('select2:select', 'select[data-autocomplete-light-function]', function (e) {
     const data = e.params.data;
     const $select = $(this);
@@ -103,7 +102,6 @@ $(document).on('select2:select', 'select[data-autocomplete-light-function]', fun
         $formRow.find('input[name$="-individual_code_history"]').val(data.code);
     }
 
-    // Заполнение количества товара на складе
     if (data.remainder !== undefined) {
         $formRow.find('.stock-remainder-input').val(`${data.remainder}`);
     }
@@ -111,6 +109,7 @@ $(document).on('select2:select', 'select[data-autocomplete-light-function]', fun
     if (data.supplier !== undefined) {
         $formRow.find('input[name$="-supplier_history"]').val(data.supplier);
     }
+
     if (data.price !== undefined) {
         const $priceInput = $formRow.find('input[name$="-buy_price_history"]');
 
@@ -137,28 +136,56 @@ $(document).on('select2:select', 'select[data-autocomplete-light-function]', fun
     }, 1);
 });
 
-// 6. Форматирование тысяч
+// Форматирование тысяч
 function formatThousands(value) {
     let numbers = String(value).replace(/\D/g, '');
     return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
-// 7. Форматирование при ручном вводе
-document.addEventListener('input', function (e) {
+// Автоматическое выделение всего содержимого при фокусе на количество или цену
+document.addEventListener('focusin', function (e) {
     if (e.target.matches('input[name$="-buy_price_history"], input[name$="-quantity_history"]')) {
-        if (e.target.type === 'number') {
-            e.target.type = 'text';
+        let input = e.target;
+
+        // Меняем тип на text сразу при входе, чтобы браузер разрешил управление курсором
+        if (input.type === 'number') {
+            input.type = 'text';
         }
-        let cursorPosition = e.target.selectionStart;
-        let oldLength = e.target.value.length;
-        e.target.value = formatThousands(e.target.value);
-        let newLength = e.target.value.length;
-        cursorPosition = cursorPosition + (newLength - oldLength);
-        e.target.setSelectionRange(cursorPosition, cursorPosition);
+
+        setTimeout(function () {
+            input.select();
+        }, 0);
     }
 });
 
-// 8. Очистка пробелов перед отправкой HTMX / Form submit
+// Динамический ввод с сохранением позиции курсора
+document.addEventListener('input', function (e) {
+    if (e.target.matches('input[name$="-quantity_history"], input[name$="-buy_price_history"]')) {
+        let input = e.target;
+
+        if (input.type === 'number') {
+            input.type = 'text';
+        }
+
+        let oldLength = input.value.length;
+        let cursorPosition = input.selectionStart;
+
+        // Если позицию определить не удалось, ставим курсор В КОНЕЦ (oldLength), а не в 0
+        if (cursorPosition === null) {
+            cursorPosition = oldLength;
+        }
+
+        input.value = formatThousands(input.value);
+
+        let newLength = input.value.length;
+        let newCursorPosition = cursorPosition + (newLength - oldLength);
+        newCursorPosition = Math.max(0, Math.min(newCursorPosition, newLength));
+
+        input.setSelectionRange(newCursorPosition, newCursorPosition);
+    }
+});
+
+// Очистка пробелов перед отправкой HTMX / Form submit
 document.body.addEventListener('htmx:configRequest', function (evt) {
     let params = evt.detail.parameters;
     for (let key in params) {
@@ -175,7 +202,7 @@ document.addEventListener('submit', function (e) {
     });
 });
 
-// 9. Уведомления HX-Trigger
+// Уведомления HX-Trigger
 document.body.addEventListener('showMessage', function (evt) {
     const messageText = typeof evt.detail === 'object' && evt.detail !== null ? evt.detail.value : evt.detail;
     if (messageText) {
