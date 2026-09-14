@@ -50,8 +50,8 @@ GarantyHistoryForm = modelformset_factory(
         'supplier_history': forms.TextInput(attrs={'class': 'form-control readonly-input', 'readonly': 'readonly'}),
         
         # Два поля которые допускают изменять данные для редактирования полей
-        'buy_price_history': forms.NumberInput(attrs={'class': 'form-control', 'value': 1, 'min': 1}),
-        'quantity_history': forms.NumberInput(attrs={'class': 'form-control', 'value': 1, 'min': 1}),
+        'buy_price_history': forms.NumberInput(attrs={'class': 'form-control','min': 0}),
+        'quantity_history': forms.NumberInput(attrs={'class': 'form-control','min': 1}),
     }
 )
 

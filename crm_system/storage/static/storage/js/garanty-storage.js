@@ -174,9 +174,7 @@ document.addEventListener('input', function (e) {
         if (cursorPosition === null) {
             cursorPosition = oldLength;
         }
-
         input.value = formatThousands(input.value);
-
         let newLength = input.value.length;
         let newCursorPosition = cursorPosition + (newLength - oldLength);
         newCursorPosition = Math.max(0, Math.min(newCursorPosition, newLength));
@@ -207,5 +205,17 @@ document.body.addEventListener('showMessage', function (evt) {
     const messageText = typeof evt.detail === 'object' && evt.detail !== null ? evt.detail.value : evt.detail;
     if (messageText) {
         alert(messageText);
+    }
+});
+
+// Проверка минимального значения при завершении ввода (при уходе из поля)
+document.addEventListener('change', function (e) {
+    if (e.target.matches('input[name$="-quantity_history"]')) {
+        let val = parseInt(e.target.value.replace(/\s/g, ''), 10);
+
+        // Если ввели 0, отрицательное число или пустоту — сбрасываем на 1
+        if (isNaN(val) || val < 1) {
+            e.target.value = '1';
+        }
     }
 });

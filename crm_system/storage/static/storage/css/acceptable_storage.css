@@ -13,13 +13,99 @@
     background-color: #fff;
     border-radius: 30px;
     box-shadow: 13px 13px 13px rgba(0, 0, 0, 0.364);
-    padding: 40px;
+    padding: 30px 40px 24px 40px;
 
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
+/* Шапка */
+.page-header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1d20;
+    margin: 0;
+}
+
+/* Форма и скроллинг */
+.storage-acceptable-form {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+}
+
+.scrollable-body {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    padding-right: 6px;
+}
+
+/* Таблица */
+.table-responsive {
+    width: 100%;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+.items-table th {
+    font-size: 13px;
+    line-height: 1.2;
+    white-space: normal;
+    /* Разрешает перенос длинных заголовков на 2 строки */
+    word-break: break-word;
+    vertical-align: bottom;
+    padding: 10px 6px;
+}
+
+.items-table td {
+    padding: 8px 4px;
+}
+
+.item-row:hover {
+    background-color: #fcfcfd;
+}
+
+.row-number {
+    color: #8c98a4;
+    font-weight: 600;
+    text-align: center;
+}
+
+/* Стилизация полей ввода */
+.django-form input[type="text"],
+.django-form input[type="number"],
+.django-form select {
+    width: 100%;
+    height: 38px;
+    padding: 6px 12px;
+    border: 1px solid #dcdfe6;
+    border-radius: 8px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.django-form input:focus,
+.django-form select:focus {
+    border-color: #5c41cd;
+}
+
+/* Отключение стрелок в инпутах number */
 .django-form input[type=number]::-webkit-outer-spin-button,
 .django-form input[type=number]::-webkit-inner-spin-button {
     -webkit-appearance: none !important;
@@ -33,4 +119,93 @@
 .django-form input {
     -webkit-appearance: none;
     appearance: none;
+}
+
+/* Скрытие оригинального select после DAL / Select2 */
+.items-table select.select2-hidden-accessible,
+.items-table select[data-autocomplete-light-function] {
+    display: none !important;
+}
+
+/* Кнопки таблицы */
+.table-actions {
+    margin-top: 16px;
+    margin-bottom: 10px;
+}
+
+.btn-add-row {
+    background: transparent;
+    border: 1px dashed #cbd5e1;
+    color: #475569;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+.btn-add-row:hover {
+    border-color: #5c41cd;
+    color: #5c41cd;
+    background-color: #f8f7ff;
+}
+
+.btn-remove-row {
+    background: transparent;
+    border: none;
+    color: #ef4444;
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 4px;
+}
+
+.btn-remove-row:hover {
+    color: #dc2626;
+}
+
+/* Подвал и главные кнопки */
+.form-footer {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #edf2f7;
+}
+
+.btn {
+    padding: 10px 24px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s;
+    border: none;
+}
+
+.btn-primary {
+    background-color: #5c41cd;
+    color: #fff;
+}
+
+.btn-primary:hover {
+    background-color: #4b32b3;
+}
+
+.btn-secondary {
+    background-color: #e2e8f0;
+    color: #475569;
+}
+
+.btn-secondary:hover {
+    background-color: #cbd5e1;
+}
+
+.text-center {
+    text-align: center;
 }

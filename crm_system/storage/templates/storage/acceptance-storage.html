@@ -7,31 +7,83 @@
 
 <div class="div-place-storage-acceptable">
     <div class="div-box-storage-acceptable">
-        <div class="field_input_name">
-            <form id="form-container" method="POST" class="storage-acceptable-form">
-                {% csrf_token %}
-                {{ form_acceptable.management_form }}
 
-                <div id="acceptable-div-form">
-                    {% for form in form_acceptable %}
-                    <div class="django-form">
-                        {{ form.as_p }}
-                    </div>
-                    {% endfor %}
+        <!-- Шапка страницы -->
+        <div class="page-header-wrapper">
+            <h1 class="page-title">Поступление товара</h1>
+        </div>
+
+        <form id="form-container" method="POST" class="storage-acceptable-form">
+            {% csrf_token %}
+            {{ form_acceptable.management_form }}
+
+            <!-- СКРОЛЛИРУЕМАЯ ЗОНА (Таблица + Кнопка «Добавить») -->
+            <div class="scrollable-body">
+                <div class="table-responsive">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 35px;">#</th>
+                                <th style="width: 25%;">Название товара</th>
+                                <th style="width: 12%;">Кол-во в закупке</th>
+                                <th style="width: 20%;">Поставщик</th>
+                                <th style="width: 13%;">Стоимость в закупке (шт.)</th>
+                                <th style="width: 13%;">Стоимость в продажу (шт.)</th>
+                                <th style="width: 14%;">Кол-во для напоминания</th>
+                                <th style="width: 40px;"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="acceptable-div-form">
+                            {% for form in form_acceptable %}
+                            <tr class="django-form item-row">
+                                <td class="row-number"><span class="hash">{{ forloop.counter }}</span></td>
+                                <td>{{ form.name_product }}</td>
+                                <td>{{ form.quantity_at_the_purchase }}</td>
+                                <td>{{ form.supplier }}</td>
+                                <td>{{ form.buy_price }}</td>
+                                <td>{{ form.retail_price }}</td>
+                                <td>{{ form.minimum_items_for_notification }}</td>
+                                <td class="text-center">
+                                    <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
 
-
-                <button type="submit" class="btn btn-primary btn-submit">Создать</button>
-                <button type="button" id="add-new-form-acceptable">Новое поступление</button>
-            </form>
-
-            <div id="empty-form-acceptable" style="display: none;">
-                <div class="django-form">
-                    {{ form_acceptable.empty_form.as_p }}
+                <div class="table-actions">
+                    <button type="button" id="add-new-form-acceptable" class="btn-add-row">
+                        <i class="fa-solid fa-plus"></i> Добавить товар
+                    </button>
                 </div>
             </div>
 
-        </div>
+            <!-- Подвал с кнопками -->
+            <div class="form-footer">
+                <button type="submit" class="btn btn-primary">Создать поступление</button>
+                <a href="#" class="btn btn-secondary">Отмена</a>
+            </div>
+        </form>
+
+        <!-- Скрытый шаблон для добавления новых строк -->
+        <table style="display: none;">
+            <tbody id="empty-form-acceptable">
+                <tr class="django-form item-row">
+                    <td class="row-number"><span class="hash">#</span></td>
+                    <td>{{ form_acceptable.empty_form.name_product }}</td>
+                    <td>{{ form_acceptable.empty_form.quantity_at_the_purchase }}</td>
+                    <td>{{ form_acceptable.empty_form.supplier }}</td>
+                    <td>{{ form_acceptable.empty_form.buy_price }}</td>
+                    <td>{{ form_acceptable.empty_form.retail_price }}</td>
+                    <td>{{ form_acceptable.empty_form.minimum_items_for_notification }}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
     </div>
 </div>
 {% endblock %}

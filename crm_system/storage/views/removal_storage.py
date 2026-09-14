@@ -45,4 +45,6 @@ class StorageRemovalCustomView(TemplateView):
             return redirect('history-storage')
         
         return redirect('removal-form-storage')
-            
+
+
+    

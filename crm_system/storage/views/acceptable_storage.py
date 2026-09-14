@@ -21,12 +21,12 @@ class StorageAcceptableCustomView(TemplateView):
 
         # Валидация форм (пропуск не важных полей) + сохранение важных
         if formset.is_valid():
-
             # Остановка сохранения 
             instances = formset.save(commit=False)
 
             # Беру каждый обьект из формсета и индивидуально в каждом записываю юзера и сохраняю
             for instance in instances:
+                print('РАБОТАЮ С ОБЬЕКТОМ!')
                 instance.user = request.user
                 instance.individual_code = instance.id
                 instance.remainder = instance.quantity_at_the_purchase

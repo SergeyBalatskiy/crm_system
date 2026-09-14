@@ -22,9 +22,18 @@ class StorageGarantyCustomView(TemplateView):
             formset = GarantyHistoryForm(request.POST)
             # Валидация форм (пропуск не важных полей) + сохранение важных
             if formset.is_valid():
-
                 # Остановка сохранения 
                 instances = formset.save(commit=False)
+
+                if not instances:
+                    if request.headers.get('HX-Request'):
+                        response = HttpResponse(status=204)
+                        payload = {
+                            'showMessage': 'Пожалуйста, выберите хотя бы один товар на списание!'
+                        }
+                        response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
+                        return response
+                    
                 # Счетчик, который считает количество "неверных операций":
                 not_success_counter = 0
                 # Счетчик "успешных операций":
@@ -39,6 +48,12 @@ class StorageGarantyCustomView(TemplateView):
                     try:
                         # Количество товара, КОТОРЫЙ УЧАВСТВУЕТ В ОПЕРАЦИИ (запоминание в переменную)
                         current_remainder_instance = instance.quantity_history
+
+                        # Проверка на наличие введенной цены и количества товара
+                        if instance.buy_price_history is None and instance.quantity_history is None:
+                            not_success_counter +=1
+                            continue
+
                         # Записывается количество товара который учавствует в "операции"
                         # с проверкой на то, что товара не будет отрицателтьное количество!
                         if history_data.remainder - current_remainder_instance >=0:  # Если количество товара НА удаление МЕНЬШЕ или РАВНО фактическому 
@@ -101,8 +116,5 @@ class StorageGarantyCustomView(TemplateView):
             # Статус 204 если название товара под списание не было указано!
             if request.headers.get('HX-Request'):
                 response = HttpResponse(status=204)
-                payload = {
-                    'showMessage': 'Пожалуйста, выберите товар на гарантийное списание в добавленном поле или удалите его!'
-                }
-                response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
                 return response
+
