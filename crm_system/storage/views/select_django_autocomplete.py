@@ -2,7 +2,8 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from storage.models import StorageInfo
 from dal_select2.views import Select2QuerySetView
-from django.db.models import Q
+from django.db.models import Q, TextField
+from django.db.models.functions import Cast
 
 """ Суть данной вью заключается в том, что она автоматически и моментально после ввода каждого
 символа пользователя, предлагает ему актуальные по его вводу обьекты/обьект из БД """
@@ -11,14 +12,18 @@ from django.db.models import Q
 @method_decorator(login_required(), name='dispatch') 
 class CountryAutocomplete(Select2QuerySetView):
     # Обязательная функция, которая выдает результатом "готовые обьекты" на автозаполнение
-    def get_queryset(self):
+    def get_queryset(self): 
         # Переменная, которая если не заполнена, то выдает ВСЕ обьекты
         qs = StorageInfo.objects.filter(user=self.request.user).order_by('-individual_code')
         # Если имеется хоть 1 символ в поле, то выдается результат с учетом поля _istartswith без
         # зависимости от регистра
         if self.q:
+            qs = qs.annotate(buy_price_str=Cast('buy_price', output_field=TextField()),
+            individual_code_str=Cast('individual_code', output_field=TextField())
+            )
+
             qs = qs.filter(
-                Q(name_product__istartswith=self.q) | Q(individual_code__istartswith=self.q) | Q(buy_price__istartswith=self.q) | Q(supplier__istartswith=self.q)
+                Q(name_product__icontains=self.q) | Q(individual_code_str__icontains=self.q) | Q(buy_price_str__icontains=self.q) | Q(supplier__icontains=self.q)
             )
 
         return qs

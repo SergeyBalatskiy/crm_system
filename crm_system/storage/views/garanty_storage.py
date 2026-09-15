@@ -34,14 +34,22 @@ class StorageGarantyCustomView(TemplateView):
                         response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
                         return response
                     
-                # Счетчик, который считает количество "неверных операций":
-                not_success_counter = 0
-                # Счетчик "успешных операций":
-                success_counter = 0
-                
                 # Беру каждый обьект из формсета и индивидуально в каждом записываю юзера и сохраняю
                 for instance in instances:
                     history_data = StorageInfo.objects.filter(individual_code=instance.individual_code_history).first() 
+
+                    if history_data is None:
+
+                        # Статус 204 если произошла ошибка + транзакция
+                        transaction.set_rollback(True)
+                        if request.headers.get('HX-Request'):
+                            response = HttpResponse(status=204)
+                            payload = {
+                                'showMessage': f'Ошибка: в предыдущем списании вы убрали все возможное количество товара!'
+                            }
+                            response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
+                            return response
+
                     # Записывается (привязывается) юзер
                     instance.user = request.user
 
@@ -50,9 +58,16 @@ class StorageGarantyCustomView(TemplateView):
                         current_remainder_instance = instance.quantity_history
 
                         # Проверка на наличие введенной цены и количества товара
-                        if instance.buy_price_history is None and instance.quantity_history is None:
-                            not_success_counter +=1
-                            continue
+                        if (instance.buy_price_history is None) or (instance.quantity_history is None):
+                            # Статус 204 если произошла ошибка + транзакция
+                            transaction.set_rollback(True)
+                            if request.headers.get('HX-Request'):
+                                response = HttpResponse(status=204)
+                                payload = {
+                                    'showMessage': f'Ошибка: Вы не указали цену товара!'
+                                }
+                                response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
+                                return response
 
                         # Записывается количество товара который учавствует в "операции"
                         # с проверкой на то, что товара не будет отрицателтьное количество!
@@ -75,7 +90,7 @@ class StorageGarantyCustomView(TemplateView):
                                 # Дата проведения "операции"
                                 instance.time_of_operation_history = timezone.now()
                                 instance.save()
-                                success_counter += 1
+                         
                                 history_data.delete()
                             else:  # Если количество товара БОЛЬШЕ 0:
                                 # Дата поступления данного товара на склад
@@ -85,11 +100,17 @@ class StorageGarantyCustomView(TemplateView):
                                 instance.save()
                                 # Обновляю обьект (один) в StorageInfo, чтобы его впоследствии и брать, и взаимодействовать.
                                 history_data.save()
-                                success_counter += 1
-
+                
                         else: # Если количество товара НА удаление БОЛЬШЕ чем фактическое количество:
-                            not_success_counter+=1
-                            continue
+                            # Статус 204 если произошла ошибка + транзакция
+                            transaction.set_rollback(True)
+                            if request.headers.get('HX-Request'):
+                                response = HttpResponse(status=204)
+                                payload = {
+                                    'showMessage': f'Ошибка: Товара {history_data.name_product} на складе меньше, чем вы указали под списание.'
+                                }
+                                response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
+                                return response
                                                     
                     except Exception as e:
                         # Статус 204 если произошла ошибка + транзакция
@@ -103,18 +124,31 @@ class StorageGarantyCustomView(TemplateView):
                             return response
 
                 if request.headers.get('HX-Request'):
-                    if not_success_counter:
-                        msg = f'Гарантийное списание прошло успешно Для {success_counter} товара(-ров). Для {not_success_counter} товара(-ров) было указано количество под списание больше, чем имеется на складе!'
-                    else:
-                        msg = 'Гарантийное списание прошло успешно. Денежные средства были возвращены в кассу!'
+                    msg = 'Гарантийное списание прошло успешно. Денежные средства были возвращены в кассу!'
                     print(msg)
                     messages.success(request, msg)
                     response = HttpResponse()
                     response['HX-Redirect'] = reverse('history-storage')
                     return response
 
-            # Статус 204 если название товара под списание не было указано!
+            # Статус 204 если ошибка
             if request.headers.get('HX-Request'):
-                response = HttpResponse(status=204)
-                return response
+                # Собираем список всех ошибок из формсета
+                error_details = []
+                
+                # Ошибки уровня всего формсета (например, некорректный TOTAL_FORMS)
+                if formset.non_form_errors():
+                    error_details.append(f"Формсет: {', '.join(formset.non_form_errors())}")
 
+                # Ошибки конкретных полей по каждой строке
+                for index, form_errors in enumerate(formset.errors):
+                    if form_errors:
+                        fields_with_errors = [f"{field}: {', '.join(errs)}" for field, errs in form_errors.items()]
+                        error_details.append(f"Строка {index + 1} -> {'; '.join(fields_with_errors)}")
+
+                msg = " | ".join(error_details) if error_details else "Ошибка валидации данных."
+
+                response = HttpResponse(status=204)
+                payload = {'showMessage': f'Ошибка: {msg}'}
+                response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
+                return response

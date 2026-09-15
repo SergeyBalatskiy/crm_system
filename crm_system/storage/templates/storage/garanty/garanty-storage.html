@@ -57,23 +57,29 @@
     </form>
 
     <!-- Скрытый шаблон -->
-    <table style="display: none;">
-        <tbody id="empty-form-garanty">
-            <tr class="django-form item-row">
-                <td class="row-number"><span class="hash">#</span></td>
-                <td>{{ form_garanty.empty_form.name_product_history }}</td>
-                <td>{{ form_garanty.empty_form.individual_code_history }}</td>
-                <!-- Новое информационное поле в шаблоне -->
-                <td>
-                    <input type="text" class="readonly-input stock-remainder-input" readonly placeholder="">
-                </td>
-                <td>{{ form_garanty.empty_form.supplier_history }}</td>
-                <td>{{ form_garanty.empty_form.buy_price_history }}</td>
-                <td>{{ form_garanty.empty_form.quantity_history }}</td>
-                <td class="text-center">
-                    <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <template id="empty-form-template">
+        <tr class="django-form item-row">
+            <td class="row-number"><span class="hash">#</span></td>
+            <td>
+                <!-- Явно добавляем пустой option внутрь селекта, чтобы Select2 понимал структуру -->
+                <select name="form-__prefix__-name_product_history"
+                    data-placeholder="Начните вводить название, код или поставщика..." maxlength="120"
+                    id="id_form-__prefix__-name_product_history"
+                    data-autocomplete-light-url="/storage/storage-autocomplete"
+                    data-autocomplete-light-function="select2" data-autocomplete-light-language="ru">
+                    <option value=""></option>
+                </select>
+            </td>
+            <td>{{ form_garanty.empty_form.individual_code_history }}</td>
+            <td>
+                <input type="text" class="readonly-input stock-remainder-input" readonly placeholder="">
+            </td>
+            <td>{{ form_garanty.empty_form.supplier_history }}</td>
+            <td>{{ form_garanty.empty_form.buy_price_history }}</td>
+            <td>{{ form_garanty.empty_form.quantity_history }}</td>
+            <td class="text-center">
+                <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
+            </td>
+        </tr>
+    </template>
 </div>

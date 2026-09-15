@@ -1,102 +1,217 @@
-// Настройка Select2: отображение только названия в выбранном поле
+// ==============================================================================
+// 1. НАСТРОЙКА SELECT2 (Шаблон отображения выбранного элемента)
+// ==============================================================================
 if (window.jQuery && window.jQuery.fn.select2) {
     window.jQuery.fn.select2.defaults.set('templateSelection', function (item) {
-        if (!item.id) {
-            return item.text;
-        }
-        if (item.name) {
-            return item.name;
-        }
-        if (item.text && item.text.includes('|')) {
-            return item.text.split('|')[0].trim();
-        }
+        if (!item.id) return item.text;
+        if (item.name) return item.name;
+        if (item.text && item.text.includes('|')) return item.text.split('|')[0].trim();
         return item.text;
     });
 }
 
-// Добавление и удаление строк в таблице
-document.addEventListener('click', function (e) {
-    // Добавление новой строки
-    if (e.target && (e.target.id === 'add-new-form-garanty' || e.target.closest('#add-new-form-garanty'))) {
-        const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
-        const emptyFormContainer = document.getElementById('empty-form-garanty');
-        const formsList = document.getElementById('garanty-div-form');
+// ==============================================================================
+// 2. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ И ПЕРЕИНДЕКСАЦИЯ
+// ==============================================================================
 
-        if (totalFormsInput && emptyFormContainer && formsList) {
-            let currentFormCount = parseInt(totalFormsInput.value);
-            let newFormHtml = emptyFormContainer.innerHTML.replace(/__prefix__/g, currentFormCount);
+// Обновление нумерации столбца #
+function updateRowNumbers() {
+    const rows = document.querySelectorAll('#garanty-div-form tr.item-row');
+    rows.forEach((row, index) => {
+        const numCell = row.querySelector('.row-number .hash');
+        if (numCell) numCell.textContent = index + 1;
+    });
+}
 
-            const tempTbody = document.createElement('tbody');
-            tempTbody.innerHTML = newFormHtml;
+// Переиндексация name/id (вызывается ТОЛЬКО при физическом удалении строки или очистке)
+function reindexGarantyForms() {
+    const formsList = document.getElementById('garanty-div-form');
+    const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
+    if (!formsList || !totalFormsInput) return;
 
-            // Очистка Select2 атрибутов для корректной инициализации нового поля
-            tempTbody.querySelectorAll('.select2-container').forEach(el => el.remove());
-            tempTbody.querySelectorAll('select').forEach(select => {
-                select.removeAttribute('data-select2-id');
-                select.classList.remove('select2-hidden-accessible');
-                select.style.display = '';
-            });
+    const rows = formsList.querySelectorAll('tr.item-row');
+    totalFormsInput.value = rows.length;
 
-            // Расчет визуального номера строки
-            const visualRowIndex = formsList.querySelectorAll('tr').length + 1;
-            const rowNumberCell = tempTbody.querySelector('.row-number .hash');
-            if (rowNumberCell) {
-                rowNumberCell.textContent = visualRowIndex;
+    rows.forEach((row, index) => {
+        row.querySelectorAll('input, select, textarea').forEach(input => {
+            if (input.name) {
+                input.name = input.name.replace(/form-\d+-/, `form-${index}-`);
             }
+            if (input.id) {
+                input.id = input.id.replace(/id_form-\d+-/, `id_form-${index}-`);
+            }
+        });
+    });
 
-            formsList.appendChild(tempTbody.firstElementChild);
-            totalFormsInput.value = currentFormCount + 1;
+    updateRowNumbers();
+}
 
-            if (window.jQuery) {
-                window.jQuery(document).trigger('dal-init-function');
+// Удаление невыбранных пустых строк перед отправкой на сервер
+function cleanupEmptyRows() {
+    const formsList = document.getElementById('garanty-div-form');
+    if (!formsList) return;
+
+    const rows = formsList.querySelectorAll('tr.item-row');
+    rows.forEach(row => {
+        const codeInput = row.querySelector('input[name$="-individual_code_history"]');
+        const hasProduct = codeInput && codeInput.value.trim() !== '';
+
+        if (!hasProduct && formsList.querySelectorAll('tr.item-row').length > 1) {
+            // Разрушаем select2 перед удалением DOM node
+            const $select = $(row).find('select[data-autocomplete-light-function]');
+            if ($select.length && $select.data('select2')) {
+                $select.select2('destroy');
+            }
+            row.remove();
+        }
+    });
+
+    reindexGarantyForms();
+}
+
+// Форматирование разделителей тысяч (10 000)
+function formatThousands(value) {
+    let numbers = String(value).replace(/\D/g, '');
+    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+}
+
+// Защита от дураков: не даем ввести 0 или отрицательное число в количестве и ценах
+document.addEventListener('input', function (e) {
+    if (e.target && (e.target.name && e.target.name.includes('quantity_history') || e.target.name.includes('buy_price_history'))) {
+        let val = parseFloat(e.target.value);
+
+        // Если поле пустое, не трогаем (чтобы человек мог стереть и написать заново)
+        if (e.target.value === '') return;
+
+        // Для количества минимальное значение всегда 1
+        if (e.target.name.includes('quantity_history')) {
+            if (val < 1) {
+                e.target.value = 1;
             }
         }
-    }
-
-    // Удаление строки по кнопке-крестику
-    if (e.target && e.target.classList.contains('btn-remove-row')) {
-        const row = e.target.closest('tr');
-        const formsList = document.getElementById('garanty-div-form');
-
-        if (row && formsList.querySelectorAll('tr').length > 1) {
-            row.remove();
-            // Обновляем нумерацию оставшихся строк
-            formsList.querySelectorAll('tr').forEach((tr, index) => {
-                const numCell = tr.querySelector('.row-number .hash');
-                if (numCell) numCell.textContent = index + 1;
-            });
+        // Для цены минимальное значение 0 (или больше)
+        else if (e.target.name.includes('buy_price_history')) {
+            if (val < 0) {
+                e.target.value = 0;
+            }
         }
     }
 });
 
-// Блокировка выпадающего списка при клике на крестик сброса
+// Дополнительно проверяем при уходе из поля (blur), если оставили пустым или нулем
+document.addEventListener('blur', function (e) {
+    if (e.target && e.target.name && e.target.name.includes('quantity_history')) {
+        if (e.target.value === '' || parseInt(e.target.value, 10) < 1) {
+            e.target.value = 1;
+        }
+    }
+}, true);
+
+// ==============================================================================
+// 3. ДОБАВЛЕНИЕ И ФИЗИЧЕСКОЕ УДАЛЕНИЕ СТРОК
+// ==============================================================================
+
+document.addEventListener('click', function (e) {
+    const formsList = document.getElementById('garanty-div-form');
+    if (!formsList) return;
+
+    // --- 1. ДОБАВЛЕНИЕ СТРОКИ ---
+    if (e.target && (e.target.id === 'add-new-form-garanty' || e.target.closest('#add-new-form-garanty'))) {
+        const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
+        const template = document.getElementById('empty-form-template');
+
+        if (totalFormsInput && template) {
+            let nextIndex = parseInt(totalFormsInput.value, 10) || formsList.querySelectorAll('tr.item-row').length;
+
+            let newFormHtml = template.innerHTML.replace(/__prefix__/g, nextIndex);
+            formsList.insertAdjacentHTML('beforeend', newFormHtml);
+
+            totalFormsInput.value = nextIndex + 1;
+            updateRowNumbers();
+
+            // Даем браузеру долю секунды на рендеринг строки, чтобы у нее появилась ширина
+            setTimeout(function () {
+                const $lastRow = $('#garanty-div-form tr.item-row:last-child');
+                const $sel = $lastRow.find('select');
+
+                if ($sel.length && typeof $sel.select2 === 'function') {
+                    $sel.select2({
+                        ajax: {
+                            url: $sel.attr('data-autocomplete-light-url') || '/storage/storage-autocomplete',
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return { q: params.term };
+                            },
+                            processResults: function (data) {
+                                return { results: data.results || data };
+                            },
+                            cache: true
+                        },
+                        placeholder: $sel.attr('data-placeholder') || 'Начните вводить название, код или поставщика...',
+                        allowClear: true,
+                        width: '100%'
+                    });
+                }
+            }, 100); // 100 миллисекунд гарантируют, что браузер уже отрисовал ряд
+        }
+    }
+
+    // --- 2. УДАЛЕНИЕ СТРОКИ ---
+    if (e.target && e.target.classList.contains('btn-remove-row')) {
+        const row = e.target.closest('tr');
+        const rows = formsList.querySelectorAll('tr.item-row');
+
+        if (row && rows.length > 1) {
+            const $select = $(row).find('select');
+            if ($select.length && $select.data('select2')) {
+                $select.select2('destroy');
+            }
+
+            row.remove();
+            reindexGarantyForms();
+            updateRowNumbers();
+        }
+    }
+});
+
+// ==============================================================================
+// 4. БЛОКИРОВКА ВЫПАДАЮЩЕГО СПИСКА ПРИ КЛИКЕ НА КРЕСТИК СБРОСА
+// ==============================================================================
 $(document).on('select2:unselecting', 'select[data-autocomplete-light-function]', function (e) {
+    if (!$(this).closest('#garanty-div-form').length) return;
     $(this).data('unselecting', true);
 });
 
 $(document).on('select2:opening', 'select[data-autocomplete-light-function]', function (e) {
+    if (!$(this).closest('#garanty-div-form').length) return;
     if ($(this).data('unselecting')) {
         $(this).removeData('unselecting');
         e.preventDefault();
     }
 });
 
+// ==============================================================================
+// 5. ОЧИСТКА И АВТОЗАПОЛНЕНИЕ СМЕЖНЫХ ПОЛЕЙ
+// ==============================================================================
+
 // Очистка смежных полей при сбросе выбора
 $(document).on('select2:clear select2:unselect', 'select[data-autocomplete-light-function]', function (e) {
+    if (!$(this).closest('#garanty-div-form').length) return;
     const $formRow = $(this).closest('.django-form');
 
     $formRow.find('input[name$="-individual_code_history"]').val('');
     $formRow.find('.stock-remainder-input').val('');
     $formRow.find('input[name$="-supplier_history"]').val('');
     $formRow.find('input[name$="-buy_price_history"]').val('');
-    $formRow.find('input[name$="-quantity_history"]').val('');
+    $formRow.find('input[name$="-quantity_history"]').val('1');
 });
 
 // Автозаполнение смежных полей при выборе товара
 $(document).on('select2:select', 'select[data-autocomplete-light-function]', function (e) {
+    if (!$(this).closest('#garanty-div-form').length) return;
     const data = e.params.data;
-    const $select = $(this);
-    const $formRow = $select.closest('.django-form');
+    const $formRow = $(this).closest('.django-form');
 
     if (data.code !== undefined) {
         $formRow.find('input[name$="-individual_code_history"]').val(data.code);
@@ -136,18 +251,16 @@ $(document).on('select2:select', 'select[data-autocomplete-light-function]', fun
     }, 1);
 });
 
-// Форматирование тысяч
-function formatThousands(value) {
-    let numbers = String(value).replace(/\D/g, '');
-    return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-}
+// ==============================================================================
+// 6. ФОКУС, ДИНАМИЧЕСКИЙ ВВОД И КУРСОР
+// ==============================================================================
 
-// Автоматическое выделение всего содержимого при фокусе на количество или цену
 document.addEventListener('focusin', function (e) {
+    if (!document.getElementById('garanty-div-form')) return;
+
     if (e.target.matches('input[name$="-buy_price_history"], input[name$="-quantity_history"]')) {
         let input = e.target;
 
-        // Меняем тип на text сразу при входе, чтобы браузер разрешил управление курсором
         if (input.type === 'number') {
             input.type = 'text';
         }
@@ -158,8 +271,9 @@ document.addEventListener('focusin', function (e) {
     }
 });
 
-// Динамический ввод с сохранением позиции курсора
 document.addEventListener('input', function (e) {
+    if (!document.getElementById('garanty-div-form')) return;
+
     if (e.target.matches('input[name$="-quantity_history"], input[name$="-buy_price_history"]')) {
         let input = e.target;
 
@@ -170,7 +284,6 @@ document.addEventListener('input', function (e) {
         let oldLength = input.value.length;
         let cursorPosition = input.selectionStart;
 
-        // Если позицию определить не удалось, ставим курсор В КОНЕЦ (oldLength), а не в 0
         if (cursorPosition === null) {
             cursorPosition = oldLength;
         }
@@ -183,39 +296,49 @@ document.addEventListener('input', function (e) {
     }
 });
 
-// Очистка пробелов перед отправкой HTMX / Form submit
-document.body.addEventListener('htmx:configRequest', function (evt) {
-    let params = evt.detail.parameters;
-    for (let key in params) {
-        if (key.includes('-buy_price_history') || key.includes('-quantity_history')) {
-            params[key] = String(params[key]).replace(/\s/g, '');
+document.addEventListener('change', function (e) {
+    if (!document.getElementById('garanty-div-form')) return;
+
+    if (e.target.matches('input[name$="-quantity_history"]')) {
+        let val = parseInt(e.target.value.replace(/\D/g, ''), 10);
+
+        if (isNaN(val) || val < 1) {
+            e.target.value = '1';
         }
+    }
+});
+
+// ==============================================================================
+// 7. ОБРАБОТКА ОТПРАВКИ ФОРМЫ (HTMX И ОБЫЧНЫЙ SUBMIT)
+// ==============================================================================
+
+document.body.addEventListener('htmx:configRequest', function (evt) {
+    const form = evt.detail.elt.closest('form') || document.querySelector('.garanty-form-storage');
+    if (form && form.querySelector('#garanty-div-form')) {
+        cleanupEmptyRows();
+
+        const formData = new FormData(form);
+        const newParams = {};
+
+        for (let [key, val] of formData.entries()) {
+            if (key.endsWith('-buy_price_history') || key.endsWith('-quantity_history')) {
+                val = String(val).replace(/\D/g, '');
+            }
+            newParams[key] = val;
+        }
+
+        evt.detail.parameters = newParams;
     }
 });
 
 document.addEventListener('submit', function (e) {
-    let inputs = e.target.querySelectorAll('input[name$="-buy_price_history"], input[name$="-quantity_history"]');
-    inputs.forEach(input => {
-        input.value = input.value.replace(/\s/g, '');
-    });
-});
+    const form = e.target;
+    if (form.querySelector && form.querySelector('#garanty-div-form')) {
+        cleanupEmptyRows();
 
-// Уведомления HX-Trigger
-document.body.addEventListener('showMessage', function (evt) {
-    const messageText = typeof evt.detail === 'object' && evt.detail !== null ? evt.detail.value : evt.detail;
-    if (messageText) {
-        alert(messageText);
-    }
-});
-
-// Проверка минимального значения при завершении ввода (при уходе из поля)
-document.addEventListener('change', function (e) {
-    if (e.target.matches('input[name$="-quantity_history"]')) {
-        let val = parseInt(e.target.value.replace(/\s/g, ''), 10);
-
-        // Если ввели 0, отрицательное число или пустоту — сбрасываем на 1
-        if (isNaN(val) || val < 1) {
-            e.target.value = '1';
-        }
+        let inputs = form.querySelectorAll('input[name$="-buy_price_history"], input[name$="-quantity_history"]');
+        inputs.forEach(input => {
+            input.value = input.value.replace(/\D/g, '');
+        });
     }
 });

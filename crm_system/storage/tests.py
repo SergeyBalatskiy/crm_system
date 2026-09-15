@@ -1,8 +1,11 @@
 from django.test import TestCase
 
 # Create your tests here.
-counter = 1
+counter = 9
 
-if counter:
+counter2 = 3
+
+if counter - counter2 < 0:
     print(1)
-print(0)
+else:
+    print(0)

@@ -130,7 +130,7 @@
 
 .items-table td .select2-container {
     width: 100% !important;
-    display: block !important;
+    display: inline-block !important;
     box-sizing: border-box !important;
 }
 
@@ -218,6 +218,15 @@
     transform: translateY(8.5px);
     flex-shrink: 0;
     background: #ffffff;
+}
+
+/* Если сам селект должен быть скрыт Select2-плагином, то скрываем только его, но контейнер оставляем видимым */
+#garanty-div-form select.select2-hidden-accessible {
+    display: none !important;
+}
+
+#garanty-div-form span.select2-container {
+    display: inline-block !important;
 }
 
 .btn {

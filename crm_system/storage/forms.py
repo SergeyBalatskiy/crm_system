@@ -1,8 +1,12 @@
 from django import forms
-from django.forms import modelformset_factory
+from django.forms import modelformset_factory, BaseModelFormSet
 from .models import StorageInfo, HistoryStorageInfo
 from dal_select2.widgets import Select2
 
+# Класс для отключения обязательной уникальности
+class DisableUniqueFormSet(BaseModelFormSet):
+    def validate_unique(self):
+        pass
 
 StorageAcceptableForm = modelformset_factory(
     StorageInfo, fields=("name_product", "quantity_at_the_purchase", "supplier", "buy_price", "retail_price", "minimum_items_for_notification"), labels={
@@ -15,7 +19,7 @@ StorageAcceptableForm = modelformset_factory(
     })
 
 RemovalHistoryForm = modelformset_factory(
-    HistoryStorageInfo, fields=("name_product_history", "individual_code_history", "quantity_history", "supplier_history"), labels={
+    HistoryStorageInfo, formset=DisableUniqueFormSet, fields=("name_product_history", "individual_code_history", "quantity_history", "supplier_history"), labels={
         "name_product_history": "Название товара",
         "individual_code_history": "Код товара",
         "quantity_history" : "Количество",
@@ -30,11 +34,11 @@ RemovalHistoryForm = modelformset_factory(
             'supplier_history': forms.TextInput(attrs={'class': 'form-control readonly-input', 'readonly': 'readonly'}),
             
             # Одно поле позволяет менять "данные"
-            'quantity_history': forms.NumberInput(attrs={'class': 'form-control', 'value': 1, 'min': 1}),
+            'quantity_history': forms.NumberInput(attrs={'class': 'form-control', 'min': 1}),
         })
 
 GarantyHistoryForm = modelformset_factory(
-    HistoryStorageInfo, fields=("name_product_history", "individual_code_history", "buy_price_history", "quantity_history", "supplier_history"), labels={
+    HistoryStorageInfo, formset=DisableUniqueFormSet, fields=("name_product_history", "individual_code_history", "buy_price_history", "quantity_history", "supplier_history"), labels={
         "name_product_history": "Название товара",
         "individual_code_history": "Код товара",
         "buy_price_history" : "Компенсация (₽)",
