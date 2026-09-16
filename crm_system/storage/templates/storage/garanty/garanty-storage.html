@@ -1,11 +1,15 @@
 {% load static %}
 
 <div class="storage-card">
-    <form hx-post="{% url 'garanty-storage' %}" class="garanty-form-storage">
+    <div id="messages-container">
+        {% include 'storage/messages.html' %}
+    </div>
+
+    <form hx-post="{% url 'garanty-storage' %}" hx-target="#messages-container" hx-swap="innerHTML"
+        class="garanty-form-storage">
         {% csrf_token %}
         {{ form_garanty.management_form }}
 
-        <!-- СКРОЛЛИРУЕМАЯ ЗОНА (Таблица + Кнопка «Добавить») -->
         <div class="scrollable-body">
             <div class="table-responsive">
                 <table class="items-table">
@@ -13,10 +17,10 @@
                         <tr>
                             <th style="width: 40px;">#</th>
                             <th style="width: 28%;">Товар (поиск)</th>
-                            <th style="width: 10%;">Код</th>
-                            <th style="width: 16%;">Товара на складе</th>
-                            <th style="width: 16%;">Поставщик</th>
-                            <th style="width: 15%;">Компенсация (₽)</th>
+                            <th style="width: 12%;">Код</th>
+                            <th style="width: 12%;">Остаток</th>
+                            <th style="width: 18%;">Поставщик</th>
+                            <th style="width: 14%;">Цена зак.</th>
                             <th style="width: 10%;">Кол-во</th>
                             <th style="width: 40px;"></th>
                         </tr>
@@ -24,10 +28,9 @@
                     <tbody id="garanty-div-form">
                         {% for form in form_garanty %}
                         <tr class="django-form item-row">
-                            <td class="row-number"><span class="hash">{{ forloop.counter }}</span></td>
+                            <td class="row-number"></td>
                             <td>{{ form.name_product_history }}</td>
                             <td>{{ form.individual_code_history }}</td>
-                            <!-- Новое информационное поле -->
                             <td>
                                 <input type="text" class="readonly-input stock-remainder-input" readonly placeholder="">
                             </td>
@@ -51,25 +54,15 @@
         </div>
 
         <div class="form-footer">
-            <button type="submit" class="btn btn-primary">Создать списание</button>
+            <button type="submit" class="btn btn-primary">Сохранить</button>
             <a href="#" class="btn btn-secondary">Отмена</a>
         </div>
     </form>
 
-    <!-- Скрытый шаблон -->
-    <template id="empty-form-template">
+    <template id="garanty-row-template">
         <tr class="django-form item-row">
-            <td class="row-number"><span class="hash">#</span></td>
-            <td>
-                <!-- Явно добавляем пустой option внутрь селекта, чтобы Select2 понимал структуру -->
-                <select name="form-__prefix__-name_product_history"
-                    data-placeholder="Начните вводить название, код или поставщика..." maxlength="120"
-                    id="id_form-__prefix__-name_product_history"
-                    data-autocomplete-light-url="/storage/storage-autocomplete"
-                    data-autocomplete-light-function="select2" data-autocomplete-light-language="ru">
-                    <option value=""></option>
-                </select>
-            </td>
+            <td class="row-number"></td>
+            <td>{{ form_garanty.empty_form.name_product_history }}</td>
             <td>{{ form_garanty.empty_form.individual_code_history }}</td>
             <td>
                 <input type="text" class="readonly-input stock-remainder-input" readonly placeholder="">

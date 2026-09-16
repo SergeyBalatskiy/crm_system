@@ -335,3 +335,17 @@
 .items-table select[data-autocomplete-light-function] {
     display: none !important;
 }
+
+#removal-div-form {
+    counter-reset: rowCounter;
+}
+
+#removal-div-form tr.item-row {
+    counter-increment: rowCounter;
+}
+
+#removal-div-form tr.item-row td.row-number::before {
+    content: counter(rowCounter);
+    font-weight: bold;
+    color: #6c757d;
+}

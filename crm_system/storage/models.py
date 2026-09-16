@@ -13,7 +13,7 @@ class StorageInfo(models.Model):
     individual_code = models.IntegerField(null=True, blank=True) # Код
     name_product = models.CharField(max_length=120)
     quantity_at_the_purchase = models.IntegerField() # Количество на момент закупки
-    supplier = models.CharField(max_length=120, blank=True) # Поставщик
+    supplier = models.CharField(max_length=120, null=True, blank=True) # Поставщик
     buy_price = models.IntegerField() # Стоимость закупки (1 шт.)
     retail_price = models.IntegerField() # Цена для продажи (1 шт.)
     minimum_items_for_notification = models.IntegerField(default=5) # Минимальное количество для напоминания

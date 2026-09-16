@@ -5,41 +5,34 @@ from dal_select2.views import Select2QuerySetView
 from django.db.models import Q, TextField
 from django.db.models.functions import Cast
 
-""" Суть данной вью заключается в том, что она автоматически и моментально после ввода каждого
-символа пользователя, предлагает ему актуальные по его вводу обьекты/обьект из БД """
-
-# Данный класс отвечает за отображение автоподсказок
 @method_decorator(login_required(), name='dispatch') 
 class CountryAutocomplete(Select2QuerySetView):
-    # Обязательная функция, которая выдает результатом "готовые обьекты" на автозаполнение
     def get_queryset(self): 
-        # Переменная, которая если не заполнена, то выдает ВСЕ обьекты
         qs = StorageInfo.objects.filter(user=self.request.user).order_by('-individual_code')
-        # Если имеется хоть 1 символ в поле, то выдается результат с учетом поля _istartswith без
-        # зависимости от регистра
         if self.q:
-            qs = qs.annotate(buy_price_str=Cast('buy_price', output_field=TextField()),
-            individual_code_str=Cast('individual_code', output_field=TextField())
+            qs = qs.annotate(
+                buy_price_str=Cast('buy_price', output_field=TextField()),
+                individual_code_str=Cast('individual_code', output_field=TextField())
             )
-
             qs = qs.filter(
-                Q(name_product__icontains=self.q) | Q(individual_code_str__icontains=self.q) | Q(buy_price_str__icontains=self.q) | Q(supplier__icontains=self.q)
+                Q(name_product__icontains=self.q) | 
+                Q(individual_code_str__icontains=self.q) | 
+                Q(buy_price_str__icontains=self.q) | 
+                Q(supplier__icontains=self.q)
             )
-
         return qs
 
     def get_results(self, context):
-        # Отдает в режиме реального времени на HTML правильно отформатированные данные для дальнейшей вставки
-        return [
-            {
-            'id' : self.get_result_value(result), 
-            'text' : f"Код: {result.individual_code or '-'} | Товар: {result.name_product} | Поставщик: {result.supplier or '-'}",
-            'name' : result.name_product,
-            'code' : result.individual_code or '-',
-            'supplier' : result.supplier or '',
-            'price' : result.buy_price or 0,
-            'remainder' : result.remainder,
-            }
-            for result in context['object_list']
-        ]
-    
+            return [
+                {
+                    'id': self.get_result_value(result), 
+                    'text': f"Код: {result.individual_code or '-'} | Товар: {result.name_product} | Поставщик: {result.supplier or '-'}",
+                    'name': result.name_product,
+                    'code': result.individual_code or '-',
+                    'supplier': result.supplier or '',
+                    # Явное приведение Decimal к int / float
+                    'price': int(result.buy_price) if result.buy_price else 0,
+                    'remainder': result.remainder if result.remainder is not None else '-',
+                }
+                for result in context['object_list']
+            ]

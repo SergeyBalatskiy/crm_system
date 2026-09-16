@@ -20,7 +20,6 @@ class StorageRemovalCustomView(TemplateView):
     def post(self, request, *args, **kwargs):
         # Получаю все формсеты, которые есть
         formset = RemovalHistoryForm(request.POST)
-        
         # Валидация форм (пропуск не важных полей) + сохранение важных
         if formset.is_valid():
         
@@ -28,13 +27,8 @@ class StorageRemovalCustomView(TemplateView):
             instances = formset.save(commit=False)
 
             if not instances:
-                if request.headers.get('HX-Request'):
-                    response = HttpResponse(status=204)
-                    payload = {
-                            'showMessage': 'Пожалуйста, выберите хотя бы один товар на списание!'
-                        }
-                    response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
-                    return response
+                messages.error(request, 'Пожалуйста, выберите хотя бы один товар на списание!')
+                return render(request, 'storage/messages.html')
 
             # Беру каждый обьект из формсета и индивидуально в каждом записываю юзера и сохраняю
             for instance in instances:
@@ -45,11 +39,8 @@ class StorageRemovalCustomView(TemplateView):
                     if history_data is None:
                         # Статус 204 если произошла ошибка + транзакция
                         transaction.set_rollback(True)
-                        if request.headers.get('HX-Request'):
-                            response = HttpResponse(status=204)
-                            payload = {'showMessage': f'Ошибка: в предыдущем списании вы убрали все возможное количество товара!'}
-                            response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
-                            return response
+                        messages.error(request, f'Ошибка: вы попытались повторно списать товар с кодом {instance.name_product_history}, количество которого на момент прошлого списания уже стало 0.')
+                        return render(request, 'storage/messages.html')
 
                     instance.name_product_history = history_data.name_product
                     instance.type_of_operation_history = "Возврат без возмещения денежных средств"
@@ -59,12 +50,9 @@ class StorageRemovalCustomView(TemplateView):
                     # Проверяю на "верность" введенного количества товара:
                     if history_data.remainder - current_remainder_instance < 0:
                         # Статус 204 если произошла ошибка + транзакция
-                            transaction.set_rollback(True)
-                            if request.headers.get('HX-Request'):
-                                response = HttpResponse(status=204)
-                                payload = {'showMessage': f'Ошибка: товара {history_data.name_product} на складе меньше, чем вы указали под списание!'}
-                                response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
-                                return response
+                        transaction.set_rollback(True)
+                        messages.error(request, f'Ошибка: товара {history_data.name_product} на складе меньше, чем вы указали под списание!')
+                        return render(request, 'storage/messages.html')
 
                     instance.remainder_history = history_data.remainder - current_remainder_instance
                     history_data.remainder = history_data.remainder - current_remainder_instance
@@ -80,12 +68,10 @@ class StorageRemovalCustomView(TemplateView):
                 except Exception as e:
                     # Статус 204 если произошла ошибка + транзакция
                     transaction.set_rollback(True)
-                    if request.headers.get('HX-Request'):
-                        response = HttpResponse(status=204)
-                        payload = {'showMessage': f'Ошибка списания: {e}'}
-                        response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
-                        return response
+                    messages.error(request, f'Ошибка: {e}')
+                    return render(request, 'storage/messages.html')
                     
+                            
             if request.headers.get('HX-Request'):
                     msg = 'Списание товара без возмещения средств прошло успешно!'
                     messages.success(request, msg)
@@ -95,6 +81,6 @@ class StorageRemovalCustomView(TemplateView):
                 
         if request.headers.get('HX-Request'):
             response = HttpResponse(status=204)
-            payload = {'showMessage': f'Ошибка списания: указано товаров болше, чем есть на складе!'}
+            payload = {'showMessage': f'Ошибка: пожалуйста, перепроверьте поля на корректность ввода!'}
             response['HX-Trigger'] = json.dumps(payload, ensure_ascii=True)
             return response

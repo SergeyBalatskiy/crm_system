@@ -1,55 +1,108 @@
 // ==============================================================================
-// 1. НАСТРОЙКА SELECT2 (Шаблон отображения выбранного элемента)
-// ==============================================================================
-if (window.jQuery && window.jQuery.fn.select2) {
-    window.jQuery.fn.select2.defaults.set('templateSelection', function (item) {
-        if (!item.id) return item.text;
-        if (item.name) return item.name;
-        if (item.text && item.text.includes('|')) return item.text.split('|')[0].trim();
-        return item.text;
-    });
-}
-
-// ==============================================================================
-// 2. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ И ПЕРЕИНДЕКСАЦИЯ
+// 1. ВСПOМОГАТЕЛЬНЫЕ ФУНКЦИИ И ИНИЦИАЛИЗАЦИЯ SELECT2
 // ==============================================================================
 
-// Обновление нумерации столбца #
-function updateRowNumbers() {
-    const rows = document.querySelectorAll('#removal-div-form tr.item-row');
-    rows.forEach((row, index) => {
-        const numCell = row.querySelector('.row-number .hash');
-        if (numCell) numCell.textContent = index + 1;
-    });
-}
-
-// Вспомогательная функция для переиндексации полей формсета
-function reindexRemovalForms() {
-    const formsList = document.getElementById('removal-div-form');
-    const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
-    if (!formsList || !totalFormsInput) return;
-
-    const rows = formsList.querySelectorAll('tr.item-row');
-    totalFormsInput.value = rows.length;
-
-    rows.forEach((row, index) => {
-        row.querySelectorAll('input, select, textarea').forEach(input => {
-            if (input.name) input.name = input.name.replace(/form-\d+-/, `form-${index}-`);
-            if (input.id) input.id = input.id.replace(/id_form-\d+-/, `id_form-${index}-`);
-        });
-    });
-
-    updateRowNumbers();
-}
-
-// Форматирование разделителей тысяч (10 000)
 function formatThousands(value) {
     let numbers = String(value).replace(/\D/g, '');
     return numbers.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 }
 
+function initRowSelect2($row) {
+    const $sel = $row.find('select');
+    if (!$sel.length) return;
+
+    if ($sel.data('select2')) {
+        $sel.select2('destroy');
+    }
+
+    $sel.removeAttr('data-select2-id')
+        .removeClass('select2-hidden-accessible')
+        .show();
+
+    $sel.select2({
+        ajax: {
+            url: $sel.attr('data-autocomplete-light-url') || '/storage/storage-autocomplete',
+            dataType: 'json',
+            delay: 250,
+            data: function (params) { return { q: params.term }; },
+            processResults: function (data) { return { results: data.results || data }; },
+            cache: true
+        },
+        placeholder: $sel.attr('data-placeholder') || 'Начните вводить название, код или поставщика...',
+        allowClear: true,
+        width: '100%'
+    });
+}
+
+function reindexRemovalForms() {
+    const container = document.getElementById('removal-div-form');
+    const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]') || document.querySelector('input[name$="-TOTAL_FORMS"]');
+    if (!container || !totalFormsInput) return;
+
+    const rows = container.querySelectorAll('tr.item-row');
+    totalFormsInput.value = rows.length;
+
+    rows.forEach((row, index) => {
+        const $row = $(row);
+
+        row.querySelectorAll('input, select, textarea').forEach(input => {
+            if (input.name) input.name = input.name.replace(/form-\d+-/, `form-${index}-`);
+            if (input.id) input.id = input.id.replace(/id_form-\d+-/, `id_form-${index}-`);
+        });
+
+        const $select = $row.find('select');
+        if ($select.length && !$select.data('select2')) {
+            initRowSelect2($row);
+        }
+    });
+}
+
 // ==============================================================================
-// 3. ЗАЩИТА ОТ ДУРАКОВ (КОЛИЧЕСТВО НЕ МЕНЬШЕ 1)
+// 2. ФУНКЦИИ ДОБАВЛЕНИЯ И УДАЛЕНИЯ (ВЫЗЫВАЮТСЯ ИЗ HTML ЧЕРЕЗ ONCLICK)
+// ==============================================================================
+
+function addRemovalRow() {
+    const container = document.getElementById('removal-div-form');
+    const template = document.getElementById('removal-row-template');
+    if (!container || !template) return;
+
+    const currentCount = container.querySelectorAll('tr.item-row').length;
+    const templateContent = template.innerHTML || template.textContent;
+
+    const newFormHtml = templateContent.replace(/__prefix__/g, currentCount);
+    container.insertAdjacentHTML('beforeend', newFormHtml);
+
+    reindexRemovalForms();
+}
+
+function removeRemovalRow(btnElement) {
+    const container = document.getElementById('removal-div-form');
+    if (!container) return;
+
+    const rows = container.querySelectorAll('tr.item-row');
+    if (rows.length > 1) {
+        const $row = $(btnElement).closest('tr.item-row');
+        const $select = $row.find('select');
+
+        if ($select.length && $select.data('select2')) {
+            $select.select2('destroy');
+        }
+
+        $row.remove();
+        reindexRemovalForms();
+    }
+}
+
+// Инициализация существующих элементов при первой загрузке
+$(document).ready(function () {
+    const $container = $('#removal-div-form');
+    if ($container.length) {
+        reindexRemovalForms();
+    }
+});
+
+// ==============================================================================
+// 3. ЗАЩИТА И ФОРМАТИРОВАНИЕ ПОЛЯ КОЛИЧЕСТВА
 // ==============================================================================
 document.addEventListener('input', function (e) {
     if (!document.getElementById('removal-div-form')) return;
@@ -73,7 +126,6 @@ document.addEventListener('input', function (e) {
     }
 });
 
-// Проверка при уходе из поля (blur), если оставили пустым или нулем
 document.addEventListener('blur', function (e) {
     if (!document.getElementById('removal-div-form')) return;
 
@@ -85,84 +137,7 @@ document.addEventListener('blur', function (e) {
 }, true);
 
 // ==============================================================================
-// 4. ДОБАВЛЕНИЕ И УДАЛЕНИЕ СТРОК В ТАБЛИЦЕ
-// ==============================================================================
-document.addEventListener('click', function (e) {
-    const formsList = document.getElementById('removal-div-form');
-    if (!formsList) return;
-
-    // Добавление новой строки
-    if (e.target && (e.target.id === 'add-new-form-removal' || e.target.closest('#add-new-form-removal'))) {
-        const totalFormsInput = document.querySelector('input[name="form-TOTAL_FORMS"]');
-        const emptyFormContainer = document.getElementById('empty-form-removal');
-
-        if (totalFormsInput && emptyFormContainer) {
-            let nextIndex = parseInt(totalFormsInput.value, 10) || formsList.querySelectorAll('tr.item-row').length;
-
-            let newFormHtml = emptyFormContainer.innerHTML.replace(/__prefix__/g, nextIndex);
-
-            const tempTbody = document.createElement('tbody');
-            tempTbody.innerHTML = newFormHtml;
-
-            // Очищаем старые артефакты select2, если они были в шаблоне
-            tempTbody.querySelectorAll('.select2-container').forEach(el => el.remove());
-            tempTbody.querySelectorAll('select').forEach(select => {
-                select.removeAttribute('data-select2-id');
-                select.classList.remove('select2-hidden-accessible');
-                select.style.display = '';
-            });
-
-            formsList.appendChild(tempTbody.firstElementChild);
-            totalFormsInput.value = nextIndex + 1;
-            updateRowNumbers();
-
-            // Инициализация Select2 для нового селекта с задержкой (гарантирует отрисовку)
-            setTimeout(function () {
-                const $lastRow = $('#removal-div-form tr.item-row:last-child');
-                const $sel = $lastRow.find('select');
-
-                if ($sel.length && typeof $sel.select2 === 'function') {
-                    $sel.select2({
-                        ajax: {
-                            url: $sel.attr('data-autocomplete-light-url') || '/storage/storage-autocomplete',
-                            dataType: 'json',
-                            delay: 250,
-                            data: function (params) {
-                                return { q: params.term };
-                            },
-                            processResults: function (data) {
-                                return { results: data.results || data };
-                            },
-                            cache: true
-                        },
-                        placeholder: $sel.attr('data-placeholder') || 'Начните вводить название, код или поставщика...',
-                        allowClear: true,
-                        width: '100%'
-                    });
-                }
-            }, 100);
-        }
-    }
-
-    // Удаление строки по кнопке-крестику
-    if (e.target && e.target.classList.contains('btn-remove-row')) {
-        const row = e.target.closest('tr');
-        const rows = formsList.querySelectorAll('tr.item-row');
-
-        if (row && rows.length > 1) {
-            const $select = $(row).find('select');
-            if ($select.length && $select.data('select2')) {
-                $select.select2('destroy');
-            }
-
-            row.remove();
-            reindexRemovalForms();
-        }
-    }
-});
-
-// ==============================================================================
-// 5. БЛОКИРОВКА ВЫПАДАЮЩЕГО СПИСКА ПРИ КЛИКЕ НА КРЕСТИК СБРОСА
+// 4. РАБОТА С SELECT2 (АВТОЗАПОЛНЕНИЕ, ОЧИСТКА И ФОРМАТИРОВАНИЕ)
 // ==============================================================================
 $(document).on('select2:unselecting', 'select[data-autocomplete-light-function]', function (e) {
     if (!$(this).closest('#removal-div-form').length) return;
@@ -177,9 +152,6 @@ $(document).on('select2:opening', 'select[data-autocomplete-light-function]', fu
     }
 });
 
-// ==============================================================================
-// 6. ОЧИСТКА СМЕЖНЫХ ПОЛЕЙ
-// ==============================================================================
 $(document).on('select2:clear select2:unselect', 'select[data-autocomplete-light-function]', function (e) {
     if (!$(this).closest('#removal-div-form').length) return;
     const $formRow = $(this).closest('.django-form');
@@ -190,9 +162,6 @@ $(document).on('select2:clear select2:unselect', 'select[data-autocomplete-light
     $formRow.find('input[name$="-quantity_history"]').val('1');
 });
 
-// ==============================================================================
-// 7. АВТОЗАПОЛНЕНИЕ ПОЛЕЙ
-// ==============================================================================
 $(document).on('select2:select', 'select[data-autocomplete-light-function]', function (e) {
     if (!$(this).closest('#removal-div-form').length) return;
     const data = e.params.data;
@@ -217,8 +186,29 @@ $(document).on('select2:select', 'select[data-autocomplete-light-function]', fun
     }, 1);
 });
 
+$(document).on('select2:select change', 'select', function () {
+    const $select = $(this);
+
+    setTimeout(() => {
+        const $rendered = $select.next('.select2-container').find('.select2-selection__rendered');
+        if (!$rendered.length) return;
+
+        let fullText = $rendered.text();
+        let match = fullText.match(/Товар:\s*([^|]+)/i);
+        if (match && match[1]) {
+            const cleanName = match[1].trim();
+            const $clearBtn = $rendered.find('.select2-selection__clear');
+
+            $rendered.text(cleanName);
+            if ($clearBtn.length) {
+                $rendered.prepend($clearBtn);
+            }
+        }
+    }, 10);
+});
+
 // ==============================================================================
-// 8. ОЧИСТКА ПЕРЕД ОТПРАВКОЙ (УДАЛЕНИЕ ПРОБЕЛОВ ИЗ ЧИСЕЛ)
+// 5. HTMX И ОТПРАВКА ФОРМЫ
 // ==============================================================================
 document.body.addEventListener('htmx:configRequest', function (evt) {
     if (!document.getElementById('removal-div-form')) return;
@@ -238,9 +228,6 @@ document.addEventListener('submit', function (e) {
     });
 });
 
-// ==============================================================================
-// 9. УВЕДОМЛЕНИЯ HX-TRIGGER
-// ==============================================================================
 document.body.addEventListener('showMessage', function (evt) {
     const messageText = typeof evt.detail === 'object' && evt.detail !== null ? evt.detail.value : evt.detail;
     if (messageText) alert(messageText);

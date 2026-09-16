@@ -1,7 +1,13 @@
 {% load static %}
 
 <div class="storage-card">
-    <form hx-post="{% url 'removal-storage' %}" class="removal-form-storage">
+
+    <div id="messages-container">
+        {% include 'storage/messages.html' %}
+    </div>
+
+    <form hx-post="{% url 'removal-storage' %}" hx-target="#messages-container" hx-swap="innerHTML"
+        class="removal-form-storage">
         {% csrf_token %}
         {{ form_removal.management_form }}
 
@@ -22,7 +28,7 @@
                     <tbody id="removal-div-form">
                         {% for form in form_removal %}
                         <tr class="django-form item-row">
-                            <td class="row-number"><span class="hash">{{ forloop.counter }}</span></td>
+                            <td class="row-number"></td>
                             <td>{{ form.name_product_history }}</td>
                             <td>{{ form.individual_code_history }}</td>
                             <td>
@@ -31,7 +37,8 @@
                             <td>{{ form.supplier_history }}</td>
                             <td>{{ form.quantity_history }}</td>
                             <td class="text-center">
-                                <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
+                                <button type="button" class="btn-remove-row" onclick="removeRemovalRow(this)"
+                                    title="Удалить">&times;</button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -40,13 +47,13 @@
             </div>
 
             <div class="table-actions">
-                <button type="button" id="add-new-form-removal" class="btn-add-row">
+                <!-- Явный вызов функции onclick -->
+                <button type="button" onclick="addRemovalRow()" class="btn-add-row">
                     <i class="fa-solid fa-plus"></i> Добавить товар
                 </button>
             </div>
         </div>
 
-        <!-- СТАТИЧНЫЙ ПОДВАЛ -->
         <div class="form-footer">
             <button type="submit" class="btn btn-primary">Создать списание</button>
             <a href="#" class="btn btn-secondary">Отмена</a>
@@ -54,21 +61,21 @@
     </form>
 
     <!-- Скрытый шаблон новой строки -->
-    <table style="display: none;">
-        <tbody id="empty-form-removal">
-            <tr class="django-form item-row">
-                <td class="row-number"><span class="hash">#</span></td>
-                <td>{{ form_removal.empty_form.name_product_history }}</td>
-                <td>{{ form_removal.empty_form.individual_code_history }}</td>
-                <td>
-                    <input type="text" class="readonly-input stock-remainder-input" readonly placeholder="">
-                </td>
-                <td>{{ form_removal.empty_form.supplier_history }}</td>
-                <td>{{ form_removal.empty_form.quantity_history }}</td>
-                <td class="text-center">
-                    <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+    <template id="removal-row-template">
+        <tr class="django-form item-row">
+            <td class="row-number"></td>
+            <td>{{ form_removal.empty_form.name_product_history }}</td>
+            <td>{{ form_removal.empty_form.individual_code_history }}</td>
+            <td>
+                <input type="text" class="readonly-input stock-remainder-input" readonly placeholder="">
+            </td>
+            <td>{{ form_removal.empty_form.supplier_history }}</td>
+            <!-- Исправлено: добавлен empty_form -->
+            <td>{{ form_removal.empty_form.quantity_history }}</td>
+            <td class="text-center">
+                <button type="button" class="btn-remove-row" onclick="removeRemovalRow(this)"
+                    title="Удалить">&times;</button>
+            </td>
+        </tr>
+    </template>
 </div>

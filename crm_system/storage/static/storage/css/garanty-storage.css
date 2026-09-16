@@ -229,6 +229,21 @@
     display: inline-block !important;
 }
 
+
+#garanty-div-form {
+    counter-reset: rowCounter;
+}
+
+#garanty-div-form tr.item-row {
+    counter-increment: rowCounter;
+}
+
+#garanty-div-form tr.item-row td.row-number::before {
+    content: counter(rowCounter);
+    font-weight: bold;
+    color: #6c757d;
+}
+
 .btn {
     padding: 10px 18px;
     border-radius: 10px;
