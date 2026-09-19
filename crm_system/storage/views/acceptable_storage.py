@@ -49,7 +49,7 @@ class StorageAcceptableCustomView(TemplateView):
                     return render(request, self.template_name, {'form_acceptable': formset})             
                     
             messages.success(request, 'Поступление товара(-ров) прошло успешно!')
-            return redirect('history-storage')
+            return redirect('filter_and_history_storage')
 
         # Если форма не прошла валидацию
         messages.error(request, 'Пожалуйста, заполните все поля!')

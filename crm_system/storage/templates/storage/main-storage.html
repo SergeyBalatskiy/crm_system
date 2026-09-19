@@ -5,48 +5,56 @@
 <link rel="stylesheet" href="{% static 'storage/css/main-storage.css' %}">
 <script src="{% static 'storage/js/main-storage.js' %}" defer></script>
 
+<div id="messages-container">
+    {% include 'storage/messages.html' %}
+</div>
+
 <div class="div-place-storage-history">
     <div class="div-box-storage-history">
 
-        {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags }}">
-            {% if message.tags == 'success' %}
-            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                viewBox="0 0 16 16">
-                <path
-                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z" />
-            </svg>
-            {% elif message.tags == 'error' %}
-            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-                viewBox="0 0 16 16">
-                <path
-                    d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
-            </svg>
-            {% endif %}
-            <span>{{ message }}</span>
+        <!-- Шапка -->
+        <div class="history-header">
+            <h2>Товары на складе</h2>
+            <span class="history-count">Активных позиций: {{ storage_actual_items|length }}</span>
         </div>
-        {% endfor %}
-        {% endif %}
 
-        <!-- Строки с остальными сотрудниками -->
-        {% for item in storage_actual_items %}
-        <div class="item-place" data-id="{{ item.individual_code }}">
+        <!-- Панель фильтров -->
+        <form id="filter-form" method="GET" action="{% url 'main-storage' %}" class="filter-toolbar">
+            
+            <!-- 1. Быстрый поиск -->
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по названию, коду, поставщику..." autocomplete="off">
+            </div>
 
-            <div class="worker-col">Айдишник: {{ item.id }}</div>
-            <div class="worker-col">Название товара: {{ item.name_product }}</div>
-            <div class="worker-col">Количество на момент покупки: {{ item.quantity_at_the_purchase }}</div>
-            <div class="worker-col">Поставщик: {{ item.supplier }}</div>
-            <div class="worker-col">Цена закупки товара: {{ item.buy_price }}</div>
-            <div class="worker-col">Цена для продажи: {{ item.retail_price }}</div>
-            <div class="worker-col">Минимальное количество товара для напоминания:
-                {{ item.minimum_items_for_notification }}</div>
-            <div class="worker-col">Осталось товара на складе: {{ item.remainder }}</div>
-            <h1> </h1>
+            <!-- 2. Тумблер "Заканчивается" -->
+            <div class="toggle-wrapper">
+                <label class="switch">
+                    <input type="checkbox" name="min_items_remainder" id="min-items-toggle" value="yes">
+                    <span class="slider round"></span>
+                </label>
+                <span class="toggle-label">Мало на складе</span>
+            </div>
+
+            <!-- 3. Диапазон дат -->
+            <div class="date-range-wrapper">
+                <div class="date-field">
+                    <label for="date_start_input">От:</label>
+                    <input type="date" name="date_start_input" id="date_start_input" class="date-input">
+                </div>
+                <div class="date-field">
+                    <label for="date_end_input">До:</label>
+                    <input type="date" name="date_end_input" id="date_end_input" class="date-input">
+                </div>
+            </div>
+
+        </form>
+
+        <!-- Контейнер для списка карточек (обновляется через AJAX) -->
+        <div class="history-list" id="main-list-container">
+            {% include 'storage/partials/main-list.html' %}
         </div>
-        {% endfor %}
 
     </div>
 </div>
-
 {% endblock %}

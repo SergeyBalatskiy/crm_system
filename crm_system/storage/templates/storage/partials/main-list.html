@@ -1,0 +1,60 @@
+{% for item in storage_actual_items %}
+<div class="history-card" data-id="{{ item.individual_code }}">
+    
+    <!-- Шапка карточки -->
+    <div class="history-card-header">
+        <div class="product-info">
+            <span class="product-name">{{ item.name_product }}</span>
+            <span class="product-code">Код: {{ item.individual_code }}</span>
+        </div>
+
+        <!-- Бейдж статуса остатка -->
+        {% if item.remainder <= item.minimum_items_for_notification %}
+            <span class="badge badge-danger">Заканчивается (осталось {{ item.remainder }} шт.)</span>
+        {% else %}
+            <span class="badge badge-success">В наличии</span>
+        {% endif %}
+    </div>
+
+    <!-- Тело с параметрами -->
+    <div class="history-card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Поставщик</span>
+                <span class="info-value">{{ item.supplier }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Закупка / Закуплено</span>
+                <span class="info-value">{{ item.buy_price }} ₽ / {{ item.quantity_at_the_purchase }} шт.</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Цена продажи</span>
+                <span class="info-value font-accent">{{ item.retail_price }} ₽</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Остаток на складе</span>
+                <span class="info-value font-accent">{{ item.remainder }} шт.</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Порог уведомления</span>
+                <span class="info-value">{{ item.minimum_items_for_notification }} шт.</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Футер -->
+    <div class="history-card-footer">
+        <div class="time-stamp">
+            <span></strong></span>
+        </div>
+        <div class="time-stamp">
+            <span>Добавлено: <strong>{{ item.created_at|date:"d.m.Y H:i" }}</strong></span>
+        </div>
+    </div>
+
+</div>
+{% empty %}
+<div class="empty-history">
+    <p>Товары по данному запросу не найдены.</p>
+</div>
+{% endfor %}

@@ -12,11 +12,10 @@ urlpatterns = [
     path('removal-storage', StorageRemovalCustomView.as_view(), name='removal-storage'),
     # Указываю на путь к показу выбора форм на списание гарантийного возврата
     path('removal', FormRemovalCustomView.as_view(), name='removal-form-storage'),   
-    # Указываю на путь к показу историй создания/списания товаров на складе
-    path('history', StorageHistoryCustomView.as_view(), name='history-storage'),
     # Указываю на путь к показу формы Гарантийного возврата
     path('garanty', StorageGarantyCustomView.as_view(), name='garanty-storage'),   
     # Указываю на путь к обращению чтобы отрбражать авто ответы для подсказок из БД
     path('storage-autocomplete', CountryAutocomplete.as_view(), name='storage-autocomplete'),   
-    
+    # Указываю на путь к обращению фильтрам на показ нужной информации из HistoryStorageInfo / показ ВСЕЙ информации
+    path('history', FilterHistoryCustomView.as_view(), name='filter_and_history_storage'),   
 ]

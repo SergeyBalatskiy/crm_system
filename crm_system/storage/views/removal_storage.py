@@ -71,12 +71,11 @@ class StorageRemovalCustomView(TemplateView):
                     messages.error(request, f'Ошибка: {e}')
                     return render(request, 'storage/messages.html')
                     
-                            
             if request.headers.get('HX-Request'):
                     msg = 'Списание товара без возмещения средств прошло успешно!'
                     messages.success(request, msg)
                     response = HttpResponse()
-                    response['HX-Redirect'] = reverse('history-storage')
+                    response['HX-Redirect'] = reverse('filter_and_history_storage')
                     return response 
                 
         if request.headers.get('HX-Request'):

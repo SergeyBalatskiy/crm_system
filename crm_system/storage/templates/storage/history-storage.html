@@ -5,72 +5,73 @@
 <link rel="stylesheet" href="{% static 'storage/css/history-storage.css' %}">
 <script src="{% static 'storage/js/history-storage.js' %}" defer></script>
 
-{% if messages %}
-{% for message in messages %}
-<div class="alert alert-{{ message.tags }}">
-    {% if message.tags == 'success' %}
-    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-        viewBox="0 0 16 16">
-        <path
-            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z" />
-    </svg>
-    {% elif message.tags == 'error' %}
-    <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
-        viewBox="0 0 16 16">
-        <path
-            d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
-    </svg>
-    {% endif %}
-    <span>{{ message }}</span>
+<div id="messages-container">
+    {% include 'storage/messages.html' %}
 </div>
-{% endfor %}
-{% endif %}
 
 <div class="div-place-storage-history">
     <div class="div-box-storage-history">
 
-        {% for item_history in storage_history_items %}
-        <div class="item-place" data-id="{{ item_history.individual_code_history }}">
-            {% if item_history.type_of_operation_history == 'Возврат без возмещения денежных средств' %}
-            <div class="worker-col">Тип операции: {{ item_history.type_of_operation_history }}</div>
-            <div class="worker-col">Код товара: {{ item_history.individual_code_history }}</div>
-            <div class="worker-col">Название товара: {{ item_history.name_product_history }}</div>
-            <div class="worker-col">Количество на момент списания: {{ item_history.quantity_history }}</div>
-            <div class="worker-col">Компенсация за списание товара: {{ item_history.buy_price_history }} ₽</div>
-            <div class="worker-col">Поставщик: {{ item_history.supplier_history }}</div>
-            <div class="worker-col">Действующий остаток: {{ item_history.remainder_history }}</div>
-            <div class="worker-col">Время проведения операции списания: {{ item_history.time_of_operation_history }}
-            </div>
-            <div class="worker-col">Товар был добавлен в базу: {{ item_history.time_created_history }}</div>
-            <h1>----------------------</h1>
-            {% elif item_history.type_of_operation_history == 'Гарантийный возврат' %}
-            <div class="worker-col">Тип операции: {{ item_history.type_of_operation_history }}</div>
-            <div class="worker-col">Код товара: {{ item_history.individual_code_history }}</div>
-            <div class="worker-col">Название товара: {{ item_history.name_product_history }}</div>
-            <div class="worker-col">Количество на момент списания: {{ item_history.quantity_history }}</div>
-            <div class="worker-col">Компенсация за гарантийный возврат (шт.): {{ item_history.buy_price_history }} ₽
-            </div>
-            <div class="worker-col">Поставщик: {{ item_history.supplier_history }}</div>
-            <div class="worker-col">Действующий остаток: {{ item_history.remainder_history }}</div>
-            <div class="worker-col">Время проведения операции возврата: {{ item_history.time_of_operation_history }}
-            </div>
-            <div class="worker-col">Товар был добавлен в базу: {{ item_history.time_created_history }}</div>
-            <h1>----------------------</h1>
-            {% else %}
-            <div class="worker-col">Тип операции: {{ item_history.type_of_operation_history }}</div>
-            <div class="worker-col">Код товара: {{ item_history.individual_code_history }}</div>
-            <div class="worker-col">Название товара: {{ item_history.name_product_history }}</div>
-            <div class="worker-col">Количество на момент закупки: {{ item_history.quantity_history }}</div>
-            <div class="worker-col">Стоимость закупки (штука): {{ item_history.buy_price_history }}</div>
-            <div class="worker-col">Поставщик: {{ item_history.supplier_history }}</div>
-            <div class="worker-col">Действующий остаток: {{ item_history.remainder_history }}</div>
-            <div class="worker-col">Время проведения операции добавления: {{ item_history.time_of_operation_history }}
-            </div>
-            <div class="worker-col">Товар был добавлен в базу: {{ item_history.time_created_history }}</div>
-            <h1>----------------------</h1>
-            {% endif %}
+        <!-- Шапка истории -->
+        <div class="history-header">
+            <h2>История операций склада</h2>
+            <span class="history-count">Записей всего: {{ storage_history_items|length }}</span>
         </div>
-        {% endfor %}
+
+        <!-- Панель фильтров -->
+        <form id="filter-form" method="GET" action="{% url 'filter_and_history_storage' %}" class="filter-toolbar">
+            
+            <!-- Поле быстрый поиск -->
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по названию, коду, поставщику..." autocomplete="off">
+            </div>
+
+            <!-- Селект типа операции -->
+            <select class="custom-select" id="history_operation_select" name="search_history_operation" autocomplete="off">
+                <option value="">Все типы операций</option>
+                <option value="acceptable_data">Поступление товара</option>
+                <option value="removal_data">Списание</option>
+                <option value="garanty_removal_data">Гарантийное списание</option>
+            </select>
+
+            <!-- ГИБРИДНЫЙ БЛОК ДАТЫ -->
+            <div class="date-filter-container">
+                
+                <!-- 1. Селект быстрых пресетов -->
+                <select class="custom-select" id="history_date_select" name="search_date_operation" autocomplete="off">
+                    <option value="">За всё время</option>
+                    <option value="date_today">Сегодня</option>
+                    <option value="date_yesterday">Вчера</option>
+                    <option value="date_this_week">За эту неделю</option>
+                    <option value="date_this_month">За месяц</option>
+                    <option value="custom">📅 Указать период...</option>
+                </select>
+
+                <!-- 2. Календарь (От... До...) - по умолчанию скрыт -->
+                <div class="date-range-wrapper hidden" id="custom-date-range">
+                    <div class="date-field">
+                        <label for="date_start_input">От:</label>
+                        <input type="date" name="date_start_input" id="date_start_input" class="date-input">
+                    </div>
+                    <div class="date-field">
+                        <label for="date_end_input">До:</label>
+                        <input type="date" name="date_end_input" id="date_end_input" class="date-input">
+                    </div>
+                    <!-- Кнопка сброса обратно на селект -->
+                    <button type="button" class="btn-reset-date" id="btn-reset-date" title="Вернуться к быстрым фильтрам">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+        <!-- Контейнер со списком карточек -->
+        <div class="history-list" id="history-list-container">
+            {% include 'storage/partials/history-list.html' %}
+        </div>
 
     </div>
 </div>

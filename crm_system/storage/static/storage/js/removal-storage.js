@@ -28,7 +28,7 @@ function initRowSelect2($row) {
             processResults: function (data) { return { results: data.results || data }; },
             cache: true
         },
-        placeholder: $sel.attr('data-placeholder') || 'Начните вводить название, код или поставщика...',
+        placeholder: $sel.attr('data-placeholder') || 'Начните вводить название, код или поставщика',
         allowClear: true,
         width: '100%'
     });

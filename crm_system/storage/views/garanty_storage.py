@@ -8,7 +8,6 @@ from storage.forms import GarantyHistoryForm
 from django.utils import timezone
 from django.contrib import messages
 from django.http import HttpResponse
-import json
 from django.urls import reverse
 from django.db import transaction
 
@@ -102,7 +101,7 @@ class StorageGarantyCustomView(TemplateView):
                     print(msg)
                     messages.success(request, msg)
                     response = HttpResponse()
-                    response['HX-Redirect'] = reverse('history-storage')
+                    response['HX-Redirect'] = reverse('filter_and_history_storage')
                     return response
 
             # Статус 204 если ошибка

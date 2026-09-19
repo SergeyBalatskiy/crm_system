@@ -1,0 +1,49 @@
+{% for item_history in storage_history_items %}
+<div class="history-card" data-id="{{ item_history.individual_code_history }}">
+    <div class="history-card-header">
+        <div class="product-info">
+            <span class="product-name">{{ item_history.name_product_history }}</span>
+            <span class="product-code">Код: {{ item_history.individual_code_history }}</span>
+        </div>
+        {% if item_history.type_of_operation_history == "Возврат без возмещения денежных средств" %}
+            <span class="badge badge-danger">{{ item_history.type_of_operation_history }}</span>
+        {% elif item_history.type_of_operation_history == "Гарантийный возврат" %}
+            <span class="badge badge-warning">{{ item_history.type_of_operation_history }}</span>
+        {% else %}
+            <span class="badge badge-success">{{ item_history.type_of_operation_history }}</span>
+        {% endif %}
+    </div>
+
+    <div class="history-card-body">
+        <div class="info-grid">
+            <div class="info-item">
+                <span class="info-label">Поставщик</span>
+                <span class="info-value">{{ item_history.supplier_history|default:"—" }}</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Количество</span>
+                <span class="info-value font-accent">{{ item_history.quantity_history }} шт.</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Цена / Компенсация</span>
+                <span class="info-value font-accent">{{ item_history.buy_price_history }} ₽</span>
+            </div>
+            <div class="info-item">
+                <span class="info-label">Остаток на складе</span>
+                <span class="info-value">{{ item_history.remainder_history }} шт.</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="history-card-footer">
+        <div class="time-stamp">
+            <i class="fa-regular fa-clock"></i>
+            <span>Проведено: <strong>{{ item_history.time_of_operation_history }}</strong></span>
+        </div>
+    </div>
+</div>
+{% empty %}
+<div class="empty-history">
+    <p>Ничего не найдено</p>
+</div>
+{% endfor %}
