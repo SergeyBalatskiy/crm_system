@@ -38,7 +38,8 @@
     padding: 32px;
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
+    /* Было overflow-y: auto — теперь фиксируем */
     box-sizing: border-box;
 }
 
@@ -176,7 +177,7 @@
 }
 
 input:checked+.slider {
-    background-color: #ef4444;
+    background-color: #8707ea;
     /* Красный цвет внимания */
 }
 
@@ -226,6 +227,15 @@ input:checked+.slider:before {
     display: flex;
     flex-direction: column;
     gap: 16px;
+
+    /* Занимает всё оставшееся место по высоте */
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+
+    /* Отступы, чтобы карточки не липли к скроллбару и ховер-эффект не обрезался */
+    padding-right: 6px;
+    padding-top: 4px;
 }
 
 .history-card {
@@ -335,4 +345,22 @@ input:checked+.slider:before {
     text-align: center;
     padding: 60px 0;
     color: #94a3b8;
+}
+
+.history-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 10px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.history-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }

@@ -96,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .then(html => {
                 listContainer.innerHTML = html;
+                formatNumbers(listContainer);
             })
             .catch(error => console.error('Ошибка фильтрации:', error));
     }
@@ -147,4 +148,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     });
+});
+
+// Вспомогательная функция форматирования тысяч
+function formatNumbers(container = document) {
+    container.querySelectorAll('.format-num').forEach(el => {
+        let rawVal = el.dataset.raw || el.textContent.trim();
+        if (!el.dataset.raw) el.dataset.raw = rawVal;
+
+        if (rawVal) {
+            // Разделяем каждые 3 цифры пробелом (10000 -> 10 000)
+            el.textContent = rawVal.replace(/\d+/g, chunk =>
+                chunk.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
+            );
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Форматируем при первичной загрузке страницы
+    formatNumbers();
 });

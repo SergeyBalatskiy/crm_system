@@ -10,7 +10,7 @@
 
         <!-- Бейдж статуса остатка -->
         {% if item.remainder <= item.minimum_items_for_notification %}
-            <span class="badge badge-danger">Заканчивается (осталось {{ item.remainder }} шт.)</span>
+            <span class="badge badge-danger">Заканчивается (осталось <span class="format-num">{{ item.remainder }}</span> шт.)</span>
         {% else %}
             <span class="badge badge-success">В наличии</span>
         {% endif %}
@@ -25,19 +25,21 @@
             </div>
             <div class="info-item">
                 <span class="info-label">Закупка / Закуплено</span>
-                <span class="info-value">{{ item.buy_price }} ₽ / {{ item.quantity_at_the_purchase }} шт.</span>
+                <span class="info-value">
+                    <span class="format-num">{{ item.buy_price }}</span> ₽ / <span class="format-num">{{ item.quantity_at_the_purchase }}</span> шт.
+                </span>
             </div>
             <div class="info-item">
                 <span class="info-label">Цена продажи</span>
-                <span class="info-value font-accent">{{ item.retail_price }} ₽</span>
+                <span class="info-value font-accent"><span class="format-num">{{ item.retail_price }}</span> ₽</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Остаток на складе</span>
-                <span class="info-value font-accent">{{ item.remainder }} шт.</span>
+                <span class="info-value font-accent"><span class="format-num">{{ item.remainder }}</span> шт.</span>
             </div>
             <div class="info-item">
                 <span class="info-label">Порог уведомления</span>
-                <span class="info-value">{{ item.minimum_items_for_notification }} шт.</span>
+                <span class="info-value"><span class="format-num">{{ item.minimum_items_for_notification }}</span> шт.</span>
             </div>
         </div>
     </div>
@@ -45,7 +47,7 @@
     <!-- Футер -->
     <div class="history-card-footer">
         <div class="time-stamp">
-            <span></strong></span>
+            <span></span>
         </div>
         <div class="time-stamp">
             <span>Добавлено: <strong>{{ item.created_at|date:"d.m.Y H:i" }}</strong></span>

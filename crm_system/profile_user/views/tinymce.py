@@ -10,6 +10,7 @@ from django.http import HttpResponse
 
 
 # Данный класс отвечает за отображение tinymce (GET запрос) и принятие из формы в метод POST (POST запрос)
+
 @method_decorator(login_required(), name='dispatch')
 class ShowDocumentView(TemplateView):
     documents_form = 'profile_user/documents_form/document.html'

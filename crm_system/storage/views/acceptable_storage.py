@@ -7,12 +7,11 @@ from storage.forms import StorageAcceptableForm
 from storage.models import StorageInfo, HistoryStorageInfo
 from django.contrib import messages
 from django.utils import timezone
-from django.http import HttpResponse
-import json
 from django.contrib import messages
+from django.views.decorators.cache import never_cache
 
 # Данный класс отвечает за показ сайта где можно добавить новые поступления на склад
-@method_decorator(login_required(), name='dispatch') 
+@method_decorator([never_cache, login_required], name='dispatch') 
 class StorageAcceptableCustomView(TemplateView):
 
     template_name = 'storage/acceptance-storage.html'

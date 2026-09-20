@@ -10,6 +10,7 @@ from django.db.models import Q
 from datetime import timedelta
 from django.views import View
 from django.utils import timezone
+from datetime import datetime
 
 # Данный класс отвечает за показ определенных данных исходя из фильров и показ всех данных из истории
 @method_decorator(login_required(), name='dispatch') 
@@ -85,7 +86,8 @@ class FilterHistoryCustomView(View):
             # Если выбраны даты СТАРТ и ФИНИШ:
         if date_start_input and date_end_input:
             # Получаю результат от СТАРТ до ФИНИШ
-            main_q &= Q(time_of_operation_history__range=(date_start_input, date_end_input))
+            date_end_input = datetime.strptime(date_end_input, "%Y-%m-%d").date()
+            main_q &= Q(time_of_operation_history__range=(date_start_input, date_end_input+timedelta(days=1)))
         
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         qs = qs.filter(main_q)

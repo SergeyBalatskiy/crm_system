@@ -10,9 +10,10 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.urls import reverse
 from django.db import transaction
+from django.views.decorators.cache import never_cache
 
 # Данный класс отвечает за показ сайта, где можно изьять/удалить товары на складе (имеющиеся)
-@method_decorator(login_required(), name='dispatch') 
+@method_decorator([never_cache, login_required], name='dispatch') 
 class StorageGarantyCustomView(TemplateView):
 
     @transaction.atomic

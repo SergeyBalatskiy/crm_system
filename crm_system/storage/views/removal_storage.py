@@ -11,9 +11,10 @@ from django.http import HttpResponse
 import json
 from django.db import transaction
 from django.urls import reverse
+from django.views.decorators.cache import never_cache
 
 # Данный класс отвечает за показ сайта, где можно изьять/удалить товары на складе (имеющиеся)
-@method_decorator(login_required(), name='dispatch') 
+@method_decorator([never_cache, login_required], name='dispatch') 
 class StorageRemovalCustomView(TemplateView):
 
     @transaction.atomic

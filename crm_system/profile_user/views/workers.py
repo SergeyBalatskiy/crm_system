@@ -8,10 +8,10 @@ from django.contrib import messages
 from profile_user.models import WorkersInfo
 from auth_registration.models import Users
 from django.contrib import messages
-
+from django.views.decorators.cache import never_cache
 
 # Класс который включает в себя метод GET и POST для отображения формы и ее принятия
-@method_decorator(login_required(), name='dispatch')
+@method_decorator([never_cache, login_required], name='dispatch') 
 class WorkersAddView(TemplateView):
     template_name = 'profile_user/workers.html'
 
