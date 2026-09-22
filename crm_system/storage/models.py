@@ -18,7 +18,7 @@ class StorageInfo(models.Model):
     retail_price = models.IntegerField() # Цена для продажи (1 шт.)
     minimum_items_for_notification = models.IntegerField(default=5) # Минимальное количество для напоминания
     remainder = models.IntegerField(null=True, blank=True) # Остаток на складе
-    created_at = models.DateTimeField(default=timezone.now()) # Дата создания (поступления) товара
+    created_at = models.DateTimeField(default=timezone.now) # Дата создания (поступления) товара
 
     # Функция пред-сохранения айдишника
     def save(self, *args, **kwargs):
