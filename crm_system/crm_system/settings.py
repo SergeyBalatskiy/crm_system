@@ -37,6 +37,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     'dal',
     'dal_select2', 
+    'finance',
     'storage',
     'tinymce',
     'profile_user',

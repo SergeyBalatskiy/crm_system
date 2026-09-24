@@ -3,6 +3,7 @@ from django.views.generic.edit import CreateView
 from auth_registration.forms import CustomUserCreationForm
 from django.contrib.auth import login
 from profile_user.models import StatusCategory, DocumentInformation, FormsForOrder
+from finance.models import CashAccount
 from pathlib import Path
 
 # Create your views here.
@@ -83,6 +84,11 @@ class RegisterView(CreateView):
         
         FormsForOrder.objects.bulk_create(forms_order_waiting)
         return None
+
+    # Вызываю функцию которая создает основной дефолтный баланс сервисного центра
+    def create_main_balance(user):
+        create_main_balance = CashAccount(user = user)
+        create_main_balance.save()
     
     # Непосредственно отвечает за валидацию и принятие формы и ее сохранение
     def form_valid(self, form):
@@ -99,6 +105,9 @@ class RegisterView(CreateView):
         # После сохранения 4 документов я вызываю функцию которая делает мне дефолт 
         # форму для заполнения информациизаказов
         self.create_default_forms(user)
+
+        # Создаю баланс с дефолтным значением 0 для сервисного центра
+        self.create_main_balance(user)
 
         login(self.request, user)
 

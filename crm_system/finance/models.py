@@ -25,9 +25,7 @@ class FinanceHistoryInfo(models.Model):
         WARRANTY = 'warranty', 'Гарантийный возврат'
         OTHER = 'other', 'Прочее'
 
-    category_of_operation = models.CharField(max_length=10, choices=CategoryOfOperation.choices)
-    
-    category_of_operation = models.CharField(null=True, blank=True, max_length=100) # Тип операции: Продажа товара / Гарантийное списание / Прочие расходы
+    category_of_operation = models.CharField(max_length=10, choices=CategoryOfOperation.choices) # Тип операции: Продажа товара / Гарантийное списание / Прочие расходы
     number_in_the_operation = models.DecimalField(max_digits=11, decimal_places=2) # Число (сумма), которая фигурирует в операции (с копейками)
     created_at = models.DateTimeField(default=timezone.now) # Дата создания операции
     comment = models.CharField(null=True, blank=True, max_length=255) # Комментарий к операции (Если нужен)

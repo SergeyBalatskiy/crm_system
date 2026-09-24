@@ -7,4 +7,5 @@ urlpatterns = [
     path('profile/', include('profile_user.urls')),
     path('tinymce/', include('tinymce.urls')),
     path('storage/', include('storage.urls')),
+    path('finance/', include('finance.urls')),
 ]
