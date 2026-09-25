@@ -15,7 +15,6 @@ class MainCashView(View):
     def get(self, request, *args, **kwargs):
 
         get_main_balance, created = CashAccount.objects.get_or_create(user=request.user)
-        print(get_main_balance.money_balance)
         
         return render(request, 'finance/main_balance.html', {'cash': get_main_balance})
         

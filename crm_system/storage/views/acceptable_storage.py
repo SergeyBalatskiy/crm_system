@@ -8,6 +8,9 @@ from storage.models import StorageInfo, HistoryStorageInfo
 from django.contrib import messages
 from django.utils import timezone
 from django.contrib import messages
+from django.db import transaction
+from finance.models import CashAccount
+from django.db.models import F
 from django.views.decorators.cache import never_cache
 
 # Данный класс отвечает за показ сайта где можно добавить новые поступления на склад
@@ -16,12 +19,14 @@ class StorageAcceptableCustomView(TemplateView):
 
     template_name = 'storage/acceptance-storage.html'
 
+    @transaction.atomic
     def post(self, request, *args, **kwargs):
 
         # Получаю все формсеты, которые есть
         formset = StorageAcceptableForm(request.POST)
         # Валидация форм (пропуск не важных полей) + сохранение важных
         if formset.is_valid():
+
             # Остановка сохранения 
             instances = formset.save(commit=False)
             
@@ -43,7 +48,17 @@ class StorageAcceptableCustomView(TemplateView):
                     buy_price_history = instance.buy_price, supplier_history = instance.supplier, 
                     remainder_history = instance.remainder, time_of_operation_history = timezone.now(), time_created_history = instance.created_at, user = request.user)
 
+                    # Меняю баланс в кассе:
+                    try:
+                        # На уровне F выражения меняю баланс в отрицательную сторону (так как закупка)
+                        CashAccount.objects.filter(user=request.user).update(money_balance=F('money_balance') - (instance.buy_price * instance.quantity_at_the_purchase))
+                    except:
+                        transaction.set_rollback(True)
+                        messages.error(request, f'Произошла ошибка: {e}')
+                        return render(request, self.template_name, {'form_acceptable': formset})     
+
                 except Exception as e:
+                    transaction.set_rollback(True)
                     messages.error(request, f'Произошла ошибка: {e}')
                     return render(request, self.template_name, {'form_acceptable': formset})             
                     

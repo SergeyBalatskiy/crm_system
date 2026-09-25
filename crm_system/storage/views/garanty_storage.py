@@ -11,6 +11,8 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.db import transaction
 from django.views.decorators.cache import never_cache
+from finance.models import CashAccount
+from django.db.models import F
 
 # Данный класс отвечает за показ сайта, где можно изьять/удалить товары на складе (имеющиеся)
 @method_decorator([never_cache, login_required], name='dispatch') 
@@ -68,6 +70,16 @@ class StorageGarantyCustomView(TemplateView):
                             instance.individual_code_history = history_data.individual_code
                             # Меняется количество товара ПОСЛЕ "операции" в "Оригинальной БД (Storage)"
                             history_data.remainder = history_data.remainder - current_remainder_instance
+
+                            # Меняю баланс в кассе:
+                            try:
+                                # На уровне F выражения меняю баланс в положительную сторону (так как возврат)
+                                CashAccount.objects.filter(user=request.user).update(money_balance=F('money_balance') + (instance.buy_price_history * instance.quantity_history))
+                            except:
+                                transaction.set_rollback(True)
+                                messages.error(request, f'Ошибка: {e}.')
+                                return render(request, 'storage/messages.html')   
+                            
                             if history_data.remainder == 0: # Если количество товара РАВНО 0:
                                 # Дата поступления данного товара на склад
                                 instance.time_created_history = history_data.created_at
