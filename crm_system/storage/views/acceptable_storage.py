@@ -64,7 +64,7 @@ class StorageAcceptableCustomView(TemplateView):
                         type_of_operation=FinanceHistoryInfo.TypeOfOperation.OUTCOME,
                         category_of_operation = FinanceHistoryInfo.CategoryOfOperation.BUY,
                         number_in_the_operation = instance.buy_price * instance.quantity_at_the_purchase,
-                        comment = f'Покупка товара {instance.name_product} в кол-ве {instance.quantity_at_the_purchase} за {instance.buy_price * instance.quantity_at_the_purchase} ₽.')
+                        comment = f'Покупка товара: {instance.name_product}, в кол-ве: {instance.quantity_at_the_purchase}, за {instance.buy_price * instance.quantity_at_the_purchase} ₽.')
 
                     except Exception as e: 
                         transaction.set_rollback(True)

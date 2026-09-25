@@ -11,7 +11,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.db import transaction
 from django.views.decorators.cache import never_cache
-from finance.models import CashAccount
+from finance.models import CashAccount, FinanceHistoryInfo
 from django.db.models import F
 
 # Данный класс отвечает за показ сайта, где можно изьять/удалить товары на складе (имеющиеся)
@@ -79,7 +79,21 @@ class StorageGarantyCustomView(TemplateView):
                                 transaction.set_rollback(True)
                                 messages.error(request, f'Ошибка: {e}.')
                                 return render(request, 'storage/messages.html')   
-                            
+
+                            # Создаю историю операции в кассе:
+                            try:
+                                # Сделал историю операции:
+                                FinanceHistoryInfo.objects.create(user=request.user, 
+                                type_of_operation=FinanceHistoryInfo.TypeOfOperation.INCOME,
+                                category_of_operation = FinanceHistoryInfo.CategoryOfOperation.WARRANTY,
+                                number_in_the_operation = instance.buy_price_history * instance.quantity_history,
+                                comment = f'Возврат товара: {instance.name_product_history}, в кол-ве: {instance.quantity_history}, на сумму: {instance.buy_price_history * instance.quantity_history} ₽.')
+
+                            except Exception as e: 
+                                transaction.set_rollback(True)
+                                messages.error(request, f'Ошибка: {e}.')
+                                return render(request, 'storage/messages.html') 
+                                                    
                             if history_data.remainder == 0: # Если количество товара РАВНО 0:
                                 # Дата поступления данного товара на склад
                                 instance.time_created_history = history_data.created_at

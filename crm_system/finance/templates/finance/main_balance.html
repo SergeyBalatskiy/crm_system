@@ -5,10 +5,12 @@
 <h1>Денег в кассе: {{ cash.money_balance }}!</h1>
 
 {% for i in history_finance %}
+<div class="history_operations">
 {{i.type_of_operation}}
 {{i.category_of_operation}}
 Сумма которая фигурирует: {{i.number_in_the_operation}}
 {{i.created_at}}
 {{i.comment}}
+</div>
 {% endfor %}
 {% endblock %}
