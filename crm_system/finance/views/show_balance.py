@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from finance.models import CashAccount
+from finance.models import CashAccount, FinanceHistoryInfo
 from django.shortcuts import render
 from django.db.models import Q, TextField, F
 from django.views import View
@@ -15,7 +15,8 @@ class MainCashView(View):
     def get(self, request, *args, **kwargs):
 
         get_main_balance, created = CashAccount.objects.get_or_create(user=request.user)
+        get_history_finance = FinanceHistoryInfo.objects.filter(user=request.user)
         
-        return render(request, 'finance/main_balance.html', {'cash': get_main_balance})
+        return render(request, 'finance/main_balance.html', {'cash': get_main_balance, 'history_finance' : get_history_finance})
         
         

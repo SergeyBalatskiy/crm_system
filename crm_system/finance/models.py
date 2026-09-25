@@ -11,21 +11,24 @@ class FinanceHistoryInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='finance')
 
     class TypeOfOperation(models.TextChoices): # Класс "тип операции" (внесение / списание)
-        INCOME = 'in', 'Поступление'
-        OUTCOME = 'out', 'Исход'
+        INCOME = 'Поступление', 'Поступление'
+        OUTCOME = 'Исход', 'Исход'
 
     type_of_operation = models.CharField(
-            max_length=3,
+            max_length=15,
             choices=TypeOfOperation.choices
         ) # Тип события: Поступление (in) / Списание (out)
 
     class CategoryOfOperation(models.TextChoices): # Категория операции (Покупка, Гарантийный возврат, Прочее...)
-        SALE = 'sale', 'Продажа'
-        BUY = 'buy', 'Покупка'
-        WARRANTY = 'warranty', 'Гарантийный возврат'
-        OTHER = 'other', 'Прочее'
+        SALE = 'Продажа', 'Продажа'
+        BUY = 'Покупка', 'Покупка'
+        WARRANTY = 'Гарантийный возврат', 'Гарантийный возврат'
+        OTHER = 'Прочее', 'Прочее'
 
-    category_of_operation = models.CharField(max_length=10, choices=CategoryOfOperation.choices) # Тип операции: Продажа товара / Гарантийное списание / Прочие расходы
+    category_of_operation = models.CharField(
+        max_length=22, choices=CategoryOfOperation.choices
+        ) # Тип операции: Продажа товара / Гарантийное списание / Прочие расходы
+    
     number_in_the_operation = models.DecimalField(max_digits=11, decimal_places=2) # Число (сумма), которая фигурирует в операции (с копейками)
     created_at = models.DateTimeField(default=timezone.now) # Дата создания операции
     comment = models.CharField(null=True, blank=True, max_length=255) # Комментарий к операции (Если нужен)

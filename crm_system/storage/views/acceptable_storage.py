@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.utils import timezone
 from django.contrib import messages
 from django.db import transaction
-from finance.models import CashAccount
+from finance.models import CashAccount, FinanceHistoryInfo
 from django.db.models import F
 from django.views.decorators.cache import never_cache
 
@@ -55,8 +55,22 @@ class StorageAcceptableCustomView(TemplateView):
                     except:
                         transaction.set_rollback(True)
                         messages.error(request, f'Произошла ошибка: {e}')
-                        return render(request, self.template_name, {'form_acceptable': formset})     
+                        return render(request, self.template_name, {'form_acceptable': formset}) 
+                    
+                    # Создаю историю операции в кассе:
+                    try:
+                        # Сделал историю операции:
+                        FinanceHistoryInfo.objects.create(user=request.user, 
+                        type_of_operation=FinanceHistoryInfo.TypeOfOperation.OUTCOME,
+                        category_of_operation = FinanceHistoryInfo.CategoryOfOperation.BUY,
+                        number_in_the_operation = instance.buy_price * instance.quantity_at_the_purchase,
+                        comment = f'Покупка товара {instance.name_product} в кол-ве {instance.quantity_at_the_purchase} за {instance.buy_price * instance.quantity_at_the_purchase} ₽.')
 
+                    except Exception as e: 
+                        transaction.set_rollback(True)
+                        messages.error(request, f'Произошла ошибка: {e}')
+                        return render(request, self.template_name, {'form_acceptable': formset}) 
+                                            
                 except Exception as e:
                     transaction.set_rollback(True)
                     messages.error(request, f'Произошла ошибка: {e}')
