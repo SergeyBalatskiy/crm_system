@@ -122,7 +122,6 @@ class StorageGarantyCustomView(TemplateView):
                         messages.error(request, f'Ошибка: {e}.')
                         return render(request, 'storage/messages.html')
                                                      
-
                 if request.headers.get('HX-Request'):
                     msg = 'Гарантийное списание прошло успешно. Денежные средства были возвращены в кассу!'
                     print(msg)

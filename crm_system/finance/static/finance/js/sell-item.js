@@ -49,9 +49,11 @@ function initCustomSelect2($context) {
             $sel.select2('destroy');
         }
 
+        const autocompleteUrl = $sel.attr('data-autocomplete-light-url') || '/finance/finance-autocomplete';
+
         $sel.select2({
             ajax: {
-                url: $sel.attr('data-autocomplete-light-url') || '/finance/finance-autocomplete',
+                url: autocompleteUrl,
                 dataType: 'json',
                 delay: 250,
                 data: params => ({ q: params.term }),
@@ -64,6 +66,42 @@ function initCustomSelect2($context) {
             templateSelection: extractProductName,
             templateResult: formatDropdownResult
         });
+
+        // Восстановление названия и остатка, если форма вернулась с ошибкой и у поля уже есть значение
+        const selectedVal = $sel.val();
+        if (selectedVal) {
+            const $row = $sel.closest('tr.item-row');
+
+            $.ajax({
+                url: autocompleteUrl,
+                dataType: 'json',
+                data: { q: selectedVal }
+            }).done(function (data) {
+                const results = data.results || data;
+                if (!results || !results.length) return;
+
+                // Ищем элемент, соответствующий выбранному ID
+                const item = results.find(i => String(i.id) === String(selectedVal)) || results[0];
+                if (item) {
+                    const cleanName = extractProductName(item);
+
+                    // 1. Обновляем текст в <option> и атрибуты для корректного отображения имени
+                    let $option = $sel.find('option:selected');
+                    if ($option.length) {
+                        $option.text(cleanName).attr('data-name', cleanName).data('name', cleanName);
+                    } else {
+                        $option = new Option(cleanName, item.id, true, true);
+                        $sel.append($option);
+                    }
+                    $sel.trigger('change.select2');
+
+                    // 2. Восстанавливаем значение в поле "Остаток"
+                    if (item.remainder !== undefined && item.remainder !== null) {
+                        $row.find('.stock-remainder-input').val(item.remainder);
+                    }
+                }
+            });
+        }
     });
 }
 
@@ -72,6 +110,15 @@ function initCustomSelect2($context) {
 // ==============================================================================
 function reindexFormset(container) {
     if (!container) return;
+
+    const $container = $(container);
+
+    // 1. Уничтожаем Select2 на всех элементах таблицы перед изменением ID
+    $container.find('select').each(function () {
+        if ($(this).data('select2')) {
+            $(this).select2('destroy');
+        }
+    });
 
     const rows = container.querySelectorAll('tr.item-row');
     const form = container.closest('form');
@@ -83,12 +130,16 @@ function reindexFormset(container) {
         totalFormsInput.value = rows.length;
     }
 
+    // 2. Обновляем name и id у всех полей
     rows.forEach((row, index) => {
         row.querySelectorAll('input, select, textarea').forEach(input => {
             if (input.name) input.name = input.name.replace(/form-\d+-/, `form-${index}-`);
             if (input.id) input.id = input.id.replace(/id_form-\d+-/, `id_form-${index}-`);
         });
     });
+
+    // 3. Заново инициализируем Select2 для обновленных строк
+    initCustomSelect2($container);
 }
 
 function addFormRow(containerId, templateId) {
@@ -113,7 +164,6 @@ function addFormRow(containerId, templateId) {
     container.appendChild(newRow);
 
     reindexFormset(container);
-    initCustomSelect2($(newRow));
 }
 
 function removeFormRow(btn) {
@@ -125,10 +175,6 @@ function removeFormRow(btn) {
 
     const rows = container.querySelectorAll('tr.item-row');
     if (rows.length > 1) {
-        const $select = $(row).find('select');
-        if ($select.length && $select.data('select2')) {
-            $select.select2('destroy');
-        }
         row.remove();
         reindexFormset(container);
     }
@@ -210,6 +256,17 @@ $(document).on('select2:select change', 'select', function () {
     }, 10);
 });
 
+// ДОБАВЛЕНО: Очистка полей строки при клике на крестик удаления (сброс)
+$(document).on('select2:unselect select2:clear', 'select', function (e) {
+    const $row = $(this).closest('tr.item-row');
+    if (!$row.length) return;
+
+    $row.find('input[name$="-individual_code_history"]').val('');
+    $row.find('.stock-remainder-input').val('');
+    $row.find('input[name$="-supplier_history"]').val('');
+    $row.find('input[name$="-buy_price_history"]').val('');
+    $row.find('input[name$="-quantity_history"]').val('1');
+});
 // ==============================================================================
 // 6. ФОРМАТИРОВАНИЕ И САНИТИЗАЦИЯ ВВОДА (ЦЕНА И КОЛИЧЕСТВО)
 // ==============================================================================
@@ -270,4 +327,56 @@ document.body.addEventListener('htmx:configRequest', function (evt) {
             input.value = input.value.replace(/\D/g, '');
         });
     }
+});
+
+document.body.addEventListener('htmx:afterSettle', function (evt) {
+    const $container = $('#sell-div-form');
+    if ($container.length) {
+        initCustomSelect2($container);
+    }
+});
+
+// Функция для динамического создания красивого плавающего алерта
+function createAlert(message, level = 'error') {
+    let wrapper = document.querySelector('.messages-wrapper');
+
+    // Если контейнера на странице нет, создаем его динамически
+    if (!wrapper) {
+        wrapper = document.createElement('div');
+        wrapper.className = 'messages-wrapper';
+        document.body.appendChild(wrapper);
+    }
+
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${level}`;
+
+    let iconSvg = '';
+    if (level === 'success') {
+        iconSvg = `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z"/></svg>`;
+    } else if (level === 'error' || level === 'danger') {
+        iconSvg = `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/></svg>`;
+    }
+
+    alertDiv.innerHTML = `
+        ${iconSvg}
+        <span class="alert-text">${message}</span>
+        <button type="button" class="alert-close" onclick="dismissAlert(this.closest('.alert'))" title="Закрыть">&times;</button>
+    `;
+
+    wrapper.appendChild(alertDiv);
+
+    // Автоматическое удаление через 4 секунды
+    setTimeout(() => {
+        if (typeof dismissAlert === 'function') {
+            dismissAlert(alertDiv);
+        } else {
+            alertDiv.remove();
+        }
+    }, 4000);
+}
+
+// При получении события HX-Trigger 'showToast' вызываем создание сообщения
+document.body.addEventListener('showToast', function (evt) {
+    const detail = evt.detail; // { level: 'error', message: '...' }
+    createAlert(detail.message, detail.level);
 });

@@ -15,6 +15,11 @@
             
         <div class="storage-card">
 
+        <div id="messages-container">
+        {% include 'finance/messages.html' %}
+        </div>
+
+
             <form hx-post="{% url 'insert_cash' %}" autocomplete="off"
                 class="sell-form-storage">
                 {% csrf_token %}    

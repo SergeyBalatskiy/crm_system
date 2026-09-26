@@ -2,21 +2,35 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from finance.models import CashAccount, FinanceHistoryInfo
 from django.shortcuts import render, redirect
-from django.db.models import Q, TextField, F
+from django.db.models import F
 from django.views import View
-from django.db.models.functions import Cast
-from datetime import timedelta, datetime
 from finance.forms import InsertCashForm, CommentCashForm
 from storage.models import HistoryStorageInfo, StorageInfo
 from django.contrib import messages
+from django.http import HttpResponse
+from django.urls import reverse
 from django.db import transaction
 from django.utils import timezone
 from finance.models import FinanceHistoryInfo, CashAccount
 from itertools import zip_longest
+import json
+
 
 # Данный класс отвечает за обычный показ баланса сервисного центра
 @method_decorator(login_required(), name='dispatch') 
 class InsertCashInBalance(View):
+
+    @staticmethod
+    def htmx_toast_error(message):
+        """Возвращает 204 No Content"""
+        response = HttpResponse(status=204)
+        response['HX-Trigger'] = json.dumps({
+            'showToast': {
+                'level': 'error',
+                'message': message
+            }
+        })
+        return response
 
     # Отправка данных на POST для создания истории в storage + финансовой операции в finance
     @transaction.atomic
@@ -31,8 +45,7 @@ class InsertCashInBalance(View):
             comments = formset_comment.save(commit=False)
 
             if not instances:
-                messages.error(request, 'Пожалуйста, выберите хотя бы один товар на продажу!')
-                return render(request, 'finance/sell/sell-item.html')
+                return self.htmx_toast_error('Пожалуйста, выберите хотя бы один товар на продажу!')
 
             # Счетчик для суммарного подсчета прибыли
             summary_cash = 0
@@ -47,8 +60,7 @@ class InsertCashInBalance(View):
                     if history_data is None:
                         # Статус 204 если произошла ошибка + транзакция
                         transaction.set_rollback(True)
-                        messages.error(request, f'Ошибка: вы попытались повторно продать товар с кодом {instance.name_product_history}, количество которого на момент прошлой продажи уже стало 0.')
-                        return render(request, 'finance/sell/sell-item.html')
+                        return self.htmx_toast_error(f'Ошибка: вы попытались повторно продать товар с кодом {instance.name_product_history}, количество которого на момент прошлой продажи уже стало 0.')
 
                     instance.name_product_history = history_data.name_product
                     instance.type_of_operation_history = "Продажа товара"
@@ -59,8 +71,7 @@ class InsertCashInBalance(View):
                     if history_data.remainder - current_remainder_instance < 0:
                         # Статус 204 если произошла ошибка + транзакция
                         transaction.set_rollback(True)
-                        messages.error(request, f'Ошибка: товара {history_data.name_product} на складе меньше, чем вы указали под продажу!')
-                        return render(request, 'finance/sell/sell-item.html')
+                        return self.htmx_toast_error(f'Ошибка: товара {history_data.name_product} на складе меньше, чем вы указали под продажу!')
 
                     instance.remainder_history = history_data.remainder - current_remainder_instance
                     history_data.remainder = history_data.remainder - current_remainder_instance
@@ -97,14 +108,15 @@ class InsertCashInBalance(View):
                     messages.error(request, f'Ошибка: {e}')
                     return render(request, 'finance/sell/sell-item.html')
                 
-            msg = f'Продажа прошла успешно! Заработано: {summary_cash}'
-            messages.success(request, msg)
-            return redirect('main_cash')
+            if request.headers.get('HX-Request'):
+                msg = f'Продажа прошла успешно! Заработано: {summary_cash}'
+                messages.success(request, msg)
+                response = HttpResponse()
+                response['HX-Redirect'] = reverse('main_cash')
+                return response
 
-        print('Не обработалась форма!')
-        print(formset.errors)
-        print(formset.non_form_errors())
-        return render(request, 'finance/sell/sell-item.html')
+         # Статус 204 если ошибка
+        return self.htmx_toast_error('Пожалуйста, проверьте поля на корректность ввода и повторите попытку.')   
 
     def get(self, request, *args, **kwargs):
         # Получаю форму для продажи товара, историю записываю сюда, а финансовую операцию запишу отдельно
