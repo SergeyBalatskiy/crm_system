@@ -1,0 +1,94 @@
+{% extends "finance/base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'finance/css/sell-item.css' %}">
+<script src="{% static 'finance/js/sell-item.js' %}"></script>
+
+<div class="div-place-form-removal">
+    <div class="div-box-form-removal">
+        
+        <!-- Шапка страницы (Flexbox-контейнер только для H1 и Select) -->
+        <div class="page-header-wrapper">
+            <h1 class="page-title">Продажа товара</h1>
+        </div>
+            
+        <div class="storage-card">
+
+            <form hx-post="{% url 'insert_cash' %}" autocomplete="off"
+                class="sell-form-storage">
+                {% csrf_token %}    
+                {{ sell_form.management_form }}
+
+                <div class="scrollable-body">
+                    <div class="table-responsive">
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;">#</th>
+                                    <th style="width: 32%;">Товар (поиск)</th>
+                                    <th style="width: 12%;">Код</th>
+                                    <th style="width: 18%;">Остаток</th>
+                                    <th style="width: 22%;">Поставщик</th>
+                                    <th style="width: 12%;">Цена продажи</th>
+                                    <th style="width: 12%;">Кол-во</th>
+                                    <th style="width: 40px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="sell-div-form">
+                                {% for form in sell_form %}
+                                <tr class="django-form item-row">
+                                    <td class="row-number"></td>
+                                    <td>{{ form.name_product_history }}</td>
+                                    <td>{{ form.individual_code_history }}</td>
+                                    <td>
+                                        <input type="text" class="readonly-input stock-remainder-input" readonly placeholder="">
+                                    </td>
+                                    <td>{{ form.supplier_history }}</td>
+                                    <td>{{ form.buy_price_history }}</td>
+                                    <td>{{ form.quantity_history }}</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn-sell-row" onclick="SellRemovalRow(this)"
+                                            title="Удалить">&times;</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-actions">
+                        <!-- Явный вызов функции onclick -->
+                        <button type="button" onclick="addSellRow()" class="btn-add-row">
+                            <i class="fa-solid fa-plus"></i> Добавить товар
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-footer">
+                    <button type="submit" class="btn btn-primary">Продажа</button>
+                </div>
+            </form>
+
+            <!-- Скрытый шаблон новой строки -->
+            <template id="sell-row-template">
+                <tr class="django-form item-row">
+                    <td class="row-number"></td>
+                    <td>{{ sell_form.empty_form.name_product_history }}</td>
+                    <td>{{ sell_form.empty_form.individual_code_history }}</td>
+                    <td>
+                        <input type="text" class="readonly-input stock-remainder-input" readonly placeholder="">
+                    </td>
+                    <td>{{ sell_form.empty_form.supplier_history }}</td>
+                    <td>{{ sell_form.empty_form.buy_price_history }}</td>
+                    <td>{{ sell_form.empty_form.quantity_history }}</td>
+                    <td class="text-center">
+                        <button type="button" class="btn-sell-row" onclick="SellRemovalRow(this)"
+                            title="Удалить">&times;</button>
+                    </td>
+                </tr>
+            </template>
+        </div>
+    </div>
+</div>
+{% endblock %}

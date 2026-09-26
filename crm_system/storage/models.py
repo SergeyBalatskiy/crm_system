@@ -8,14 +8,13 @@ User = get_user_model()
 
 # Create your models here.
 class StorageInfo(models.Model):
-
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='storage')
     individual_code = models.IntegerField(null=True, blank=True) # Код
     name_product = models.CharField(max_length=120)
     quantity_at_the_purchase = models.IntegerField() # Количество на момент закупки
     supplier = models.CharField(max_length=120, null=True, blank=True) # Поставщик
-    buy_price = models.IntegerField() # Стоимость закупки (1 шт.)
-    retail_price = models.IntegerField() # Цена для продажи (1 шт.)
+    buy_price = models.DecimalField(max_digits=11, decimal_places=0) # Стоимость закупки (1 шт.)
+    retail_price = models.DecimalField(max_digits=11, decimal_places=0) # Цена для продажи (1 шт.)
     minimum_items_for_notification = models.IntegerField(default=5) # Минимальное количество для напоминания
     remainder = models.IntegerField(null=True, blank=True) # Остаток на складе
     created_at = models.DateTimeField(default=timezone.now) # Дата создания (поступления) товара
@@ -37,7 +36,7 @@ class HistoryStorageInfo(models.Model):
     name_product_history = models.CharField(max_length=120) # Название товара
     individual_code_history = models.IntegerField(null=True, blank=True)  # id (Код товара)
     quantity_history = models.IntegerField(default=1) # Количество, которое учавствует в операции (Добавление, списание, возврат)
-    buy_price_history = models.IntegerField(null=True, blank=True) # Стоимость закупки (1 шт.)
+    buy_price_history = models.DecimalField(null=True, blank=True, max_digits=11, decimal_places=0) # Стоимость закупки (1 шт.)
     supplier_history = models.CharField(max_length=120, null=True, blank=True) # Поставщик
     remainder_history = models.IntegerField(null=True, blank=True) # Остаток на складе (После проведения операции)
     time_of_operation_history = models.DateTimeField(null=True, blank=True) # Время проведения операции ("создание"\"списание"\"возврат")
