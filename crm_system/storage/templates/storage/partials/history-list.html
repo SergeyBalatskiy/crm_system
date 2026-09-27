@@ -9,6 +9,8 @@
             <span class="badge badge-danger">{{ item_history.type_of_operation_history }}</span>
         {% elif item_history.type_of_operation_history == "Гарантийный возврат" %}
             <span class="badge badge-warning">{{ item_history.type_of_operation_history }}</span>
+        {% elif item_history.type_of_operation_history == "Продажа товара" %}
+            <span class="badge badge-sell">{{ item_history.type_of_operation_history }}</span>        
         {% else %}
             <span class="badge badge-success">{{ item_history.type_of_operation_history }}</span>
         {% endif %}

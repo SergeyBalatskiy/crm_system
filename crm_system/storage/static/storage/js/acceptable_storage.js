@@ -179,4 +179,52 @@ document.addEventListener('DOMContentLoaded', function () {
         document.querySelector('.div-box-storage-acceptable').insertBefore(cont, formContainer);
         return cont;
     }
+
+    document.body.addEventListener('showToast', function (evt) {
+        const detail = evt.detail || {};
+        const message = detail.message;
+        const level = detail.level || 'error';
+
+        if (message) {
+            // Ищем или создаем фиксированный контейнер в body
+            let container = document.getElementById('messages-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'messages-container';
+                document.body.appendChild(container);
+            }
+
+            // Очищаем прошлые сообщения, чтобы показывалось только одно актуальное
+            container.innerHTML = '';
+
+            const isError = level === 'error' || level === 'danger';
+            const alertClass = isError ? 'alert-error' : 'alert-success';
+            const iconClass = isError ? 'fa-circle-xmark' : 'fa-circle-check';
+
+            // Создаем тост с вашей структурой
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert ${alertClass}`;
+            alertDiv.innerHTML = `
+                <i class="fa-solid ${iconClass} alert-icon"></i>
+                <span class="alert-text">${message}</span>
+                <button type="button" class="alert-close" aria-label="Закрыть">&times;</button>
+            `;
+
+            // Функция плавного удаления
+            function dismissAlert() {
+                alertDiv.classList.add('fade-out');
+                setTimeout(() => alertDiv.remove(), 300); // 300ms совпадает с CSS transition
+            }
+
+            // Клик по крестику
+            alertDiv.querySelector('.alert-close').addEventListener('click', dismissAlert);
+
+            // Добавляем тост в контейнер
+            container.appendChild(alertDiv);
+
+            // Автоскрытие через 4 секунды
+            setTimeout(dismissAlert, 4000);
+        }
+    });
+
 });

@@ -1,3 +1,3 @@
-from .show_balance import MainCashView
+from .balance_and_history_cash import MainCashAndHistoryView
 from .insert_cash import InsertCashInBalance
 from .select_django_autocomplete import CountryAutocomplete

@@ -5,8 +5,8 @@
 <link rel="stylesheet" href="{% static 'finance/css/sell-item.css' %}">
 <script src="{% static 'finance/js/sell-item.js' %}"></script>
 
-<div class="div-place-form-removal">
-    <div class="div-box-form-removal">
+<div class="div-place-form-sell">
+    <div class="div-box-form-sell">
         
         <!-- Шапка страницы (Flexbox-контейнер только для H1 и Select) -->
         <div class="page-header-wrapper">
@@ -18,8 +18,6 @@
         <div id="messages-container">
         {% include 'finance/messages.html' %}
         </div>
-
-
             <form hx-post="{% url 'insert_cash' %}" autocomplete="off"
                 class="sell-form-storage">
                 {% csrf_token %}    

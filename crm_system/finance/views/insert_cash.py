@@ -88,8 +88,9 @@ class InsertCashInBalance(View):
 
                     # Добавляю новую историю операции продажи
                     FinanceHistoryInfo.objects.create(user=request.user, 
-                    type_of_operation=FinanceHistoryInfo.TypeOfOperation.INCOME,
+                    type_of_operation = FinanceHistoryInfo.TypeOfOperation.INCOME,
                     category_of_operation = FinanceHistoryInfo.CategoryOfOperation.SALE,
+                    product_name = instance.name_product_history, product_code = instance.individual_code_history,
                     number_in_the_operation = instance.buy_price_history * instance.quantity_history,
                     comment = comment)
                     

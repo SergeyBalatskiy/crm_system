@@ -7,100 +7,88 @@
 
 <div class="div-place-storage-acceptable">
     <div class="div-box-storage-acceptable">
-
-        <!-- Шапка страницы -->
-        <div class="page-header-wrapper">
-            <h1 class="page-title">Поступление товара</h1>
-        </div>
-
-        <!-- Исчезающие сообщения -->
-        {% if messages %}
-        <div class="messages-container">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">
-                {% if message.tags == 'success' %}
-                <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z" />
-                </svg>
-                {% elif message.tags == 'error' %}
-                <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z" />
-                </svg>
-                {% endif %}
-                <span>{{ message }}</span>
+        <div class="storage-card">
+            <!-- Шапка страницы -->
+            <div class="page-header-wrapper">
+                <h1 class="page-title">Поступление товара</h1>
             </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+            
+            <!-- Добавлен класс messages-container -->
+            <div class="messages-container" id="messages-container">
+                {% include 'storage/messages.html' %}
+            </div>
 
-        <form id="form-container" method="POST" class="storage-acceptable-form">
-            {% csrf_token %}
-            {{ form_acceptable.management_form }}
+            <form id="form-container" 
+                hx-post="{% url 'acceptance-storage' %}" 
+                hx-swap="none" 
+                class="storage-acceptable-form">
+                {% csrf_token %}
+                {{ form_acceptable.management_form }}
 
-            <div class="scrollable-body">
-                <div class="table-responsive">
-                    <table class="items-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 35px;">#</th>
-                                <th style="width: 25%;">Название товара</th>
-                                <th style="width: 12%;">Кол-во в закупке</th>
-                                <th style="width: 20%;">Поставщик</th>
-                                <th style="width: 13%;">Стоимость в закупке (шт.)</th>
-                                <th style="width: 13%;">Стоимость в продажу (шт.)</th>
-                                <th style="width: 14%;">Кол-во для напоминания</th>
-                                <th style="width: 40px;"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="acceptable-div-form">
-                            {% for form in form_acceptable %}
-                            <tr class="django-form item-row">
-                                <td class="row-number"><span class="hash">{{ forloop.counter }}</span></td>
-                                <td>{{ form.name_product }}</td>
-                                <td>{{ form.quantity_at_the_purchase }}</td>
-                                <td>{{ form.supplier }}</td>
-                                <td>{{ form.buy_price }}</td>
-                                <td>{{ form.retail_price }}</td>
-                                <td>{{ form.minimum_items_for_notification }}</td>
-                                <td class="text-center">
-                                    <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
+                <div class="scrollable-body">
+                    <div class="table-responsive">
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35px;">#</th>
+                                    <th style="width: 25%;">Название товара</th>
+                                    <th style="width: 12%;">Кол-во в закупке</th>
+                                    <th style="width: 20%;">Поставщик</th>
+                                    <th style="width: 13%;">Стоимость в закупке (шт.)</th>
+                                    <th style="width: 13%;">Стоимость в продажу (шт.)</th>
+                                    <th style="width: 14%;">Кол-во для напоминания</th>
+                                    <th style="width: 40px;"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="acceptable-div-form">
+                                {% for form in form_acceptable %}
+                                <tr class="django-form item-row">
+                                    <td class="row-number"><span class="hash">{{ forloop.counter }}</span></td>
+                                    <td>{{ form.name_product }}</td>
+                                    <td>{{ form.quantity_at_the_purchase }}</td>
+                                    <td>{{ form.supplier }}</td>
+                                    <td>{{ form.buy_price }}</td>
+                                    <td>{{ form.retail_price }}</td>
+                                    <td>{{ form.minimum_items_for_notification }}</td>
+                                    <td class="text-center">
+                                        <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="table-actions">
+                        <button type="button" id="add-new-form-acceptable" class="btn-add-row">
+                            <i class="fa-solid fa-plus"></i> Добавить товар
+                        </button>
+                    </div>
                 </div>
 
-                <div class="table-actions">
-                    <button type="button" id="add-new-form-acceptable" class="btn-add-row">
-                        <i class="fa-solid fa-plus"></i> Добавить товар
-                    </button>
+                <div class="form-footer">
+                    <button type="submit" class="btn btn-primary">Создать поступление</button>
+                    <a href="#" class="btn btn-secondary">Отмена</a>
                 </div>
-            </div>
+            </form>
 
-            <div class="form-footer">
-                <button type="submit" class="btn btn-primary">Создать поступление</button>
-                <a href="#" class="btn btn-secondary">Отмена</a>
-            </div>
-        </form>
-
-        <table style="display: none;">
-            <tbody id="empty-form-acceptable">
-                <tr class="django-form item-row">
-                    <td class="row-number"><span class="hash">#</span></td>
-                    <td>{{ form_acceptable.empty_form.name_product }}</td>
-                    <td>{{ form_acceptable.empty_form.quantity_at_the_purchase }}</td>
-                    <td>{{ form_acceptable.empty_form.supplier }}</td>
-                    <td>{{ form_acceptable.empty_form.buy_price }}</td>
-                    <td>{{ form_acceptable.empty_form.retail_price }}</td>
-                    <td>{{ form_acceptable.empty_form.minimum_items_for_notification }}</td>
-                    <td class="text-center">
-                        <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
+            <table style="display: none;">
+                <tbody id="empty-form-acceptable">
+                    <tr class="django-form item-row">
+                        <td class="row-number"><span class="hash">#</span></td>
+                        <td>{{ form_acceptable.empty_form.name_product }}</td>
+                        <td>{{ form_acceptable.empty_form.quantity_at_the_purchase }}</td>
+                        <td>{{ form_acceptable.empty_form.supplier }}</td>
+                        <td>{{ form_acceptable.empty_form.buy_price }}</td>
+                        <td>{{ form_acceptable.empty_form.retail_price }}</td>
+                        <td>{{ form_acceptable.empty_form.minimum_items_for_notification }}</td>
+                        <td class="text-center">
+                            <button type="button" class="btn-remove-row" title="Удалить">&times;</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 {% endblock %}

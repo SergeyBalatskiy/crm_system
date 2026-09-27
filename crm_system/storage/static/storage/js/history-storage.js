@@ -1,35 +1,38 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('filter-form');
-    const container = document.getElementById('history-list-container');
 
-    function fetchFilteredData() {
-        const formData = new FormData(form);
-        const searchParams = new URLSearchParams(formData).toString();
+    // ==========================================
+    // 1. ИНИЦИАЛИЗАЦИЯ И АВТОСКРЫТИЕ СООБЩЕНИЙ (ПРИ РЕДИРЕКТЕ)
+    // ==========================================
+    function initFlashMessages() {
+        const container = document.getElementById('messages-container');
+        if (!container) return;
 
-        fetch(`${form.action}?${searchParams}`, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest'
+        const alerts = container.querySelectorAll('.alert');
+        alerts.forEach(alert => {
+            // Добавляем обработчик клика на кнопку закрытия (крестик)
+            const closeBtn = alert.querySelector('.alert-close');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', () => dismissAlert(alert));
             }
-        })
-            .then(response => response.text())
-            .then(html => {
-                container.innerHTML = html; // Заменяем список карточек новыми данными
-            });
+
+            // Автоматическое скрытие через 4 секунды
+            setTimeout(() => dismissAlert(alert), 4000);
+        });
     }
 
-    // Слушаем изменения в селектах и ввод в инпуте
-    form.querySelectorAll('select').forEach(select => {
-        select.addEventListener('change', fetchFilteredData);
-    });
+    function dismissAlert(alert) {
+        if (!alert || alert.classList.contains('fade-out')) return;
+        alert.classList.add('fade-out');
+        setTimeout(() => alert.remove(), 300); // 300ms совпадает с анимацией в CSS
+    }
 
-    let timeout = null;
-    document.getElementById('search-input').addEventListener('input', () => {
-        clearTimeout(timeout);
-        timeout = setTimeout(fetchFilteredData, 300); // Задержка 300мс при печати (дебаунс)
-    });
-});
+    // Запускаем обработку входящих сообщений
+    initFlashMessages();
 
-document.addEventListener('DOMContentLoaded', () => {
+
+    // ==========================================
+    // 2. ФИЛЬТРАЦИЯ И КАЛЕНДАРЬ
+    // ==========================================
     const filterForm = document.getElementById('filter-form');
     const searchInput = document.getElementById('search-input');
     const operationSelect = document.getElementById('history_operation_select');
@@ -51,12 +54,13 @@ document.addEventListener('DOMContentLoaded', () => {
         return /^\d{4}-\d{2}-\d{2}$/.test(dateString);
     }
 
-    // Главная функция отправки AJAX
+    // Главная функция отправки AJAX для фильтрации
     function fetchFilteredData() {
+        if (!filterForm || !listContainer) return;
+
         const startVal = dateStartInput.value;
         const endVal = dateEndInput.value;
 
-        // Проверяем валидность дат, если открыт календарь
         if (!customDateRange.classList.contains('hidden')) {
             const isStartValid = isValidFullDate(startVal);
             const isEndValid = isValidFullDate(endVal);
@@ -64,10 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
             dateStartInput.classList.toggle('error', !isStartValid);
             dateEndInput.classList.toggle('error', !isEndValid);
 
-            // Если одна из дат заполнена не полностью — отменяем отправку
             if (!isStartValid || !isEndValid) return;
 
-            // Если "От" больше чем "До" — отменяем
             if (startVal && endVal && startVal > endVal) {
                 dateStartInput.classList.add('error');
                 dateEndInput.classList.add('error');
@@ -79,7 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const params = new URLSearchParams();
 
         for (const [key, value] of formData.entries()) {
-            // Не передаем значение "custom", чтобы не сбивать бэкенд
             if (value && value !== 'custom') {
                 params.append(key, value);
             }
@@ -101,71 +102,72 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(error => console.error('Ошибка фильтрации:', error));
     }
 
-    // --- ПЕРЕКЛЮЧЕНИЕ РЕЖИМОВ ДАТЫ ---
-
-    // 1. При выборе "Указать период..." переключаем на календарь
-    dateSelect.addEventListener('change', () => {
-        if (dateSelect.value === 'custom') {
-            dateSelect.classList.add('hidden');
-            customDateRange.classList.remove('hidden');
-        } else {
-            fetchFilteredData();
-        }
-    });
-
-    // 2. Нажатие на крестик — возврат к обычным пресетам
-    btnResetDate.addEventListener('click', () => {
-        // Очищаем календарь
-        dateStartInput.value = '';
-        dateEndInput.value = '';
-        dateStartInput.classList.remove('error');
-        dateEndInput.classList.remove('error');
-
-        // Переключаем видимость
-        customDateRange.classList.add('hidden');
-        dateSelect.classList.remove('hidden');
-
-        // Сбрасываем селект на "За всё время" и запрашиваем данные
-        dateSelect.value = '';
-        fetchFilteredData();
-    });
-
-    // --- СОБЫТИЯ ВВОДА ---
-
-    searchInput.addEventListener('input', () => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(fetchFilteredData, 300);
-    });
-
-    operationSelect.addEventListener('change', fetchFilteredData);
-
-    // События ввода для календаря
-    [dateStartInput, dateEndInput].forEach(input => {
-        input.addEventListener('change', fetchFilteredData);
-        input.addEventListener('input', () => {
-            if (isValidFullDate(input.value)) {
+    // --- Переключение режимов даты ---
+    if (dateSelect) {
+        dateSelect.addEventListener('change', () => {
+            if (dateSelect.value === 'custom') {
+                dateSelect.classList.add('hidden');
+                customDateRange.classList.remove('hidden');
+            } else {
                 fetchFilteredData();
             }
         });
+    }
+
+    if (btnResetDate) {
+        btnResetDate.addEventListener('click', () => {
+            dateStartInput.value = '';
+            dateEndInput.value = '';
+            dateStartInput.classList.remove('error');
+            dateEndInput.classList.remove('error');
+
+            customDateRange.classList.add('hidden');
+            dateSelect.classList.remove('hidden');
+
+            dateSelect.value = '';
+            fetchFilteredData();
+        });
+    }
+
+    // --- События ввода ---
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(fetchFilteredData, 300);
+        });
+    }
+
+    if (operationSelect) {
+        operationSelect.addEventListener('change', fetchFilteredData);
+    }
+
+    [dateStartInput, dateEndInput].forEach(input => {
+        if (input) {
+            input.addEventListener('change', fetchFilteredData);
+            input.addEventListener('input', () => {
+                if (isValidFullDate(input.value)) {
+                    fetchFilteredData();
+                }
+            });
+        }
     });
+
+    // Форматирование разрядов чисел при загрузке
+    formatNumbers();
 });
 
-// Вспомогательная функция форматирования тысяч
+// ==========================================
+// 3. ВСПОМОГАТЕЛЬНАЯ ФУНКЦИЯ ФОРМАТИРОВАНИЯ
+// ==========================================
 function formatNumbers(container = document) {
     container.querySelectorAll('.format-num').forEach(el => {
         let rawVal = el.dataset.raw || el.textContent.trim();
         if (!el.dataset.raw) el.dataset.raw = rawVal;
 
         if (rawVal) {
-            // Разделяем каждые 3 цифры пробелом (10000 -> 10 000)
             el.textContent = rawVal.replace(/\d+/g, chunk =>
                 chunk.replace(/\B(?=(\d{3})+(?!\d))/g, ' ')
             );
         }
     });
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    // 1. Форматируем при первичной загрузке страницы
-    formatNumbers();
-});

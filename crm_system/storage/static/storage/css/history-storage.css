@@ -145,6 +145,12 @@
     border: 1px solid #bbf7d0;
 }
 
+.badge-sell {
+    background-color: #f0fdf4;
+    color: #44d30c;
+    border: 1px solid #bbf7d0;
+}
+
 .badge-warning {
     background-color: #fefce8;
     color: #a16207;
