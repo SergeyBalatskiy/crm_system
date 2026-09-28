@@ -57,7 +57,7 @@ class StorageRemovalCustomView(TemplateView):
 
                     instance.remainder_history = history_data.remainder - current_remainder_instance
                     history_data.remainder = history_data.remainder - current_remainder_instance
-                    instance.time_created_history = history_data.created_at
+                    # УДАЛЕНО ПОЛЕ ВРЕМЯ ДОБАВЛЕНИЯ ТОВАРА НА СКЛАД!
                     instance.buy_price_history = 0
                     instance.time_of_operation_history = timezone.now()
                     instance.save()

@@ -76,7 +76,7 @@ class StorageAcceptableCustomView(TemplateView):
                 individual_code_history = instance.individual_code, name_product_history = instance.name_product,
                 quantity_history = instance.quantity_at_the_purchase, buy_price_history = instance.buy_price,
                 supplier_history = instance.supplier, remainder_history = instance.remainder,
-                time_of_operation_history = now, time_created_history = instance.created_at))
+                time_of_operation_history = now))
 
                 # Список list_for_add_history_storage позволяет внедрить команды с добавлением обьектов в 1 переменную, и затем в конце
                 # создать это множество обьектов!

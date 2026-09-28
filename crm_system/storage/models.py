@@ -39,8 +39,7 @@ class HistoryStorageInfo(models.Model):
     buy_price_history = models.DecimalField(null=True, blank=True, max_digits=11, decimal_places=0) # Стоимость закупки (1 шт.)
     supplier_history = models.CharField(max_length=120, null=True, blank=True) # Поставщик
     remainder_history = models.IntegerField(null=True, blank=True) # Остаток на складе (После проведения операции)
-    time_of_operation_history = models.DateTimeField(null=True, blank=True) # Время проведения операции ("создание"\"списание"\"возврат")
-    time_created_history = models.DateTimeField(null=True, blank=True) # Время проведения операции (Появления самого товара)
+    time_of_operation_history = models.DateTimeField(default=timezone.now) # Время проведения операции ("создание"\"списание"\"возврат")
 
     def __str__(self):
         return f'История товара: {self.name_product_history}, Кол-во: {self.remainder_history}, связан с {self.user.get_full_name()}'
