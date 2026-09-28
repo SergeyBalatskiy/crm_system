@@ -46,7 +46,7 @@ class StorageGarantyCustomView(TemplateView):
         instances = formset.save(commit=False)
         # Обработка еще одного некорректного случая:
         if not instances:
-            return self.htmx_toast_error('Пожалуйста, выберите хотя бы один товар на списание!')
+            return self.htmx_toast_error('Пожалуйста, выберите хотя бы один товар на гарантийное списание!')
             
         # Список на добавление истории возврата средств 
         list_to_add_finane_history = []
@@ -70,6 +70,10 @@ class StorageGarantyCustomView(TemplateView):
             for instance in instances:
                 # Получаю 1 обьект из словаря с StorageInfo - Query`сетами
                 selected_object = dict_for_objects.get(instance.individual_code_history)
+
+                # Если такого товара нету в БД:
+                if not selected_object:
+                    return self.htmx_toast_error('Такого товара не существует в БД!')
 
                 # Проверка на наличие введенной цены и количества товара 
                 if instance.buy_price_history is None:
@@ -102,8 +106,7 @@ class StorageGarantyCustomView(TemplateView):
                     transaction.set_rollback(True)
                     return self.htmx_toast_error('Товара под гарантийное списание указано больше, чем есть на складе!')
                 elif selected_object.remainder == 0:
-                    if instance.individual_code_history not in list_to_delete_obj:
-                        list_to_delete_obj.append(instance.individual_code_history)
+                    list_to_delete_obj.append(instance.individual_code_history)
             
                 # Меняю баланс в кассе:
                 global_garanty_sum += instance.buy_price_history * instance.quantity_history
@@ -115,13 +118,13 @@ class StorageGarantyCustomView(TemplateView):
                 type_of_operation=FinanceHistoryInfo.TypeOfOperation.INCOME, category_of_operation = FinanceHistoryInfo.CategoryOfOperation.WARRANTY,
                 number_in_the_operation = instance.buy_price_history * instance.quantity_history, product_name = instance.name_product_history,
                 product_code = instance.individual_code_history, supplier = instance.supplier_history,
-                comment = f'Возврат товара: {instance.name_product_history}, в кол-ве: {instance.quantity_history}, за {instance.buy_price_history * instance.quantity_history} ₽.')
+                comment = f'Возврат товара: {instance.name_product_history}, в кол-ве: {instance.quantity_history}, на {instance.buy_price_history * instance.quantity_history} ₽.')
                 )          
 
                 # После всех ОСНОВНЫХ действий добавляю в список list_for_add_history_storage 1 обьект (на каждой итерации)
                 # чтобы потом сделать bulk_create(list_for_add_history_storage)
                 list_for_add_history_storage.append(instance)
-
+    
             # Если цикл убавления (гарантийного) произошел успешно, осталось только "закомитить" два списка, вычесть с кассы 
             # актуальную цену закупки, и отдать готовый результат!
             # BULK_CREATE!!!
@@ -133,10 +136,10 @@ class StorageGarantyCustomView(TemplateView):
             HistoryStorageInfo.objects.bulk_create(list_for_add_history_storage)
 
             # Обновляю в StorageInfo только само количество товара (так как ничего другого я не изменял)
-            StorageInfo.objects.bulk_update(dict_for_objects.values, ['remainder'])
+            StorageInfo.objects.bulk_update(dict_for_objects.values(), ['remainder'])
 
             # После того как обновил StorageInfo, удаляю те обьекты, которые имеют remainder = 0
-            StorageInfo.objects.filter(individual_code__in = list_to_delete_obj).delete()
+            StorageInfo.objects.filter(user = request.user, individual_code__in = list_to_delete_obj).delete()
 
             if request.headers.get('HX-Request'):
                 msg = 'Гарантийное списание прошло успешно. Денежные средства были возвращены в кассу!'

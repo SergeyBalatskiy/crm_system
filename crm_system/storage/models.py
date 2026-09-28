@@ -43,4 +43,4 @@ class HistoryStorageInfo(models.Model):
 
     def __str__(self):
         return f'История товара: {self.name_product_history}, Кол-во: {self.remainder_history}, связан с {self.user.get_full_name()}'
-
+    
