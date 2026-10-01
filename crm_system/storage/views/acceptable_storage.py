@@ -40,6 +40,7 @@ class StorageAcceptableCustomView(TemplateView):
 
         # Получаю все формсеты, которые есть
         formset = StorageAcceptableForm(request.POST)
+        # ОБЯЗАТЕЛЬНО НУЖНО ЧТОБЫ ПРИХОДИЛ ФОРМСЕТ ТАКЖЕ И С КОММЕНТАРИЕМ И ЧТОБЫ ОН БЫЛ ПРИВЯЗАН К АЙДИШНИКУ И САМОМУ ТОВАРУ
 
         # Валидация форм (пропуск не важных полей) + сохранение важных
         if not formset.is_valid():

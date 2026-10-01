@@ -1,13 +1,5 @@
-from django.test import TestCase
-from itertools import zip_longest
-# Create your tests here.
-y = [1, 2, 3, 4]
-z = ['a', 'b']
+from .models import FinanceHistoryInfo
 
-# по умолчанию пустые места заполнятся значением None
-for i, k in zip_longest(y, z, fillvalue=None):
-    if not k:
-        print('Нет к!')
-    else:
-        print(i, k)
+# Находим все записи, где age равен NULL, и выставляем им 0
+FinanceHistoryInfo.objects.filter(product_name__isnull=True).update('Нет данных')
 

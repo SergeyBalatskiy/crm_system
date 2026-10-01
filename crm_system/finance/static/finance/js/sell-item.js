@@ -347,6 +347,9 @@ function createAlert(message, level = 'error') {
         document.body.appendChild(wrapper);
     }
 
+    // 🔥 ОЧИЩАЕМ СТАРЫЕ СООБЩЕНИЯ (чтобы они не строились в столбик)
+    wrapper.innerHTML = '';
+
     const alertDiv = document.createElement('div');
     alertDiv.className = `alert alert-${level}`;
 
@@ -367,16 +370,14 @@ function createAlert(message, level = 'error') {
 
     // Автоматическое удаление через 4 секунды
     setTimeout(() => {
-        if (typeof dismissAlert === 'function') {
-            dismissAlert(alertDiv);
-        } else {
-            alertDiv.remove();
-        }
+        dismissAlert(alertDiv);
     }, 4000);
 }
 
 // При получении события HX-Trigger 'showToast' вызываем создание сообщения
 document.body.addEventListener('showToast', function (evt) {
     const detail = evt.detail; // { level: 'error', message: '...' }
-    createAlert(detail.message, detail.level);
+    if (detail && detail.message) {
+        createAlert(detail.message, detail.level || 'error');
+    }
 });

@@ -1,3 +1,6 @@
 from .balance_and_history_cash import MainCashAndHistoryView
 from .insert_cash import InsertCashInBalance
 from .select_django_autocomplete import CountryAutocomplete
+from .sell_other.sell_other import SellFinanceCustomView
+from .buy_other.buy_other import BuyFinanceCustomView
+from .other_forms import ShowOthersCustomView

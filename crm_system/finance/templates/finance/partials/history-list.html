@@ -1,0 +1,63 @@
+{% if history_finance %}
+    {% for i in history_finance %}
+    <div class="finance-card">
+        <div class="finance-card-header">
+            <div class="product-title">
+                {% if i.product_name %}
+                    <strong>{{ i.product_name }}</strong>
+                {% else %}
+                    <strong>Кассовая операция</strong>
+                {% endif %}
+                
+                {% if i.product_code %}
+                    <span class="code-badge">Код: {{ i.product_code }}</span>
+                {% endif %}
+            </div>
+
+            <!-- Статус поступления/списания -->
+            {% if i.type_of_operation == 'Поступление' %}
+                <span class="status-badge badge-success">
+                    <i class="fa-solid fa-arrow-down-left"></i> {{ i.type_of_operation }}
+                </span>
+            {% else %}
+                <span class="status-badge badge-danger">
+                    <i class="fa-solid fa-arrow-up-right"></i> {{ i.type_of_operation }}
+                </span>
+            {% endif %}
+        </div>
+
+        <div class="finance-card-body">
+            <div class="info-cell">
+                <span class="info-label">Категория</span>
+                <span class="info-value">{{ i.category_of_operation|default:"—" }}</span>
+            </div>
+
+            <div class="info-cell">
+                <span class="info-label">Сумма</span>
+                <span class="info-value price-value {% if i.type_of_operation == 'Поступление' %}text-green{% else %}text-red{% endif %}">
+                    {% if i.type_of_operation == 'Поступление' %}+{% else %}-{% endif %}{{ i.number_in_the_operation }} ₽
+                </span>
+            </div>
+
+            <div class="info-cell">
+                <span class="info-label">Поставщик</span>
+                <span class="info-value">{{ i.supplier|default:"—" }}</span>
+            </div>
+
+            <div class="info-cell full-width">
+                <span class="info-label">Комментарий</span>
+                <span class="info-value comment-text">{{ i.comment|default:"—" }}</span>
+            </div>
+        </div>
+
+        <div class="finance-card-footer">
+            <span class="created-at"><i class="fa-regular fa-clock"></i> Операция выполнена: {{ i.created_at|date:"d.m.Y H:i" }}</span>
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="empty-state">
+        <i class="fa-solid fa-receipt empty-icon"></i>
+        <p>Операций не найдено</p>
+    </div>
+{% endif %}

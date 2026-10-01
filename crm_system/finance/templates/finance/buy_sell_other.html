@@ -1,0 +1,29 @@
+{% extends "finance/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="div-place-form-other">
+    <div class="div-box-form-other">
+
+        <!-- Шапка страницы (Flexbox-контейнер только для H1 и Select) -->
+        <div class="page-header-wrapper">
+            <h1 class="page-title">Списание товара</h1>
+
+            <div class="form-editor-header">
+                <form method="get" class="navigation-form-select">
+                    <select class="custom-select" id="page-select" name="type_of_other_selected" autocomplete="off"
+                        hx-trigger="change" hx-target="#show-other-forms" hx-get="{% url 'other_transaction' %}"
+                        hx-swap="innerHTML">
+                        <option value="" disabled selected hidden>Выберите операции...</option>
+                        <option value="buy_other">Исход</option>
+                        <option value="sell_other">Поступление</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <div id="show-other-forms" class="builder-container"></div>
+
+    </div>
+</div>
+{% endblock %}

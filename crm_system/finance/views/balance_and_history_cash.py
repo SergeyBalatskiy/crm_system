@@ -102,5 +102,13 @@ class MainCashAndHistoryView(View):
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         qs = qs.filter(main_q)
 
-        context = {'history_finance' : qs}
+        context = {
+            'history_finance': qs,
+            'cash': get_main_balance,
+        }
+
+        # Если это AJAX-запрос — отдаем только список карточек
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return render(request, 'finance/partials/history-list.html', context)
+
         return render(request, 'finance/main_balance.html', context)

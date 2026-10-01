@@ -211,6 +211,19 @@ $(document).on('select2:select', 'select', function (e) {
     $option.attr('data-name', cleanName).data('name', cleanName);
 });
 
+// 🔥 2. Очистка всех связанных полей строки при клике на крестик (сбросе выбора)
+$(document).on('select2:clear select2:unselect', 'select', function (e) {
+    const $row = $(this).closest('tr.item-row');
+    if (!$row.length) return;
+
+    // Сбрасываем значение всех инпутов текущей строки
+    $row.find('input[name$="-individual_code_history"]').val('');
+    $row.find('.stock-remainder-input').val('');
+    $row.find('input[name$="-supplier_history"]').val('');
+    $row.find('input[name$="-buy_price_history"]').val('');
+    $row.find('input[name$="-quantity_history"]').val('');
+});
+
 // ==============================================================================
 // 6. ФОРМАТИРОВАНИЕ ЧИСЕЛ И ЦЕН
 // ==============================================================================
@@ -300,4 +313,52 @@ $(document).on('select2:select change', 'select', function () {
             }
         }
     }, 10);
+});
+
+// ==============================================================================
+// 7. ОБРАБОТКА HTMX ОШИБОК ЧЕРЕЗ 204 СТАТУС (ОДНО СООБЩЕНИЕ ЗА РАЗ)
+// ==============================================================================
+
+window.dismissAlert = function (alertEl) {
+    if (!alertEl || alertEl.classList.contains('fade-out')) return;
+    alertEl.classList.add('fade-out');
+    setTimeout(() => alertEl.remove(), 300);
+};
+
+document.body.addEventListener('showToast', function (evt) {
+    const detail = evt.detail; // { level: 'error', message: '...' }
+    if (!detail || !detail.message) return;
+
+    const container = document.getElementById('messages-container');
+    if (!container) return;
+
+    let wrapper = container.querySelector('.messages-wrapper');
+    if (!wrapper) {
+        wrapper = document.createElement('div');
+        wrapper.className = 'messages-wrapper';
+        container.appendChild(wrapper);
+    }
+
+    // 🔥 ОЧИЩАЕМ СТАРЫЕ СООБЩЕНИЯ (чтобы они не строились в столбик)
+    wrapper.innerHTML = '';
+
+    // Создаем элемент плашки ошибки
+    const alertEl = document.createElement('div');
+    alertEl.className = `alert alert-${detail.level || 'error'}`;
+
+    // Иконка
+    const iconSvg = detail.level === 'success'
+        ? `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z"/></svg>`
+        : `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"/></svg>`;
+
+    alertEl.innerHTML = `
+        ${iconSvg}
+        <span class="alert-text">${detail.message}</span>
+        <button type="button" class="alert-close" onclick="dismissAlert(this.closest('.alert'))" title="Закрыть">&times;</button>
+    `;
+
+    wrapper.appendChild(alertEl);
+
+    // Сбрасываем и запускаем 4-секундный таймер заново для нового сообщения
+    setTimeout(() => dismissAlert(alertEl), 4000);
 });

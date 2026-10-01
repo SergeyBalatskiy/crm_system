@@ -34,5 +34,18 @@ InsertCashForm = modelformset_factory(
 CommentCashForm = modelformset_factory(
     FinanceHistoryInfo, fields=("comment",), labels={"comment": "Комментарий"})
 
+# Форма для поступления финансов (продажа чего-то)
+SellCustomForm = modelformset_factory(FinanceHistoryInfo, formset=DisableUniqueFormSet, fields=("product_name", "number_in_the_operation", "supplier", "comment"), labels={
+        "product_name": "Причина поступления",
+        "number_in_the_operation": "Сумма, ₽",
+        "supplier" : "Поставщик",
+        "comment" : "Комментарий",
+    })
 
-
+# Форма для исхода финансов (покупка чего-то)
+BuyCustomForm = modelformset_factory(FinanceHistoryInfo, formset=DisableUniqueFormSet, fields=("product_name", "number_in_the_operation", "supplier", "comment"), labels={
+        "product_name": "Причина списания",
+        "number_in_the_operation": "Сумма, ₽",
+        "supplier" : "Поставщик",
+        "comment" : "Комментарий",
+    })

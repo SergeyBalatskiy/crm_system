@@ -3,34 +3,61 @@
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'finance/css/main-balance.css' %}">
-<script src="{% static 'finance/js/main-balance.js' %}"></script>
+<script src="{% static 'finance/js/main-balance.js' %}" defer></script>
 
 <div class="div-place-form-balance">
     <div class="div-box-form-balance">
-        <h1>Денег в кассе: {{ cash.money_balance }}!</h1>
+
+        <!-- Верхняя шапка с кассой и кнопкой перенаправления -->
+        <div class="finance-header">
+            <div class="header-title-box">
+                <h2>История финансовых операций</h2>
+                <div class="cash-card-badge">
+                    <i class="fa-solid fa-wallet"></i>
+                    <span>В кассе: <strong>{{ cash.money_balance }} ₽</strong></span>
+                </div>
+            </div>
+
+            <!-- Кнопка перехода к внесению/списанию кассы -->
+            <a href="{% url 'insert_cash' %}" class="btn-action-insert">
+                <i class="fa-solid fa-circle-plus"></i> Продажа товара
+            </a>
+            <a href="{% url 'acceptance-storage' %}" class="btn-action-insert">
+                <i class="fa-solid fa-circle-plus"></i> Прочее
+            </a>
+        </div>
+
+        <div id="messages-container">
+            {% include 'finance/messages.html' %}
+        </div>
 
         <!-- Панель фильтров -->
         <form id="filter-form" method="GET" action="{% url 'main_cash' %}" class="filter-toolbar">
             
-            <!-- Поле быстрый поиск -->
+            <!-- Быстрый поиск -->
             <div class="search-input-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по названию, коду, поставщику..." autocomplete="off">
+                <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по названию, коду, сумме, комментарию..." autocomplete="off">
             </div>
 
-            <!-- Селект типа операции -->
-            <select class="custom-select" id="history_operation_select" name="search_history_operation" autocomplete="off">
-                <option value="">Все типы операций</option>
-                <option value="acceptable_data">Поступление</option>
-                <option value="removal_data">Возврат без возмещения денежных средств</option>
-                <option value="garanty_removal_data">Гарантийный возврат</option>
-                <option value="sell_data">Продажа товара</option>
+            <!-- Тип операции -->
+            <select class="custom-select" id="history_operation_select" name="selected_finance_operation" autocomplete="off">
+                <option value="">Все типы</option>
+                <option value="income">Поступление</option>
+                <option value="outcome">Исход / Списание</option>
             </select>
 
-            <!-- ГИБРИДНЫЙ БЛОК ДАТЫ -->
+            <!-- Категория -->
+            <select class="custom-select" id="history_category_select" name="selected_finance_category" autocomplete="off">
+                <option value="">Все категории</option>
+                <option value="Продажа">Продажа</option>
+                <option value="Покупка">Покупка</option>
+                <option value="Гарантийный возврат">Гарантийный возврат</option>
+                <option value="Прочее">Прочее</option>
+            </select>
+
+            <!-- Селект даты / Диапазон -->
             <div class="date-filter-container">
-                
-                <!-- 1. Селект быстрых пресетов -->
                 <select class="custom-select" id="history_date_select" name="search_date_operation" autocomplete="off">
                     <option value="">За всё время</option>
                     <option value="date_today">Сегодня</option>
@@ -40,7 +67,6 @@
                     <option value="custom">📅 Указать период...</option>
                 </select>
 
-                <!-- 2. Календарь (От... До...) - по умолчанию скрыт -->
                 <div class="date-range-wrapper hidden" id="custom-date-range">
                     <div class="date-field">
                         <label for="date_start_input">От:</label>
@@ -50,30 +76,19 @@
                         <label for="date_end_input">До:</label>
                         <input type="date" name="date_end_input" id="date_end_input" class="date-input" autocomplete="off">
                     </div>
-                    <!-- Кнопка сброса обратно на селект -->
-                    <button type="button" class="btn-reset-date" id="btn-reset-date" title="Вернуться к быстрым фильтрам">
+                    <button type="button" class="btn-reset-date" id="btn-reset-date" title="Сбросить даты">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
-
             </div>
 
         </form>
 
-        
-        {% for i in history_finance %}
-        <div class="history_operations">
-            {{i.type_of_operation}}
-            {{i.category_of_operation}}
-            Название товара: {{i.product_name}}
-            Код товара: {{i.product_code}}    
-            Поставщик: {{i.supplier}}           
-            Сумма которая фигурирует: {{i.number_in_the_operation}}
-            {{i.created_at}}
-            {{i.comment}}
+        <!-- Контейнер карточек -->
+        <div class="history-list-scrollable" id="history-list-container">
+            {% include 'finance/partials/history-list.html' %}
         </div>
-        {% endfor %}
+
     </div>
 </div>
-
 {% endblock %}
