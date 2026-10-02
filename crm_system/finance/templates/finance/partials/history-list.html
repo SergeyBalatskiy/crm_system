@@ -1,3 +1,4 @@
+{% load humanize %}
 {% if history_finance %}
     {% for i in history_finance %}
     <div class="finance-card">
@@ -35,7 +36,7 @@
             <div class="info-cell">
                 <span class="info-label">Сумма</span>
                 <span class="info-value price-value {% if i.type_of_operation == 'Поступление' %}text-green{% else %}text-red{% endif %}">
-                    {% if i.type_of_operation == 'Поступление' %}+{% else %}-{% endif %}{{ i.number_in_the_operation }} ₽
+                    {% if i.type_of_operation == 'Поступление' %}+{% else %}-{% endif %}{{ i.number_in_the_operation|intcomma }} ₽
                 </span>
             </div>
 

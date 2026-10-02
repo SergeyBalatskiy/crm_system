@@ -23,8 +23,9 @@
 /* Шапка со сплошным верхом и селектом */
 .page-header-wrapper {
     display: flex;
-    justify-content: space-between;
+    justify-content: flex-start;
     align-items: center;
+    gap: 20px;
     margin-bottom: 20px;
     padding-bottom: 16px;
     border-bottom: 1px solid #e9ecef;
@@ -44,6 +45,7 @@
 
 .custom-select {
     height: 38px;
+    width: 290px;
     padding: 0 14px;
     border: 1px solid #d1d5db;
     border-radius: 8px;

@@ -85,7 +85,7 @@ class BuyFinanceCustomView(TemplateView):
             CashAccount.objects.filter(user=request.user).update(money_balance=F('money_balance') - global_sum)
 
             if request.headers.get('HX-Request'):
-                msg = 'Поступление средств прошло успешно.'
+                msg = 'Списание средств прошло успешно.'
                 print(msg)
                 messages.success(request, msg)
                 response = HttpResponse()

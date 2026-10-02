@@ -81,7 +81,7 @@ class InsertCashInBalance(View):
 
                     # Счетчик который суммарно показывает заработок:
                     summary_cash += (instance.buy_price_history * instance.quantity_history)
-
+                    
                     # Если комментарий не задан:
                     if not comment:
                         comment = f'Продажа товара: {instance.name_product_history}, в кол-ве: {instance.quantity_history}, на сумму: {instance.buy_price_history * instance.quantity_history} ₽.'
@@ -103,11 +103,14 @@ class InsertCashInBalance(View):
                     if history_data.remainder == 0:
                         history_data.delete()
 
+                except TypeError:
+                    transaction.set_rollback(True)
+                    return self.htmx_toast_error(f'Необходимо указать цену для продажив!')  
+
                 except Exception as e:
                     # Статус 204 если произошла ошибка + транзакция
                     transaction.set_rollback(True)
-                    messages.error(request, f'Ошибка: {e}')
-                    return render(request, 'finance/sell/sell-item.html')
+                    return self.htmx_toast_error(f'Ошибка: {e}')   
                 
             if request.headers.get('HX-Request'):
                 msg = f'Продажа прошла успешно! Заработано: {summary_cash}'

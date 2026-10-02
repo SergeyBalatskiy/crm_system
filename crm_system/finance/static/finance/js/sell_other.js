@@ -42,3 +42,32 @@ function removeOtherRow(button) {
         totalFormsInput.value = remainingRows;
     }
 }
+
+// Автоматическое форматирование ввода чисел с пробелами
+document.addEventListener('input', function (e) {
+    if (e.target.matches('input[name$="-number_in_the_operation"]')) {
+        const input = e.target;
+
+        // Запоминаем текущее положение курсора и длину текста до форматирования
+        const oldCursorPos = input.selectionStart;
+        const oldLength = input.value.length;
+
+        // Оставляем ТОЛЬКО цифры (любые буквы, знаки и пробелы удаляются)
+        const rawValue = input.value.replace(/\D/g, '');
+
+        if (rawValue) {
+            // Форматируем число с разделителями тысяч (обычный пробел)
+            const formattedValue = rawValue.replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+            input.value = formattedValue;
+
+            // Вычисляем новое положение курсора, учитывая добавление/удаление пробелов
+            const newLength = formattedValue.length;
+            let newCursorPos = oldCursorPos + (newLength - oldLength);
+
+            newCursorPos = Math.max(0, newCursorPos);
+            input.setSelectionRange(newCursorPos, newCursorPos);
+        } else {
+            input.value = '';
+        }
+    }
+});

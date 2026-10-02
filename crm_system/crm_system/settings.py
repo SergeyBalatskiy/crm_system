@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'finance',
     'storage',
     'tinymce',
+    'django.contrib.humanize',
     'profile_user',
     'auth_registration',
     'django.contrib.admin',
@@ -126,6 +127,11 @@ TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
 
 USE_TZ = True
+
+# Форматирование чисел до 1 000:
+USE_THOUSAND_SEPARATOR = True
+THOUSAND_SEPARATOR = ' ' 
+NUMBER_GROUPING = 3
 
 
 # Static files (CSS, JavaScript, Images)

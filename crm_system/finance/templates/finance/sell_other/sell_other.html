@@ -2,10 +2,6 @@
 
 <div class="storage-card">
 
-    <div id="messages-container">
-        {% include 'finance/messages.html' %}
-    </div>
-
     <form hx-post="{% url 'sell-other' %}" hx-target="#messages-container" hx-swap="innerHTML" class="sell-other-form">
         {% csrf_token %}
         {{ form_sell_other.management_form }}
