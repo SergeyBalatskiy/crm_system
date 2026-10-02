@@ -40,7 +40,8 @@ SellCustomForm = modelformset_factory(FinanceHistoryInfo, formset=DisableUniqueF
         "number_in_the_operation": "Сумма, ₽",
         "supplier" : "Поставщик",
         "comment" : "Комментарий",
-    })
+    }, 
+    widgets = {'number_in_the_operation': forms.TextInput(attrs={'class': 'no-spinners'})})
 
 # Форма для исхода финансов (покупка чего-то)
 BuyCustomForm = modelformset_factory(FinanceHistoryInfo, formset=DisableUniqueFormSet, fields=("product_name", "number_in_the_operation", "supplier", "comment"), labels={
@@ -48,4 +49,5 @@ BuyCustomForm = modelformset_factory(FinanceHistoryInfo, formset=DisableUniqueFo
         "number_in_the_operation": "Сумма, ₽",
         "supplier" : "Поставщик",
         "comment" : "Комментарий",
-    })
+    },
+    widgets = {'number_in_the_operation': forms.TextInput(attrs={'class': 'no-spinners'})})

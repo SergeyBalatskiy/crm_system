@@ -19,12 +19,14 @@
             </div>
 
             <!-- Кнопка перехода к внесению/списанию кассы -->
-            <a href="{% url 'insert_cash' %}" class="btn-action-insert">
-                <i class="fa-solid fa-circle-plus"></i> Продажа товара
-            </a>
-            <a href="{% url 'acceptance-storage' %}" class="btn-action-insert">
-                <i class="fa-solid fa-circle-plus"></i> Прочее
-            </a>
+            <div class="header-actions">
+                <a href="{% url 'insert_cash' %}" class="btn-action-insert">
+                    <i class="fa-solid fa-circle-plus"></i> Продажа товара
+                </a>
+                <a href="{% url 'other_transaction' %}" class="btn-action-insert">
+                    <i class="fa-solid fa-circle-plus"></i> Прочие транзакции
+                </a>
+            </div>
         </div>
 
         <div id="messages-container">

@@ -89,7 +89,7 @@ class BuyFinanceCustomView(TemplateView):
                 print(msg)
                 messages.success(request, msg)
                 response = HttpResponse()
-                response['HX-Redirect'] = reverse('filter_and_history_storage')
+                response['HX-Redirect'] = reverse('main_cash')
                 return response
                                                     
         except Exception as e:

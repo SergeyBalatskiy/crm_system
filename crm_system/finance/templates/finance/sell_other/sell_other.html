@@ -6,8 +6,7 @@
         {% include 'finance/messages.html' %}
     </div>
 
-    <form hx-post="{% url 'sell-other' %}" hx-target="#messages-container" hx-swap="innerHTML"
-        class="sell-other-form">
+    <form hx-post="{% url 'sell-other' %}" hx-target="#messages-container" hx-swap="innerHTML" class="sell-other-form">
         {% csrf_token %}
         {{ form_sell_other.management_form }}
 
@@ -16,13 +15,12 @@
                 <table class="items-table">
                     <thead>
                         <tr>
-                            <th style="width: 40px;">#</th>
-                            <th style="width: 32%;">Товар (поиск)</th>
-                            <th style="width: 12%;">Код</th>
-                            <th style="width: 18%;">Остаток</th>
-                            <th style="width: 22%;">Поставщик</th>
-                            <th style="width: 12%;">Кол-во</th>
-                            <th style="width: 40px;"></th>
+                            <th style="width: 45px;">#</th>
+                            <th style="width: 30%;">Причина поступления</th>
+                            <th style="width: 15%;">Сумма, ₽</th>
+                            <th style="width: 20%;">Поставщик</th>
+                            <th style="width: 30%;">Комментарий</th>
+                            <th style="width: 45px;"></th>
                         </tr>
                     </thead>
                     <tbody id="other-div-form">
@@ -34,8 +32,7 @@
                             <td>{{ form.supplier }}</td>
                             <td>{{ form.comment }}</td>
                             <td class="text-center">
-                                <button type="button" class="btn-remove-row" onclick="removeRemovalRow(this)"
-                                    title="Удалить">&times;</button>
+                                <button type="button" class="btn-remove-row" onclick="removeOtherRow(this)" title="Удалить">&times;</button>
                             </td>
                         </tr>
                         {% endfor %}
@@ -44,7 +41,6 @@
             </div>
 
             <div class="table-actions">
-                <!-- Явный вызов функции onclick -->
                 <button type="button" onclick="addSellOtherRow()" class="btn-add-row">
                     <i class="fa-solid fa-plus"></i> Добавить транзакцию
                 </button>
@@ -52,7 +48,7 @@
         </div>
 
         <div class="form-footer">
-            <button type="submit" class="btn btn-primary">Подвердить</button>
+            <button type="submit" class="btn btn-primary">Подтвердить</button>
         </div>
     </form>
 
@@ -60,13 +56,12 @@
     <template id="sell-other-row-template">
         <tr class="django-form item-row">
             <td class="row-number"></td>
-            <td>{{ form_removal.empty_form.product_name }}</td>
-            <td>{{ form_removal.empty_form.number_in_the_operation }}</td>
-            <td>{{ form_removal.empty_form.supplier }}</td>
-            <td>{{ form_removal.empty_form.comment }}</td>
+            <td>{{ form_sell_other.empty_form.product_name }}</td>
+            <td>{{ form_sell_other.empty_form.number_in_the_operation }}</td>
+            <td>{{ form_sell_other.empty_form.supplier }}</td>
+            <td>{{ form_sell_other.empty_form.comment }}</td>
             <td class="text-center">
-                <button type="button" class="btn-remove-row" onclick="removeRemovalRow(this)"
-                    title="Удалить">&times;</button>
+                <button type="button" class="btn-remove-row" onclick="removeOtherRow(this)" title="Удалить">&times;</button>
             </td>
         </tr>
     </template>

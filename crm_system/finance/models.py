@@ -30,7 +30,7 @@ class FinanceHistoryInfo(models.Model):
         ) # Тип операции: Продажа товара / Гарантийное списание / Прочие расходы
     
     number_in_the_operation = models.DecimalField(max_digits=11, decimal_places=0) # Число (сумма), которая фигурирует в операции (с копейками)
-    product_name = models.CharField(max_length=120, default='Нет данных') # Название товара
+    product_name = models.CharField(max_length=120, default='') # Название товара
     product_code = models.IntegerField(null=True, blank=True) # Код самого товара (который хранится в StorageInfo)
     created_at = models.DateTimeField(default=timezone.now) # Дата создания операции
     supplier = models.CharField(max_length=120, null=True, blank=True)

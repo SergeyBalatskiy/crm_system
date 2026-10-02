@@ -9,15 +9,15 @@
     top: 40px;
     right: 40px;
     height: calc(100vh - 80px);
-
-    background-color: #fff;
-    border-radius: 30px;
-    box-shadow: 8px 8px 18px rgba(0, 0, 0, 0.08);
-    padding: 35px 40px;
-
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    /* Было overflow-y: auto — теперь фиксируем */
+    box-sizing: border-box;
 }
 
 /* Шапка */
@@ -32,13 +32,21 @@
     display: flex;
     align-items: center;
     gap: 20px;
+
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Расстояние между кнопками (можно уменьшить до 8px или увеличить по вкусу) */
 }
 
 .header-title-box h2 {
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #1a1d20;
+    color: #4d2b9e
 }
 
 /* Баланс кассы */
@@ -54,7 +62,7 @@
 }
 
 .cash-card-badge i {
-    color: #2563eb;
+    color: #6336cd;
     font-size: 18px;
 }
 
@@ -68,7 +76,7 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background-color: #2563eb;
+    background-color: #6336cd;
     color: #ffffff;
     padding: 10px 20px;
     border-radius: 14px;
@@ -79,9 +87,8 @@
 }
 
 .btn-action-insert:hover {
-    background-color: #1d4ed8;
+    background-color: #502aa7;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25);
 }
 
 /* Фильтры */
@@ -119,7 +126,7 @@
 }
 
 .search-input-wrapper input:focus {
-    border-color: #2563eb;
+    border-color: #6537d0;
     background-color: #fff;
 }
 
