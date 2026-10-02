@@ -24,7 +24,6 @@ class StorageAcceptableCustomView(TemplateView):
 
     @staticmethod
     def htmx_toast_error(message):
-        print('Сработала функция ерор')
         """Возвращает 204 No Content"""
         response = HttpResponse(status=204)
         response['HX-Trigger'] = json.dumps({
@@ -53,46 +52,64 @@ class StorageAcceptableCustomView(TemplateView):
             global_sum = 0
             list_for_add_finance_history = []
             list_for_add_history_storage = []
+            # Список на добавление нового товара в хранилище (склад)
+            list_to_add_storage_info = []
                 
             if not instances:   
                 return(self.htmx_toast_error('Пожалуйста, заполните форму на добавление!'))
 
             # Беру каждый обьект из формсета и индивидуально в каждом записываю юзера и сохраняю <- StorageInfo
             for instance in instances:
+
+                # Записываю только 2 обьекта в таблице, так как остальные - заполняются сами
                 instance.user = request.user
                 instance.remainder = instance.quantity_at_the_purchase
-                instance.save()
-
-                # Придаю "Коду товара" такой же id как и у истинного айдишника 
-                instance.individual_code = instance.id
 
                 # Беру цену этого товара и записываю ее в переменную current_price_summary
                 current_price_summary = instance.quantity_at_the_purchase * instance.buy_price
                 # Добавляю суммарно глобальную переменную, показывающую цену всех товаров совместно
                 global_sum += current_price_summary
 
+                # В список на добавление товара я добавляю instance
+                list_to_add_storage_info.append(instance)
+
+            # Создаю историю гарантийного списания товаров:
+            # individual_code ОСТАЮТСЯ ПУСТЫМИ!
+            StorageInfo.objects.bulk_create(list_to_add_storage_info)
+            # Затем беру все обьекты, чьи значения равны Null:
+            null_objects = StorageInfo.objects.filter(user = request.user, individual_code__isnull=True)
+
+            # Беру каждый обьект и перезаписываю!
+            for object in null_objects:
+                # Присваиваю ID
+                object.individual_code = object.id
+            # Сохраняю с уже исправленным ID:
+            StorageInfo.objects.bulk_update(null_objects, ['individual_code'])
+
+            # Этот цикл позволяет мне создавать историю для поступления товара на склад + финансовую историю
+            for object_to_update in null_objects:
+                # Список  list_for_add_history_storage позволяет внедрить команды с добавлением обьектов в 1 переменную, и затем в конце
+                # создать это множество обьектов!
+                list_for_add_history_storage.append(HistoryStorageInfo(user=request.user, type_of_operation_history = 'Поступление', 
+                name_product_history = object_to_update.name_product,
+                quantity_history = object_to_update.quantity_at_the_purchase, buy_price_history = object_to_update.buy_price,
+                supplier_history = object_to_update.supplier, remainder_history = object_to_update.remainder, individual_code_history = object_to_update.individual_code,
+                time_of_operation_history = now))   
+
                 # Список list_for_add_finance_history позволяет внедрить команды с добавлением обьектов в 1 переменную, и затем в конце
                 # создать это множество обьектов!
-                list_for_add_finance_history.append(HistoryStorageInfo(user=request.user, type_of_operation_history = 'Поступление', 
-                individual_code_history = instance.individual_code, name_product_history = instance.name_product,
-                quantity_history = instance.quantity_at_the_purchase, buy_price_history = instance.buy_price,
-                supplier_history = instance.supplier, remainder_history = instance.remainder,
-                time_of_operation_history = now))
-
-                # Список list_for_add_history_storage позволяет внедрить команды с добавлением обьектов в 1 переменную, и затем в конце
-                # создать это множество обьектов!
-                list_for_add_history_storage.append(FinanceHistoryInfo(user=request.user, 
+                list_for_add_finance_history.append(FinanceHistoryInfo(user=request.user, 
                 type_of_operation=FinanceHistoryInfo.TypeOfOperation.OUTCOME, category_of_operation = FinanceHistoryInfo.CategoryOfOperation.BUY,
-                number_in_the_operation = instance.buy_price * instance.quantity_at_the_purchase, product_name = instance.name_product,
-                product_code = instance.individual_code, supplier = instance.supplier,
-                comment = f'Покупка товара: {instance.name_product}, в кол-ве: {instance.quantity_at_the_purchase}, за {instance.buy_price * instance.quantity_at_the_purchase} ₽.')
+                number_in_the_operation = object_to_update.buy_price * object_to_update.quantity_at_the_purchase, product_name = object_to_update.name_product,
+                supplier = object_to_update.supplier, product_code = object_to_update.individual_code,
+                comment = f'Покупка товара: {object_to_update.name_product}, в кол-ве: {object_to_update.quantity_at_the_purchase}, за {object_to_update.buy_price * object_to_update.quantity_at_the_purchase} ₽.')
                 )
 
             # Если цикл добавления товаров произошел успешно, осталось только "закомитить" два списка, вычесть с кассы актуальную цену закупки,
             # и отдать готовый результат!
             # BULK_CREATE!!!
-            HistoryStorageInfo.objects.bulk_create(list_for_add_finance_history)
-            FinanceHistoryInfo.objects.bulk_create(list_for_add_history_storage)
+            HistoryStorageInfo.objects.bulk_create(list_for_add_history_storage)
+            FinanceHistoryInfo.objects.bulk_create(list_for_add_finance_history)
 
             # На уровне F выражения меняю баланс в отрицательную сторону из-за покупки
             CashAccount.objects.filter(user=request.user).update(money_balance=F('money_balance') - global_sum)

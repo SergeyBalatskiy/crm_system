@@ -15,8 +15,7 @@ StorageAcceptableForm = modelformset_factory(
         "supplier" : "Поставщик",
         "buy_price" : "Стоимость в закупке (шт.)", 
         "retail_price" : "Стоимость в продажу (шт.) - Это просто напоминание для себя за сколько планируют продать", 
-        "minimum_items_for_notification" : "Напоминание о маленьком кол-ве (шт.)"
-    })
+        "minimum_items_for_notification" : "Напоминание о маленьком кол-ве (шт.)"})
 
 RemovalHistoryForm = modelformset_factory(
     HistoryStorageInfo, formset=DisableUniqueFormSet, fields=("name_product_history", "individual_code_history", "quantity_history", "supplier_history"), labels={

@@ -226,5 +226,23 @@ document.addEventListener('DOMContentLoaded', function () {
             setTimeout(dismissAlert, 4000);
         }
     });
+    document.addEventListener('input', function (e) {
+        if (e.target.matches('input[name$="-quantity_at_the_purchase"]')) {
+            let input = e.target;
 
+            // 1. Оставляем только цифры
+            let rawValue = input.value.replace(/\D/g, '');
+
+            // 2. Удаляем все ведущие нули (чтобы нельзя было ввести 0, 00, 000)
+            rawValue = rawValue.replace(/^0+/, '');
+
+            if (rawValue) {
+                // Разделяем тысячи пробелами
+                input.value = new Intl.NumberFormat('ru-RU').format(rawValue);
+            } else {
+                // Если остался чистый 0 или пустота — очищаем поле
+                input.value = '';
+            }
+        }
+    });
 });
