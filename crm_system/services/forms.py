@@ -13,6 +13,7 @@ class ServicesWorkForm(forms.ModelForm):
         model = ServicesInfo
         # Выбираю поля на показ
         fields = ['name_service_work', 'price', 'category']
+        
         # Даю название этим полям (они будут находиться рядом с самим полем)
         labels = {'name_service_work' : 'Название оказанной услуги',
                   'price' : 'Цена',

@@ -20,3 +20,6 @@ class ServicesInfo(models.Model):
 class CategoryServicesInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='category_services')
     name_catrgory_work = models.CharField(max_length=120)
+
+    def __str__(self):
+        return f'Название категории: {self.name_catrgory_work}, связан с пользователем: {self.user}'

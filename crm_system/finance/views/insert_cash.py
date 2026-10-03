@@ -36,13 +36,11 @@ class InsertCashInBalance(View):
     @transaction.atomic
     def post(self, request, *args, **kwargs):
         formset = InsertCashForm(request.POST)
-        formset_comment = CommentCashForm(request.POST)
 
         if formset.is_valid():
                 
             # Остановка сохранения 
             instances = formset.save(commit=False)
-            comments = formset_comment.save(commit=False)
 
             if not instances:
                 return self.htmx_toast_error('Пожалуйста, выберите хотя бы один товар на продажу!')
@@ -52,7 +50,8 @@ class InsertCashInBalance(View):
 
             # Беру каждый обьект из формсета и индивидуально в каждом записываю юзера и сохраняю
             #    товар    коммент                  товары    комменты
-            for instance, comment in zip_longest(instances, comments, fillvalue=None):
+            for instance in instances:
+                
                 try:
                     history_data = StorageInfo.objects.filter(individual_code=instance.individual_code_history).first()
                     instance.user = request.user
@@ -82,9 +81,7 @@ class InsertCashInBalance(View):
                     # Счетчик который суммарно показывает заработок:
                     summary_cash += (instance.buy_price_history * instance.quantity_history)
                     
-                    # Если комментарий не задан:
-                    if not comment:
-                        comment = f'Продажа товара: {instance.name_product_history}, в кол-ве: {instance.quantity_history}, на сумму: {instance.buy_price_history * instance.quantity_history} ₽.'
+                    comment = f'Продажа товара: {instance.name_product_history}, в кол-ве: {instance.quantity_history}, на сумму: {instance.buy_price_history * instance.quantity_history} ₽.'
 
                     # Добавляю новую историю операции продажи
                     FinanceHistoryInfo.objects.create(user=request.user, 
