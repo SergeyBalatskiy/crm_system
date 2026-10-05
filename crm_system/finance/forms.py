@@ -52,10 +52,6 @@ class BaseFinanceForm(forms.ModelForm):
                 raise forms.ValidationError("Введите корректное число.")
         return value
         
-CommentCashForm = modelformset_factory(
-    FinanceHistoryInfo, fields=("comment",), labels={"comment": "Комментарий"}) # Подставляю комментарий рядом с формой 
-# InsertCashForm и в момент сохранения записываю в нее данные из InsertCashForm, а комментарий у меня как раз уже имеется! :3
-
 # Форма для поступления финансов (продажа чего-то)
 SellCustomForm = modelformset_factory(FinanceHistoryInfo, form=BaseFinanceForm, formset=DisableUniqueFormSet, fields=("product_name", "number_in_the_operation", "supplier", "comment"), labels={
         "product_name": "Причина поступления",

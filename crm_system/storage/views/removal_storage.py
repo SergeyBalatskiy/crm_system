@@ -1,14 +1,12 @@
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
 from storage.models import HistoryStorageInfo, StorageInfo
 from django.shortcuts import render, redirect
 from storage.forms import RemovalHistoryForm
 from django.contrib import messages
 from django.utils import timezone
 from django.http import HttpResponse
-import json
 from django.db import transaction
 from django.urls import reverse
 import json

@@ -9,6 +9,15 @@
 <div class="div-place-services">
     <div class="div-box-services">
 
+        {% comment %} Здесь в будущем будет кнопка "Создать услугу", которая будет вызывать поле для показа форм {% endcomment %}
+
+        <h2>Создать новый предмет</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form_services.as_p }}
+            <button type="submit">Сохранить</button>
+        </form>
+
         <h1>Ваши усулуги</h1>
 
         {% if not service_works %}

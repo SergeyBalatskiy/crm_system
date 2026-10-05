@@ -4,7 +4,7 @@ from finance.models import CashAccount, FinanceHistoryInfo
 from django.shortcuts import render, redirect
 from django.db.models import F
 from django.views import View
-from finance.forms import InsertCashForm, CommentCashForm
+from finance.forms import InsertCashForm
 from storage.models import HistoryStorageInfo, StorageInfo
 from django.contrib import messages
 from django.http import HttpResponse
@@ -12,7 +12,6 @@ from django.urls import reverse
 from django.db import transaction
 from django.utils import timezone
 from finance.models import FinanceHistoryInfo, CashAccount
-from itertools import zip_longest
 import json
 
 
