@@ -1,6 +1,8 @@
+/* Основной контейнер */
 .div-place-services {
     width: 100%;
     height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .div-box-services {
@@ -9,13 +11,349 @@
     top: 40px;
     right: 40px;
     height: calc(100vh - 80px);
-
-    background-color: #fff;
-    border-radius: 30px;
-    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
-    padding: 40px;
-
+    background-color: #f8fafc;
+    border-radius: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+    padding: 32px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+.services-header h1 {
+    margin: 0 0 24px 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+/* Двухколоночный макет */
+.services-content-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 28px;
+    align-items: start;
+}
+
+/* Блок формы */
+.service-form-card {
+    background: #ffffff;
+    border-radius: 18px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e2e8f0;
+}
+
+.service-form-card h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 17px;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.styled-form .form-group {
+    margin-bottom: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.styled-form label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #475569;
+}
+
+.styled-form input[type="text"],
+.styled-form input[type="number"],
+.styled-form select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.styled-form input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* Подгонка внешнего вида Select2 */
+.select2-container--default .select2-selection--single {
+    border-radius: 10px !important;
+    border: 1px solid #cbd5e1 !important;
+    height: 42px !important;
+    padding: 6px 4px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+    line-height: 28px !important;
+    color: #1e293b !important;
+    font-size: 14px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background-color: #2563eb;
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s, transform 0.1s;
+    margin-top: 8px;
+}
+
+.btn-primary:hover {
+    background-color: #1d4ed8;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* Сетка карточек услуг */
+.services-list-section h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 17px;
+    color: #1e293b;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-count {
+    background-color: #e2e8f0;
+    color: #475569;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.service-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.service-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.service-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.category-pill {
+    background-color: #eff6ff;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+.service-price {
+    font-size: 15px;
+    font-weight: 700;
+    color: #059669;
+}
+
+.service-title {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
+    line-height: 1.4;
+}
+
+/* Пустое состояние */
+.empty-state {
+    background: #ffffff;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 48px 24px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+}
+
+.empty-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #334155;
+    margin: 0 0 4px 0;
+}
+
+.empty-subtitle {
+    font-size: 13px;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Тосты (Toast Notifications) */
+.toast-container {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 360px;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #ffffff;
+    padding: 14px 18px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #2563eb;
+    animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.toast-error {
+    border-left-color: #ef4444;
+}
+
+.toast-message {
+    font-size: 13px;
+    font-weight: 500;
+    color: #1e293b;
+    flex-grow: 1;
+}
+
+.toast-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.toast-close:hover {
+    color: #475569;
+}
+
+.toast.hide {
+    animation: fadeOut 0.3s forwards;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+}
+
+.messages-wrapper {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+/* Родительская карточка должна иметь relative для позиционирования кнопки */
+.service-card {
+    position: relative;
+    /* Ваши текущие стили карточки... */
+}
+
+/* Отступ справа в шапке карточки, чтобы категория и цена не наезжали на крестик */
+.service-card-header {
+    padding-right: 28px;
+}
+
+/* Контейнер формы удаления в правом верхнем углу */
+.delete-form {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 5;
+}
+
+/* Кнопка удаления */
+.btn-delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    background-color: transparent;
+    color: #94a3b8;
+    /* Нейтральный серый цвет */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+}
+
+/* Эффект при наведении */
+.btn-delete:hover {
+    background-color: #fef2f2;
+    /* Легкий красный фон */
+    color: #ef4444;
+    /* Ярко-красный цвет крестика */
+    transform: scale(1.1);
+}
+
+/* Эффект при нажатии */
+.btn-delete:active {
+    transform: scale(0.95);
 }

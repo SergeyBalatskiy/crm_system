@@ -1,42 +1,102 @@
 {% extends "services/base.html" %}
 {% load static %}
-{% load humanize %}
 
 {% block content %}
 <link rel="stylesheet" href="{% static 'services/css/services-main.css' %}">
 <script src="{% static 'services/js/services-main.js' %}" defer></script>
 
+<!-- Контейнер для сообщений (HTMX будет добавлять алерты сюда) -->
+<div class="messages-wrapper" id="messages-wrapper"></div>
+
 <div class="div-place-services">
     <div class="div-box-services">
 
-        {% comment %} Здесь в будущем будет кнопка "Создать услугу", которая будет вызывать поле для показа форм {% endcomment %}
+        <div id="messages-container">
+            {% include 'services/messages.html' %}
+        </div>
+                
+        <div class="services-header">
+            <h1>Управление услугами</h1>
+        </div>
 
-        <h2>Создать новый предмет</h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ form_services.as_p }}
-            <button type="submit">Сохранить</button>
-        </form>
+        <div class="services-content-layout">
+            
+            <!-- Форма создания -->
+            <div class="service-form-card">
+                <h2>Новая услуга</h2>
+                
+                <!-- hx-post и hx-swap="none" позволяют HTMX обрабатывать ответ без перезагрузки -->
+                <form id="service-form" hx-post="" hx-swap="none" method="post" class="styled-form">
+                    {% csrf_token %}
+                    
+                    <div class="form-group">
+                        <label for="{{ form_services.name_service_work.id_for_label }}">
+                            {{ form_services.name_service_work.label }}
+                        </label>
+                        {{ form_services.name_service_work }}
+                    </div>
 
-        <h1>Ваши усулуги</h1>
+                    <div class="form-group">
+                        <label for="{{ form_services.price.id_for_label }}">
+                            {{ form_services.price.label }}
+                        </label>
+                        {{ form_services.price }}
+                    </div>
 
-        {% if not service_works %}
+                    <div class="form-group">
+                        <label for="{{ form_services.category.id_for_label }}">
+                            {{ form_services.category.label }}
+                        </label>
+                        {{ form_services.category }}
+                    </div>
 
-        <h1>У вас нет созданных услуг!</h1>
+                    <button type="submit" class="btn-primary">Создать услугу</button>
+                </form>
+            </div>
 
-        {% else %}
+            <!-- Список созданных услуг -->
+            <div class="services-list-section">
+                <h2>
+                    Ваши услуги 
+                    <span class="badge-count">{{ service_works|length }}</span>
+                </h2>
 
-        {% for obj in service_works %}
-        <div class='services-work'>
+                {% if not service_works %}
+                    <div class="empty-state">
+                        <div class="empty-icon">📁</div>
+                        <p class="empty-title">У вас пока нет созданных услуг</p>
+                        <p class="empty-subtitle">Заполните форму слева, чтобы добавить первую услугу</p>
+                    </div>
+                {% else %}
+                    <div class="services-grid">
+                    {% for obj in service_works %}
+                        <div class="service-card">
+                            
+                            <!-- Форма удаления -->
+                            <form hx-post="{% url 'delete_services' %}" hx-swap="none" class="delete-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="services" value="{{ obj.id }}">
+                                
+                                <button type="submit" class="btn-delete" title="Удалить услугу" hx-confirm="Вы уверены, что хотите удалить эту услугу?">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                                    </svg>
+                                </button>
+                            </form>
 
-            <h2>Название услуги: {{obj.name_service_work}}</h2>
-            <h2>Цена услуги: {{obj.price}}</h2>
-            <h2>Категория: {{obj.category}}</h2>
+                            <div class="service-card-header">
+                                <span class="category-pill">{{ obj.category.name_category_work }}</span>
+                                <span class="service-price">{{ obj.price }} ₽</span>
+                            </div>
+                            <h3 class="service-title">{{ obj.name_service_work }}</h3>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
 
         </div>
-        {% endfor %}
-
-        {% endif %}
 
     </div>
 </div>

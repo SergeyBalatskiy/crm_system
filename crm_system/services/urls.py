@@ -5,4 +5,6 @@ from .views import *
 urlpatterns = [
     # Путь на указание созданных уже услуг + создание услуг
     path('', ShowAndCreateServicesWork.as_view(), name='services_work'),
+    path('delete', DeleteCategoryOrServices.as_view(), name='delete_services'),
+        
 ]

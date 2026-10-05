@@ -58,7 +58,14 @@ class ShowAndCreateServicesWork(View):
             obj = formset.save(commit=False)
             obj.user = request.user
             obj.save()
-            return redirect('services_work')
+
+            if request.headers.get('HX-Request'):
+                msg = 'Новая услуга была успешно создана!'
+                print(msg)
+                messages.success(request, msg)
+                response = HttpResponse()
+                response['HX-Redirect'] = reverse('services_work')
+                return response                  
         
         except Exception as e:
             return self.htmx_toast_error(f'Ошибка: {e}')
