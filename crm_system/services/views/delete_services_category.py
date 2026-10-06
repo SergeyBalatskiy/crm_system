@@ -1,7 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.shortcuts import render, redirect
-from django.db.models import Q, TextField, F
+from django.shortcuts import redirect
 from django.views import View
 from services.models import ServicesInfo, CategoryServicesInfo
 from django.views.decorators.cache import never_cache

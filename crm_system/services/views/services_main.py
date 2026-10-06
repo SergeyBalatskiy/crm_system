@@ -1,7 +1,7 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django.shortcuts import render, redirect
-from django.db.models import Q, TextField, F
+from django.shortcuts import render
+from django.db.models import Q, TextField
 from django.views import View
 from services.models import ServicesInfo
 from services.forms import ServicesWorkForm
@@ -11,6 +11,9 @@ from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib import messages
 import json
+from django.db.models.functions import Cast
+from django.shortcuts import render
+from django.db.models import Q
 
 # Данный класс отвечает за показ всех добавленных услуг и также фильтры(В БУДУЩЕМ!) + возможность создавать новые услуги
 @method_decorator([login_required, never_cache], name='dispatch') 
@@ -31,16 +34,27 @@ class ShowAndCreateServicesWork(View):
         return response
     
     def get(self, request, *args, **kwargs):
-        # Получаю все созданные ранее услуги в БД:
-        
-        # Думаю что сюда в будущем нужно будет добавить фильтр
-        
-        # Передаю также и форму
+
+        # Получаю квери сет всех обьектов
+        qs = ServicesInfo.objects.filter(user=request.user)
         formset = ServicesWorkForm(user=request.user)
+        fast_search = request.GET.get('fast_search_all', '').strip()
+       
+        # Поиск по "Быстрому поиску"
+        if fast_search:
+            # "Переформатирую данные" из инта в текст
+            qs = qs.annotate(price_str=Cast('price', output_field=TextField()))
+    
+            # "Закидываю в фильтр"
+            text_q = (
+                Q(name_service_work__icontains=fast_search) | 
+                Q(price_str__icontains=fast_search) | 
+                Q(category__name_category_work__icontains=fast_search))
+            # Привязываю к глобальному поиску
+            qs=qs.filter(text_q)
 
-        get_services = ServicesInfo.objects.filter(user=request.user)
-
-        context = {'service_works' : get_services, 'form_services' : formset}
+        # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
+        context = {'service_works' : qs, 'form_services' : formset, 'fast_search_all' : fast_search}
         return render(request, 'services/services_main.html', context)
 
     @transaction.atomic

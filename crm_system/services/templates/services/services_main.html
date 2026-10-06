@@ -56,48 +56,83 @@
 
             <!-- Список созданных услуг -->
             <div class="services-list-section">
-                <h2>
-                    Ваши услуги 
-                    <span class="badge-count">{{ service_works|length }}</span>
-                </h2>
+                <div class="services-list-header">
+                    <h2>
+                        Ваши услуги 
+                        <span class="badge-count">{{ service_works|length }}</span>
+                    </h2>
 
-                {% if not service_works %}
-                    <div class="empty-state">
-                        <div class="empty-icon">📁</div>
-                        <p class="empty-title">У вас пока нет созданных услуг</p>
-                        <p class="empty-subtitle">Заполните форму слева, чтобы добавить первую услугу</p>
+                    <!-- Поле быстрого поиска -->
+                    <div class="search-box">
+                        <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="search" 
+                            name="fast_search_all" 
+                            value="{{ fast_search_all|default:'' }}"
+                            placeholder="Поиск по названию, цене, категории..." 
+                            class="search-input"
+                            hx-get="{% url 'services_work' %}" 
+                            hx-trigger="keyup changed delay:400ms, search" 
+                            hx-target="#services-grid-container" 
+                            hx-select="#services-grid-container"
+                            hx-swap="outerHTML"
+                            hx-replace-url="false"
+                            autocomplete="off">
                     </div>
-                {% else %}
-                    <div class="services-grid">
-                    {% for obj in service_works %}
-                        <div class="service-card">
-                            
-                            <!-- Форма удаления -->
-                            <form hx-post="{% url 'delete_services' %}" hx-swap="none" class="delete-form">
-                                {% csrf_token %}
-                                <input type="hidden" name="services" value="{{ obj.id }}">
-                                
-                                <button type="submit" class="btn-delete" title="Удалить услугу" hx-confirm="Вы уверены, что хотите удалить эту услугу?">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="18" y1="6" x2="6" y2="18"></line>
-                                        <line x1="6" y1="6" x2="18" y2="18"></line>
-                                    </svg>
-                                </button>
-                            </form>
-
-                            <div class="service-card-header">
-                                <span class="category-pill">{{ obj.category.name_category_work }}</span>
-                                <span class="service-price">{{ obj.price }} ₽</span>
-                            </div>
-                            <h3 class="service-title">{{ obj.name_service_work }}</h3>
-                        </div>
-                    {% endfor %}
                 </div>
-                {% endif %}
+
+                <!-- Контейнер сетки услуг (обновляется через HTMX) -->
+                <div id="services-grid-container">
+                    {% if not service_works %}
+                        <div class="empty-state">
+                            <div class="empty-icon">📁</div>
+                            <p class="empty-title">
+                                {% if fast_search_all %}
+                                    По запросу «{{ fast_search_all }}» ничего не найдено
+                                {% else %}
+                                    У вас пока нет созданных услуг
+                                {% endif %}
+                            </p>
+                            <p class="empty-subtitle">
+                                {% if fast_search_all %}
+                                    Попробуйте изменить поисковый запрос
+                                {% else %}
+                                    Заполните форму слева, чтобы добавить первую услугу
+                                {% endif %}
+                            </p>
+                        </div>
+                    {% else %}
+                        <div class="services-grid">
+                            {% for obj in service_works %}
+                                <div class="service-card">
+                                    
+                                    <!-- Форма удаления -->
+                                    <form hx-post="{% url 'delete_services' %}" hx-swap="none" class="delete-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="services" value="{{ obj.id }}">
+                                        
+                                        <button type="submit" class="btn-delete" title="Удалить услугу" hx-confirm="Вы уверены, что хотите удалить эту услугу?">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                                            </svg>
+                                        </button>
+                                    </form>
+
+                                    <div class="service-card-header">
+                                        <span class="category-pill">{{ obj.category.name_category_work }}</span>
+                                        <span class="service-price">{{ obj.price }} ₽</span>
+                                    </div>
+                                    <h3 class="service-title">{{ obj.name_service_work }}</h3>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
-
         </div>
-
     </div>
 </div>
 {% endblock %}
