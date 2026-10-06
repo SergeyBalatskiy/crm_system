@@ -48,15 +48,19 @@ class DeleteCategoryOrServices(View):
                     response = HttpResponse()
                     response['HX-Redirect'] = reverse('services_work')
                     return response   
+            print(get_category_to_delete)
+            if get_category_to_delete:
+                CategoryServicesInfo.objects.filter(user=request.user, name_category_work=get_category_to_delete).delete()
 
-            CategoryServicesInfo.objects.filter(user=request.user, name_category_work=get_category_to_delete).delete()
-            if request.headers.get('HX-Request'):
-                msg = 'Категория и услуги были успешно удалены!'
-                print(msg)
-                messages.success(request, msg)
-                response = HttpResponse()
-                response['HX-Redirect'] = reverse('services_work')
-                return response   
+                if request.headers.get('HX-Request'):
+                    msg = 'Категория и услуги были успешно удалены!'
+                    print(msg)
+                    messages.success(request, msg)
+                    response = HttpResponse()
+                    response['HX-Redirect'] = reverse('services_work')
+                    return response   
+        
+            return redirect('services_work')
 
         except Exception as e:
             return self.htmx_toast_error(f'Ошибка: {e}')

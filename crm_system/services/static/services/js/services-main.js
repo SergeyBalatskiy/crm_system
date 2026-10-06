@@ -65,3 +65,64 @@ $(document).ready(function () {
         }, 4000);
     }
 });
+
+$(document).ready(function () {
+    // Получаем CSRF-токен из формы
+    const getCsrfToken = () => $('[name=csrfmiddlewaretoken]').val();
+
+    // Кастомный рендеринг пунктов выпадающего списка Select2
+    function formatCategoryOption(option) {
+        // Если это плейсхолдер или пустой пункт — возвращаем стандартный текст
+        if (!option.id) {
+            return option.text;
+        }
+
+        // Создаем DOM-структуру пункта с крестиком
+        const $container = $(`
+            <div class="select2-category-item">
+                <span class="select2-category-title">${option.text}</span>
+                <button type="button" class="select2-category-delete-btn" title="Удалить категорию">&times;</button>
+            </div>
+        `);
+
+        // Обработчик клика на крестик удаления
+        const $deleteBtn = $container.find('.select2-category-delete-btn');
+
+        // 1. Блокируем события мыши, чтобы Select2 не перехватил их и не выбрал пункт
+        $deleteBtn.on('mousedown mouseup', function (e) {
+            e.stopPropagation();
+        });
+
+        // 2. Обрабатываем сам клик удаления
+        $deleteBtn.on('click', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+
+            const categoryName = option.text;
+            const confirmDelete = confirm(`Вы действительно хотите удалить категорию «${categoryName}» и ВСЕ связанные с ней услуги?`);
+
+            if (confirmDelete) {
+                const deleteUrl = typeof DELETE_SERVICES_URL !== 'undefined' ? DELETE_SERVICES_URL : '/services/delete';
+
+                // Отправляем запрос через HTMX
+                htmx.ajax('POST', deleteUrl, {
+                    values: {
+                        'category': categoryName,
+                        'csrfmiddlewaretoken': getCsrfToken()
+                    }
+                });
+            }
+        });
+
+        return $container;
+    }
+
+    // Инициализация Select2 с шаблоном
+    $('.select2-creatable').select2({
+        tags: true,
+        placeholder: "Выберите или введите категорию",
+        allowClear: true,
+        width: '100%',
+        templateResult: formatCategoryOption
+    });
+});

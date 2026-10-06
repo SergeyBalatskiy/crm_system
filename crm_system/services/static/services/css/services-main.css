@@ -357,3 +357,41 @@
 .btn-delete:active {
     transform: scale(0.95);
 }
+
+/* Выравнивание текста и крестика внутри выпадающего списка Select2 */
+.select2-category-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.select2-category-title {
+    flex-grow: 1;
+    color: #1e293b;
+}
+
+/* Кнопка-крестик внутри пункта списка */
+.select2-category-delete-btn {
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    padding: 2px 6px;
+    margin-left: 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+/* Подсветка крестика при наведении */
+.select2-category-delete-btn:hover {
+    color: #ef4444;
+    background-color: #fee2e2;
+}
+
+.select2-category-delete-btn:active {
+    transform: scale(0.9);
+}
