@@ -269,8 +269,8 @@
 }
 
 .search-input-wrapper input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    border-color: #7444e4;
+    box-shadow: 0 0 0 3px #7444e466;
 }
 
 /* Кастомные селекты */

@@ -46,7 +46,7 @@
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #4d2b9e
+    color: #5735a8
 }
 
 /* Баланс кассы */
@@ -62,7 +62,7 @@
 }
 
 .cash-card-badge i {
-    color: #6336cd;
+    color: #7444e4;
     font-size: 18px;
 }
 
@@ -76,7 +76,7 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background-color: #6336cd;
+    background-color: #7444e4;
     color: #ffffff;
     padding: 10px 20px;
     border-radius: 14px;
@@ -87,7 +87,7 @@
 }
 
 .btn-action-insert:hover {
-    background-color: #502aa7;
+    background-color: #7444e4;
     transform: translateY(-1px);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .search-input-wrapper input:focus {
-    border-color: #6537d0;
+    border-color: #7444e4;
     background-color: #fff;
 }
 

@@ -32,9 +32,9 @@
 }
 
 .page-title {
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 700;
-    color: #1f2937;
+    color: #5935ae;
     margin: 0;
 }
 
@@ -60,7 +60,7 @@
 
 .custom-select:focus,
 .custom-select:hover {
-    border-color: #512da8;
+    border-color: #7444e4;
     background-color: #ffffff;
     box-shadow: 0 0 0 3px rgba(81, 45, 168, 0.15);
 }
@@ -190,7 +190,7 @@
 .items-table input[type="text"]:focus,
 .items-table input[type="number"]:focus,
 .items-table select:focus {
-    border-color: #512da8;
+    border-color: #7444e4;
     outline: none;
     box-shadow: 0 0 0 3px rgba(81, 45, 168, 0.15);
 }
@@ -199,7 +199,7 @@
 .items-table input[name$="-number_in_the_operation"] {
     font-weight: 600;
     text-align: right;
-    color: #512da8;
+    color: #7444e4;
     background-color: #fcfaff;
 }
 
@@ -211,20 +211,20 @@
 .btn-add-row {
     background: transparent;
     border: 1px dashed #adb5bd;
-    color: #495057;
+    color: #060606;
     padding: 8px 16px;
-    border-radius: 6px;
+    border-radius: 7px;
     transform: translate(10px, -5px);
     cursor: pointer;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 400;
     transition: all 0.2s ease;
 }
 
 .btn-add-row:hover {
     background-color: #f8f9fa;
-    border-color: #6c757d;
-    color: #212529;
+    border-color: #7444e4;
+    color: #7444e4;
 }
 
 .btn-remove-row {
@@ -266,13 +266,13 @@
 }
 
 .btn-primary {
-    background-color: #512da8;
+    background-color: #7444e4;
     transform: translate(10px, -8px);
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    background-color: #412486;
+    background-color: #7444e4;
 }
 
 input.no-spinners::-webkit-outer-spin-button,

@@ -52,7 +52,7 @@ a .django-form input[type=number]::-webkit-outer-spin-button,
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #4d2b9e;
+    color: #5934af;
 }
 
 /* Стилизация выпадающего списка */
@@ -69,6 +69,6 @@ a .django-form input[type=number]::-webkit-outer-spin-button,
 }
 
 .custom-select:focus {
-    border-color: #512da8;
+    border-color: #7444e4;
     box-shadow: 0 0 0 2px rgba(70, 24, 117, 0.1);
 }

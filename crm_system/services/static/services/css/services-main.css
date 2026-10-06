@@ -80,8 +80,8 @@
 }
 
 .styled-form input:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    border-color: #7444e4;
+    box-shadow: 0 0 0 3px #7444e447;
 }
 
 /* Подгонка внешнего вида Select2 */
@@ -105,7 +105,7 @@
 .btn-primary {
     width: 100%;
     padding: 12px;
-    background-color: #2563eb;
+    background-color: #7444e4;
     color: #ffffff;
     border: none;
     border-radius: 10px;
@@ -117,7 +117,7 @@
 }
 
 .btn-primary:hover {
-    background-color: #1d4ed8;
+    background-color: #5b35b2;
 }
 
 .btn-primary:active {
@@ -175,7 +175,7 @@
 
 .category-pill {
     background-color: #eff6ff;
-    color: #2563eb;
+    color: #7444e4;
     font-size: 12px;
     font-weight: 600;
     padding: 4px 10px;
@@ -243,7 +243,7 @@
     padding: 14px 18px;
     border-radius: 12px;
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
-    border-left: 4px solid #2563eb;
+    border-left: 4px solid #7444e4;
     animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
@@ -448,13 +448,13 @@
 
 .search-input:focus {
     background-color: #ffffff;
-    border-color: #3b82f6;
+    border-color: #7444e4;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
 }
 
 .search-input:focus+.search-icon,
 .search-box:focus-within .search-icon {
-    color: #3b82f6;
+    color: #7444e4;
 }
 
 .search-input::placeholder {

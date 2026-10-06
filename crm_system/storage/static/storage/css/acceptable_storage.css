@@ -43,7 +43,7 @@
 .page-title {
     font-size: 24px;
     font-weight: 700;
-    color: #4d2b9e;
+    color: #6139bf;
     margin: 0;
 }
 
@@ -114,7 +114,7 @@
 
 .django-form input:focus,
 .django-form select:focus {
-    border-color: #5c41cd;
+    border-color: #7444e4;
 }
 
 /* Отключение стрелок в инпутах number */
@@ -148,7 +148,7 @@
 .btn-add-row {
     background: transparent;
     border: 1px dashed #cbd5e1;
-    color: #475569;
+    color: #000000;
     padding: 8px 16px;
     border-radius: 8px;
     cursor: pointer;
@@ -158,8 +158,8 @@
 }
 
 .btn-add-row:hover {
-    border-color: #5c41cd;
-    color: #5c41cd;
+    border-color: #7444e4;
+    color: #7444e4;
     background-color: #f8f7ff;
 }
 
@@ -201,12 +201,12 @@
 }
 
 .btn-primary {
-    background-color: #5c41cd;
+    background-color: #7444e4;
     color: #fff;
 }
 
 .btn-primary:hover {
-    background-color: #4b32b3;
+    background-color: #7444e4;
 }
 
 .btn-secondary {

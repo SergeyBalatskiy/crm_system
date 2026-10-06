@@ -56,7 +56,7 @@
 .history-header h2 {
     font-size: 22px;
     font-weight: 700;
-    color: #4d2b9e;
+    color: #5d37b6;
     margin: 0;
 }
 
@@ -111,8 +111,8 @@
 }
 
 .search-input-wrapper input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    border-color: #7444e4;
+    box-shadow: 0 0 0 3px rgba(159, 49, 203, 0.104);
 }
 
 /* Переключатель-тумблер (Switch) */
@@ -177,7 +177,7 @@
 }
 
 input:checked+.slider {
-    background-color: #8707ea;
+    background-color: #7444e4;
     /* Красный цвет внимания */
 }
 
