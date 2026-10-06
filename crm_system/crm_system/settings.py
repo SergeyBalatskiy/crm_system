@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'services',
     'finance',
     'storage',
+    'orders',
     'tinymce',
     'django.contrib.humanize',
     'profile_user',
