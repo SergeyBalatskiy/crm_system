@@ -8,7 +8,7 @@
 .main-page-title {
     font-size: 38px;
     font-weight: 700;
-    color: #512da8;
+    color: #6235cb8;
     margin: 0 0 16px 0;
     text-align: left;
     align-self: flex-start;
@@ -236,7 +236,7 @@
 .active-workers-title {
     font-size: 33px;
     font-weight: 600;
-    color: #512da8;
+    color: #6235cb8;
     margin: 0 0 16px 0;
     text-align: left;
     padding-bottom: 7px;
@@ -283,7 +283,7 @@
     align-items: center;
     gap: 16px;
     background-color: #ffffff;
-    border: 2px solid #512da8;
+    border: 2px solid #6235cb8;
     border-radius: 12px;
     padding: 14px 24px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);

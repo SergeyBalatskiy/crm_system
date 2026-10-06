@@ -84,6 +84,20 @@
     box-shadow: 0 0 0 3px #7444e447;
 }
 
+
+/* Скрытие стрелочек (spinners) для Chrome, Safari, Edge, Opera */
+input.no-spinners::-webkit-outer-spin-button,
+input.no-spinners::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Скрытие стрелочек для Firefox */
+input.no-spinners[type=number] {
+    -moz-appearance: textfield;
+}
+
+
 /* Подгонка внешнего вида Select2 */
 .select2-container--default .select2-selection--single {
     border-radius: 10px !important;
