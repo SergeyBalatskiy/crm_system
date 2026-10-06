@@ -7,7 +7,7 @@ from decimal import Decimal
 User = get_user_model()
 
 class ServicesWorkForm(forms.ModelForm):
-    price = forms.IntegerField(widget=forms.NumberInput(attrs={'min' : '0', 'autocomplete': 'off', 'class': 'no-spinners', 'oninput': "this.value = this.value.replace(/[^0-9]/g, '')"}), label = 'Сумма, ₽')
+    price = forms.CharField(widget=forms.TextInput(attrs={'autocomplete': 'off', 'class': 'price-format-input'}), label = 'Сумма, ₽')
     
     category = forms.CharField(
         label="Категория",
