@@ -3,13 +3,14 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from django.db.models import Q, TextField
 from django.views import View
-from services.models import ServicesInfo
+from orders.models import Orders
 from services.forms import ServicesWorkForm
 from django.views.decorators.cache import never_cache
 from django.db import transaction
 from django.http import HttpResponse
 from django.urls import reverse
 from django.contrib import messages
+from datetime import datetime, timedelta
 import json
 from django.db.models.functions import Cast
 from django.shortcuts import render
@@ -42,7 +43,7 @@ class ShowAndFilterOrders(View):
 
         # Если у нас НЕ пришел запрос через AJAX (или HTMX) — отдаем ТОЛЬКО кусок со списком
         if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            context = {'history_finance' : qs}
+            context = {'orders' : qs}
             return render(request, 'orders/orders.html', context)
         
         # В противном случае:
@@ -68,55 +69,24 @@ class ShowAndFilterOrders(View):
             """Суть заключается в том, что выбранный нами статус уже и будет нести в себе нужный для нас фильтр в БД"""
             # С POST-запроса может прийти следующий статус (от status = request.GET.get('selected_order_status')):  
             # in_process, deferred, success, finished
-            main_q &= Q(type_of_operation=status)
+            main_q &= Q(status=status)
 
             # ПРОДОЛЖИТЬ ДАЛЬШЕ ЗДЕСЬ!!!
-
-        # Поиск по категории операции
-        category = request.GET.get('selected_finance_category')
-        if category:
-            category_dict = {'Продажа':'Продажа',
-                             'Покупка':'Покупка',
-                             'Гарантийный возврат':'Гарантийный возврат',
-                             'Прочее':'Прочее'
-                            }
-            cat_value = category_dict.get(category)
-            if cat_value:
-                main_q &= Q(category_of_operation=cat_value)
 
         # Поиск по "Быстрому поиску"
         fast_search = request.GET.get('fast_search_all', '').strip()
         if fast_search:
 
-            # "Переназначенные 2 переменные с уже строковым типом я закидываю в фильтр"
-            # value.strip() - обязательно, ведь именно это и является тем, ЧТО ввел пользователь! (предварительно
-            # форматирую еще)
+            # Тут у меня в будущем будет фильтр по определенным полям...
             text_q = (
-                Q(product_name__icontains=fast_search) | 
-                Q(product_code_str__icontains=fast_search) | 
-                Q(number_in_the_operation_str__icontains=fast_search) |
-                Q(comment__icontains=fast_search))
+                Q(...__icontains=fast_search) | 
+                Q(...__icontains=fast_search) | 
+                Q(...__icontains=fast_search) |
+                Q(...__icontains=fast_search) |
+                Q(...__icontains=fast_search) | 
+                Q(...__icontains=fast_search) |)
                 # Привязываю к глобальному поиску
             main_q &=text_q
-
-        # Поиск по дате
-        date_selected = request.GET.get('search_date_operation')
-        if date_selected:
-
-                # Получение точного момента времени
-                now = timezone.now()
-                # Получение только даты (без времени)
-                today = now.date()
-
-                # Словарь с датами в зависимости от выбранного дня
-                dates_dict = {'date_today' : (today, now), 
-                              'date_yesterday' : (today - timedelta(days=1), today),
-                              'date_this_week' : (today - timedelta(days=7), now),
-                              'date_this_month' : (today - timedelta(days=30), now)
-                              }
-                date_finded = dates_dict.get(date_selected)
-                if date_finded:
-                    main_q &= Q(created_at__range=date_finded)
 
         # Поиск по дате (состоит из СТАРТ и ФИНИШ)
         date_start_input = request.GET.get('date_start_input')
@@ -130,17 +100,9 @@ class ShowAndFilterOrders(View):
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         qs = qs.filter(main_q)
 
-        context = {
-            'history_finance': qs,
-            'cash': get_main_balance,
-        }
+        context = {'orders': qs}
 
-        # Если это AJAX-запрос — отдаем только список карточек
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return render(request, 'finance/partials/history-list.html', context)
-
-        return render(request, 'finance/main_balance.html', context)
-
+        return render(request, 'orders/orders.html', context)
 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
