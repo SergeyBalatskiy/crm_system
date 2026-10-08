@@ -14,7 +14,8 @@ from datetime import datetime, timedelta
 import json
 from django.db.models.functions import Cast
 from django.shortcuts import render
-from django.db.models import Q
+from django.db.models import Q, Value
+from django.db.models.functions import Concat
 
 # Данный класс отвечает за показ всех созданных заявок на ремонт (orders) + фильтр через уже знакомый метод
 @method_decorator([login_required, never_cache], name='dispatch') 
@@ -50,12 +51,21 @@ class ShowAndFilterOrders(View):
         # Для удобного будущего суммарного поиска через Q (или)
         main_q = Q()
 
-        # "Переформатирую данные" из инта в текст
+        # "Переформатирую данные
+        """Здесь работает достаточно нелогичный способ достать нужный обьект из таблицы БД, в которой нужные для нас Имя и Фамилия 
+        разнесены по разным полям: name, surname. 
+
+        manager_fullname1=Concat('manager__surname', Value(' '), 'manager__name'),
+        manager_fullname2=Concat('manager__name', Value(' '), 'manager__surname')
+        
+        Concat склеивает кусочки текса в 1 обьект, что позволяет обратиться к определенному обьекту и соединить его в один ответ
+        
+        В быстром поиске он позволит опираясь на определенный обьект по айдишнику, доставать сразу же действующую фамилию, имя и 
+        потом тут же выдавать нужный нам результат"""
         qs = qs.annotate(
-            # Тут пока что два поля которые находятся в БД (Orders): id (уникальный код заявки), price (цена)
-            id_str=Cast('id', output_field=TextField()),
-            price_str=Cast('price', output_field=TextField()),
-            )
+            manager_fullname1=Concat('manager__surname', Value(' '), 'manager__name'),
+            manager_fullname2=Concat('manager__name', Value(' '), 'manager__surname'),
+            id_str=Cast('id', output_field=TextField()))
 
         # Поиск по типу операции
         status = request.GET.get('selected_order_status')
@@ -71,20 +81,23 @@ class ShowAndFilterOrders(View):
             # in_process, deferred, success, finished
             main_q &= Q(status=status)
 
-            # ПРОДОЛЖИТЬ ДАЛЬШЕ ЗДЕСЬ!!!
-
         # Поиск по "Быстрому поиску"
         fast_search = request.GET.get('fast_search_all', '').strip()
         if fast_search:
 
             # Тут у меня в будущем будет фильтр по определенным полям...
             text_q = (
-                Q(...__icontains=fast_search) | 
-                Q(...__icontains=fast_search) | 
-                Q(...__icontains=fast_search) |
-                Q(...__icontains=fast_search) |
-                Q(...__icontains=fast_search) | 
-                Q(...__icontains=fast_search) |)
+                Q(id_str__icontains=fast_search) | 
+                Q(type_of_order__icontains=fast_search) |
+                Q(manager__icontains=fast_search) |
+                Q(client__name__icontains=fast_search) | 
+                Q(client__phone__icontains=fast_search) |
+                Q(manager_fullname1__icontains=fast_search) |
+                Q(manager_fullname2__icontains=fast_search) |
+                Q(device_type__icontains=fast_search) |
+                Q(color_of_device__icontains=fast_search) |
+                Q(name_of_device__icontains=fast_search) | 
+                Q(problem_with_device__icontains=fast_search))
                 # Привязываю к глобальному поиску
             main_q &=text_q
 

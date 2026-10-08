@@ -1,0 +1,79 @@
+{% extends "orders/base.html" %}
+{% load static %}
+
+{% block content %}
+
+<div class="div-place-orders">
+    <div class="div-box-orders">
+
+        <!-- Шапка истории -->
+        <div class="order-header">
+            <h2>Заказы</h2>
+            {% if orders %}
+            <span class="order-count">Заказов всего: {{ orders|length }}</span>
+            {% endif %}
+        </div>
+
+        {% comment %} Тут у меня будет вызов справа динамического появления окна которое вылезает, показывает активные формы {% endcomment %}
+        <button>Создать заказ</button>
+
+        <!-- Панель фильтров -->
+        <form id="filter-form" method="GET" action="{% url 'orders' %}" class="filter-toolbar">
+            
+            <!-- Поле быстрый поиск -->
+            <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по заказчику, устройству, неисправности..." autocomplete="off">
+            </div>
+
+            <!-- Селект статуса заказа -->
+            <select class="custom-select" id="select_status_order" name="search_status_order" autocomplete="off">
+                <option value="">Все типы статусов заказа</option>
+                <option value="in_process">На ремонте</option>
+                <option value="deferred">На согласовании</option>
+                <option value="success">Готов</option>
+                <option value="finished">Завершен</option>
+            </select>
+
+            <!-- ГИБРИДНЫЙ БЛОК ДАТЫ -->
+            <div class="date-filter-container">
+                
+                <!-- 1. Селект быстрых пресетов -->
+                <select class="custom-select" id="history_date_select" name="search_date_operation" autocomplete="off">
+                    <option value="">За всё время</option>
+                    <option value="date_today">Сегодня</option>
+                    <option value="date_yesterday">Вчера</option>
+                    <option value="date_this_week">За эту неделю</option>
+                    <option value="date_this_month">За месяц</option>
+                    <option value="custom">📅 Указать период...</option>
+                </select>
+
+                <!-- 2. Календарь (От... До...) - по умолчанию скрыт -->
+                <div class="date-range-wrapper hidden" id="custom-date-range">
+                    <div class="date-field">
+                        <label for="date_start_input">От:</label>
+                        <input type="date" name="date_start_input" id="date_start_input" class="date-input" autocomplete="off">
+                    </div>
+                    <div class="date-field">
+                        <label for="date_end_input">До:</label>
+                        <input type="date" name="date_end_input" id="date_end_input" class="date-input" autocomplete="off">
+                    </div>
+                    <!-- Кнопка сброса обратно на селект -->
+                    <button type="button" class="btn-reset-date" id="btn-reset-date" title="Вернуться к быстрым фильтрам">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </form>
+
+        <!-- Контейнер со списком карточек -->
+        <div class="history-list" id="history-list-container">
+            {% include 'storage/partials/history-list.html' %}
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

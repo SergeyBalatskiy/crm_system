@@ -31,8 +31,10 @@ class WorkersInfo(models.Model):
     phone = models.CharField(max_length=16, null=True)
 
     def __str__(self):
-        return f'Cотрудник: {self.name} {self.surname}, связан с {self.user.get_full_name()}'
-
+        # Собирается вывод для показа нашего сотрудника
+        full_name = f"{self.surname or ''} {self.name or ''}".strip()
+        return full_name if full_name else f"Сотрудник №{self.pk}"
+    
 # Создаю статус категорий
 class StatusCategory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='status_info')
