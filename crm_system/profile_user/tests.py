@@ -141,4 +141,6 @@ for obj_info in x.get('sections', []):
     ...
     # print(obj_info['id'])
 
-print(x.get('sections'))
+s = x.get('sections')
+
+print(s[0])

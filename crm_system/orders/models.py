@@ -55,6 +55,9 @@ class Orders(models.Model):
     # Само поле для JSON-форм и данных внутри неё:
     form_with_order_information = models.JSONField()
 
+    # Булево значение для: СРОЧНО
+    important = models.BooleanField(default=False)
+
     def __str__(self):
         return f'Статус: {self.status}, Менеджер: {self.manager}, ФИО клиента: {self.client_name}, Номер: {self.client_phone}, Название девайса: {self.name_of_device}, Проблема с девайсом: {self.problem_with_device}, Был создан: {self.created_at}, Поле c JSON-формами: {self.form_with_order_information}'
 

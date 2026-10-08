@@ -34,16 +34,134 @@ class ShowFormForOrder(View):
             }
         })
         return response
-    
+
+    def get_dict_for_json_forms():
+        return {
+        'sections':[
+            {
+            'id':'client_info', 
+            'title' : 'Клиент',
+            'order' : 1,
+            'fields' : [{
+                'field_key' : 'name',
+                'label' : 'Имя клиента',
+                'type' : 'select',
+                'is_required' : True,
+                'hints' : [],
+                'order' : 1
+            },
+            {
+                'field_key' : 'phone',
+                'label' : 'Телефон',
+                'type' : 'select',
+                'is_required' : True,
+                'hints' : [],
+                'order' : 2
+            },
+            {
+                'field_key' : 'telegram',
+                'label' : 'Телеграм',
+                'type' : 'select',
+                'is_required' : False,
+                'hints' : [],
+                'order' : 3
+            }
+            ], 
+            'custom_forms' : []
+        },
+        {
+            'id':'device_info', 
+            'title' : 'Устройство и неисправности',
+            'order' : 2,
+            'fields' : [{
+                'field_key' : 'serial_number',
+                'label' : 'Серийный номер',
+                'type' : 'select',
+                'is_required' : False,
+                'order' : 1
+            },
+            {
+                'field_key' : 'type_of_device',
+                'label' : 'Тип устройства',
+                'type' : 'select',
+                'is_required' : False,
+                'hints' : ['Телефон', 'Ноутбук', 'Планшет', 'Компьютер'],
+                'order' : 2
+            },
+            {
+                'field_key' : 'device_company',
+                'label' : 'Марка',
+                'type' : 'select',
+                'is_required' : False,
+                'hints' : [],
+                'order' : 3
+            },
+            {
+                'field_key' : 'color',
+                'label' : 'Цвет',
+                'type' : 'select',
+                'is_required' : False,
+                'hints' : [],
+                'order' : 4
+            }
+            ], 
+            'custom_forms' : []
+        },
+        {
+            'id':'bonus_information', 
+            'title' : 'Дополнительная информация',
+            'order' : 3,
+            'fields' : [{
+                'field_key' : 'target_price',
+                'label' : 'Ориентировочная цена',
+                'type' : 'select',
+                'is_required' : False,
+                'hints' : [],
+                'order' : 1
+            },
+            {
+                'field_key' : 'master',
+                'label' : 'Мастер',
+                'type' : 'select',
+                'is_required' : False,
+                'hints' : [],
+                'order' : 2
+            },
+            {
+                'field_key' : 'manager',
+                'label' : 'Менеджер',
+                'type' : 'select',
+                'is_required' : False,
+                'hints' : [],
+                'order' : 3
+            },
+            {
+                'field_key' : 'comment_of_order',
+                'label' : 'Комментарий приемщика',
+                'type' : 'textarea',
+                'is_required' : False,
+                'hints' : [],
+                'order' : 4
+            }
+            ], 
+            'custom_forms' : []
+        }
+        ]}
+
     def get(self, request, *args, **kwargs):
 
         # Отдаю актуальные формы
         get_forms = FormsForOrder.objects.filter(user=request.user, type_of_order='paid').first()
         section = get_forms.json_forms.get('sections')
-        print(section)
+        # Отдается информация формы о клиенте
+        client_info=section[0]
+        # Информация о устройстве (поля)
+        device_info=section[1]
+        # Отдается информация дополнительная
+        bonus_information=section[2]
 
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
-        context = {'form' : get_forms}
+        context = {'client_info' : client_info, 'device_info' : device_info, 'bonus_information' : bonus_information}
         return render(request, 'orders/forms/forms.html', context)
 
     @transaction.atomic
