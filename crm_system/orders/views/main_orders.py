@@ -116,8 +116,3 @@ class ShowAndFilterOrders(View):
         context = {'orders': qs}
 
         return render(request, 'orders/orders.html', context)
-
-    @transaction.atomic
-    def post(self, request, *args, **kwargs):
-        # Данная функция отвечает за создание заявки на ремонт
-        ...
