@@ -50,8 +50,10 @@
     position: fixed;
     top: 0;
     right: 0;
-    width: 28vw;
-    min-width: 380px;
+    width: 42vw;
+    /* Увеличили ширину для двух колонок */
+    min-width: 560px;
+    /* Увеличили минимальную ширину */
     height: 100vh;
     background: #1e1e2d;
     color: #fff;
@@ -62,7 +64,14 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    /* Блокируем общий скролл шторки */
+}
+
+.section-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* Ровно две колонки */
+    gap: 14px;
+    /* Отступы между полями */
 }
 
 #drawer-content-loader {
@@ -165,10 +174,15 @@
 }
 
 .form-group {
-    margin-bottom: 12px;
+    margin-bottom: 0;
+    /* Убираем старый margin-bottom, так как теперь есть gap в grid */
     display: flex;
     flex-direction: column;
     gap: 6px;
+}
+
+.form-group:has(.custom-textarea) {
+    grid-column: span 2;
 }
 
 .form-label {
