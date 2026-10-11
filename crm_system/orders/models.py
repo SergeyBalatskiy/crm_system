@@ -20,7 +20,7 @@ def return_deleted_info():
 class Client(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_for_order')
     name = models.CharField(max_length=200, db_index=True)
-    phone = models.CharField(max_length=20, db_index=True)
+    phone = models.CharField(max_length=45, db_index=True)
 
     class Meta:
         # Говорю, что два поля должны быть уникальны в рамках строго этого пользователя!
@@ -57,6 +57,10 @@ class Orders(models.Model):
 
     # Булево значение для: СРОЧНО
     important = models.BooleanField(default=False)
+
+    # Указываю предоплату, если галочка была выбрана в самой форме: (Decimalfield чтобы потом
+    # добавлять в историю транзакций: ВНЕСЕНИЕ > Прочее > Предоплата)
+    prepay = models.DecimalField(default=0, decimal_places=0, max_digits=11)
 
     def __str__(self):
         return f'Статус: {self.status}, Менеджер: {self.manager}, ФИО клиента: {self.client_name}, Номер: {self.client_phone}, Название девайса: {self.name_of_device}, Проблема с девайсом: {self.problem_with_device}, Был создан: {self.created_at}, Поле c JSON-формами: {self.form_with_order_information}'

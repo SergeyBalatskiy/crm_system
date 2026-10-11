@@ -3,19 +3,36 @@
 
 {% block content %}
 
+<!-- Оверлей (затемнение фона при открытии) -->
+<div id="drawer-overlay" class="drawer-overlay" onclick="closeOrderDrawer()"></div>
+
+<!-- Боковая шторка (Drawer) на 1/4 экрана справа -->
+<div id="order-drawer" class="order-drawer">
+    <div id="drawer-content-loader">
+        <!-- Сюда HTMX подгрузит orders/forms/forms.html -->
+    </div>
+</div>
+
 <div class="div-place-orders">
     <div class="div-box-orders">
 
-        <!-- Шапка истории -->
+        <!-- Шапка -->
         <div class="order-header">
             <h2>Заказы</h2>
             {% if orders %}
             <span class="order-count">Заказов всего: {{ orders|length }}</span>
             {% endif %}
-        </div>
 
-        {% comment %} Тут у меня будет вызов справа динамического появления окна которое вылезает, показывает активные формы {% endcomment %}
-        <button>Создать заказ</button>
+            <!-- Кнопка вызова формы через HTMX -->
+            <button type="button" 
+                    class="btn-create-order"
+                    hx-get="{% url 'show_form' %}" 
+                    hx-target="#drawer-content-loader" 
+                    hx-swap="innerHTML"
+                    onclick="openOrderDrawer()">
+                <i class="fa-solid fa-plus"></i> Создать заказ
+            </button>
+        </div>
 
         <!-- Панель фильтров -->
         <form id="filter-form" method="GET" action="{% url 'orders' %}" class="filter-toolbar">
@@ -68,7 +85,7 @@
 
         </form>
 
-        <!-- Контейнер со списком карточек -->
+       <!-- Контейнер со списком карточек -->
         <div class="history-list" id="history-list-container">
             {% include 'storage/partials/history-list.html' %}
         </div>

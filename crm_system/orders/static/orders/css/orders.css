@@ -20,3 +20,258 @@
     flex-direction: column;
     overflow: hidden;
 }
+
+/* ==========================================
+   БОКОВАЯ ШТОРКА (SIDE DRAWER - 1/4 ЭКРАНА)
+   ========================================== */
+
+/* Затемнение заднего фона */
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.drawer-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Панель, выезжающая справа */
+.order-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 28vw;
+    min-width: 380px;
+    height: 100vh;
+    background: #1e1e2d;
+    color: #fff;
+    z-index: 1000;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.5);
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Блокируем общий скролл шторки */
+}
+
+#drawer-content-loader {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.order-drawer.active {
+    transform: translateX(0);
+    /* Выезжает в зону видимости */
+}
+
+/* Внутренние блоки формы */
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    background: #151521;
+    border-bottom: 1px solid #2b2b40;
+    flex-shrink: 0;
+    /* Запрещает шапке сжиматься */
+}
+
+.drawer-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #3699ff;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-close-drawer {
+    background: transparent;
+    border: none;
+    color: #a2a3b7;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-close-drawer:hover {
+    color: #f64e60;
+}
+
+.drawer-form-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    /* Критично для Flexbox-скролла */
+    margin: 0;
+}
+
+/* Прокручиваемый блок с секциями */
+.drawer-sections-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    /* Включает вертикальный скролл */
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Кастомный красивый скроллбар */
+.drawer-sections-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.drawer-sections-wrapper::-webkit-scrollbar-track {
+    background: #1e1e2d;
+}
+
+.drawer-sections-wrapper::-webkit-scrollbar-thumb {
+    background: #32324a;
+    border-radius: 4px;
+}
+
+.drawer-sections-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #3699ff;
+}
+
+.form-section {
+    background: #27273a;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #32324a;
+}
+
+.section-title {
+    margin: 0 0 14px 0;
+    font-size: 0.95rem;
+    color: #8950fc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    color: #b5b5c3;
+}
+
+.req-star {
+    color: #f64e60;
+}
+
+.custom-input,
+.custom-select,
+.custom-textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: #1e1e2d;
+    border: 1px solid #3f3f5a;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.custom-input:focus,
+.custom-select:focus,
+.custom-textarea:focus {
+    border-color: #3699ff;
+}
+
+.drawer-footer {
+    padding: 16px 24px;
+    background: #151521;
+    border-top: 1px solid #2b2b40;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-shrink: 0;
+    /* Запрещает футеру уплывать */
+}
+
+.btn-submit-order {
+    background: #3699ff;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-cancel {
+    background: #2b2b40;
+    color: #a2a3b7;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* Контейнер для подсказок под инпутом */
+.client-dropdown-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #151521;
+    border: 1px solid #3f3f5a;
+    border-radius: 6px;
+    z-index: 1050;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    margin-top: 4px;
+}
+
+/* Элемент списка подсказок */
+.suggestion-item {
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #2b2b40;
+    transition: background 0.2s;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #27273a;
+}
+
+.suggestion-item .client-name {
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.suggestion-item .client-phone {
+    color: #3699ff;
+    font-size: 0.85rem;
+}

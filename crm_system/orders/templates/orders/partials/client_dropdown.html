@@ -1,0 +1,11 @@
+{% if client_info %}
+    <ul class="suggestions-list">
+        {% for client in client_info %}
+            <li class="suggestion-item" 
+                onclick="fillClientData('{{ client.name }}', '{{ client.phone }}')">
+                <span class="client-name">{{ client.name }}</span>
+                <span class="client-phone">{{ client.phone }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
