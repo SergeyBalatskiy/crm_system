@@ -3,7 +3,7 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from django.db.models import Q, TextField
 from django.views import View
-from services.models import ServicesInfo
+from orders.models import Client
 from services.forms import ServicesWorkForm
 from django.views.decorators.cache import never_cache
 from django.db import transaction
@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.contrib import messages
 import json
 from django.db.models.functions import Cast
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Q
 from profile_user.models import FormsForOrder
 
@@ -20,35 +20,44 @@ from profile_user.models import FormsForOrder
 # актуальных обьектов (из информации о клиенте, устройстве, прочей информации
 @method_decorator([login_required, never_cache], name='dispatch') 
 class ShowFormForOrder(View):
-    
-    @staticmethod
-    def htmx_toast_error(message):
-        print('Сработала функция ерор')
-        print(message)
-        """Возвращает 204 No Content"""
-        response = HttpResponse(status=204)
-        response['HX-Trigger'] = json.dumps({
-            'showToast': {
-                'level': 'error',
-                'message': message
-            }
-        })
-        return response
 
     def get(self, request, *args, **kwargs):
 
+        # Получаю тип заказа
+        # Если тип заказа не выбран, отдаю дефолт форму (ее только что открыли)
+        type_of_order_selected = request.GET.get('type_of_order_selected', 'paid')
+
         # Отдаю актуальные формы
-        get_forms = FormsForOrder.objects.filter(user=request.user, type_of_order='paid').first()
+        get_forms = FormsForOrder.objects.filter(user=request.user, type_of_order=type_of_order_selected).first()
         section = get_forms.json_forms.get('sections')
 
-        print(section)
-
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
-        context = {'sections' : section}
+        context = {'sections' : section, 'current_type': type_of_order_selected}
+
+        # ЕСЛИ запрос пришел конкретно от селекта
+        if request.headers.get('HX-Target') == 'form-change':
+            return render(request, 'orders/form_inner/form_inner.html', context)
+        
         return render(request, 'orders/forms/forms.html', context)
 
+    # Обработчик JSON поля, который будет записывать АКТУАЛЬНЫЕ все поля
     @transaction.atomic
     def post(self, request, *args, **kwargs):
 
-        # Пока что пост запрос не обрабатываю
-        ...
+        # Получаю имя, телефон
+        name = request.POST.get('name', '').strip()
+        phone = request.POST.get('phone', '').strip()
+
+        # GET_or_CREATE - если обьекта нет, создаю и вношу в create_client
+        client, create_client = Client.objects.get_or_create(name=name, phone=phone, user=request.user)
+        # Отладка для себя
+        if not client:
+            print(f'У нас новый клиент: {create_client}')
+
+        # Если чекбокс отмечен, вернет True. Если не отмечен — False.
+        important = 'important' in request.POST
+
+        prepay = request.POST.get('prepay')
+
+        if prepay:
+            prepay_amount = request.POST.get('prepay_amount')

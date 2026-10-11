@@ -1,0 +1,118 @@
+<form method="POST" hx-post="{% url 'show_form' %}" id="create-order-form" class="drawer-form-body">
+    {% csrf_token %}
+    <input type="hidden" name="type_of_order" value="{{ current_type }}">
+
+    <!-- Прокручиваемая область с секциями -->
+    <div class="drawer-sections-wrapper">
+        {% for section in sections %}
+        <div class="form-section">
+            <h4 class="section-title">{{ section.title }}</h4>
+
+            <div class="section-fields">
+                {% for field in section.fields %}
+                    {% if field.field_key != 'empty_for_add' %}
+                    <div class="form-group" style="position: relative;">
+                        <label class="form-label">
+                            {{ field.label }}
+                            {% if field.is_required %}<span class="req-star">*</span>{% endif %}
+                        </label>
+
+                        {% if field.field_key == 'name' or field.field_key == 'phone' %}
+                            <input type="text" 
+                                name="{{ field.field_key }}" 
+                                id="id_{{ field.field_key }}"
+                                class="custom-input client-search-input" 
+                                placeholder="Начните вводить {{ field.label|lower }}..."
+                                autocomplete="off"
+                                hx-get="{% url 'find_client' %}" 
+                                hx-trigger="keyup changed delay:300ms" 
+                                hx-target="#suggestions-{{ field.field_key }}" 
+                                hx-swap="innerHTML"
+                                {% if field.is_required %}required{% endif %}>
+
+                            <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
+
+                        {% elif field.hints %}
+                            <div class="custom-autocomplete-wrapper">
+                                <input type="text" 
+                                    name="{{ field.field_key }}" 
+                                    class="custom-input hint-input" 
+                                    placeholder="Выберите или введите..."
+                                    autocomplete="off"
+                                    onfocus="showHints(this)"
+                                    oninput="filterHints(this)"
+                                    {% if field.is_required %}required{% endif %}>
+
+                                <ul class="custom-hints-dropdown">
+                                    {% for hint in field.hints %}
+                                        <li onclick="selectHint(this, '{{ hint|escapejs }}')">{{ hint }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                        {% elif field.type == 'textarea' %}
+                            <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}></textarea>
+
+                        {% elif field.type == 'checkbox' %}
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="{{ field.field_key }}" value="true">
+                                <span class="checkmark"></span>
+                                Отметить как {{ field.label }}
+                            </label>
+
+                        {% else %}
+                            <input type="{{ field.type|default:'text' }}" 
+                                name="{{ field.field_key }}" 
+                                class="custom-input" 
+                                placeholder="{{ field.label }}"
+                                {% if field.is_required %}required{% endif %}>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if forloop.last %}
+                <div class="form-group options-group" style="grid-column: span 2; margin-top: 6px;">
+                    <div class="custom-options-row">
+                        <label class="modern-checkbox-label">
+                            <input type="checkbox" name="important" id="idImportant" value="true">
+                            <span class="modern-checkbox-box"></span>
+                            <i class="fa-solid fa-bolt" style="color: #ffc107;"></i> Срочный заказ
+                        </label>
+
+                        <label class="modern-checkbox-label">
+                            <input type="checkbox" name="prepay" id="idPrepay" value="true" onchange="togglePrepayInput(this)">
+                            <span class="modern-checkbox-box"></span>
+                            <i class="fa-solid fa-money-check-dollar" style="color: #2ecc71;"></i> Предоплата
+                        </label>
+                    </div>
+
+                    <div id="prepay-amount-container" class="prepay-amount-container" style="display: none; margin-top: 12px;">
+                        <label class="form-label">Сумма предоплаты (₽)</label>
+                        <input type="text" 
+                            name="prepay_amount" 
+                            id="prepay-amount-input" 
+                            class="custom-input" 
+                            placeholder="Например: 1 500" 
+                            autocomplete="off"
+                            oninput="formatMoneyInput(this)">
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+
+        {% empty %}
+        <div class="empty-form-msg">
+            <p>Форма создания заказа еще не настроена.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Зафиксированный футер -->
+    <div class="drawer-footer">
+        <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Отмена</button>
+        <button type="submit" class="btn-submit-order">Создать заказ</button>
+    </div>
+</form>

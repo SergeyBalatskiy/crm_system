@@ -5,81 +5,20 @@
     </button>
 </div>
 
-<form id="create-order-form" method="POST" action="{% url 'show_form' %}" class="drawer-form-body">
-    {% csrf_token %}
+<!-- Выпадающий селект выбора типа заказа -->
+<div class="type_of_order_select" style="padding: 15px 24px 0 24px;">
+    <label class="form-label" style="margin-bottom: 6px; display: block;">Тип заказа</label>
+    <select class="custom-select" id="form-select" name="type_of_order_selected" autocomplete="off"
+        hx-get="{% url 'show_form' %}"
+        hx-trigger="change" 
+        hx-target="#form-change"
+        hx-swap="innerHTML">
+        <option value="paid" {% if current_type == 'paid' %}selected{% endif %}>Платный</option>
+        <option value="warranty" {% if current_type == 'warranty' %}selected{% endif %}>Гарантийный</option>
+    </select>
+</div>
 
-    <!-- Прокручиваемая область с секциями -->
-    <div class="drawer-sections-wrapper">
-        {% for section in sections %}
-        <div class="form-section">
-            <h4 class="section-title">{{ section.title }}</h4>
-
-            <div class="section-fields">
-                {% for field in section.fields %}
-                    {% if field.field_key != 'empty_for_add' %}
-                    <div class="form-group" style="position: relative;"> <!-- Важно для позиционирования выпадающего списка -->
-                        <label class="form-label">
-                            {{ field.label }}
-                            {% if field.is_required %}<span class="req-star">*</span>{% endif %}
-                        </label>
-
-                        {% comment %} ЕСЛИ ЭТО ПОЛЕ ИМЕНИ ИЛИ ТЕЛЕФОНА — ДЕЛАЕМ ИХ ПОИСКОВЫМИ {% endcomment %}
-                        {% if field.field_key == 'name' or field.field_key == 'phone' %}
-                            <input type="text" 
-                                name="{{ field.field_key }}" 
-                                id="id_{{ field.field_key }}"
-                                class="custom-input client-search-input" 
-                                placeholder="Начните вводить {{ field.label|lower }}..."
-                                autocomplete="off"
-                                hx-get="{% url 'find_client' %}" 
-                                hx-trigger="keyup changed delay:300ms" 
-                                hx-target="#suggestions-{{ field.field_key }}" 
-                                hx-swap="innerHTML"
-                                {% if field.is_required %}required{% endif %}>
-
-                            <!-- Контейнер, куда HTMX подгрузит найденных клиентов -->
-                            <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
-
-                        {% elif field.type == 'select' %}
-                            <select name="{{ field.field_key }}" class="custom-select" {% if field.is_required %}required{% endif %}>
-                                <option value="">Выберите...</option>
-                                {% for hint in field.hints %}
-                                    <option value="{{ hint }}">{{ hint }}</option>
-                                {% endfor %}
-                            </select>
-
-                        {% elif field.type == 'textarea' %}
-                            <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}></textarea>
-
-                        {% elif field.type == 'checkbox' %}
-                            <label class="checkbox-container">
-                                <input type="checkbox" name="{{ field.field_key }}" value="true">
-                                <span class="checkmark"></span>
-                                Отметить как {{ field.label }}
-                            </label>
-
-                        {% else %}
-                            <input type="{{ field.type|default:'text' }}" 
-                                name="{{ field.field_key }}" 
-                                class="custom-input" 
-                                placeholder="{{ field.label }}"
-                                {% if field.is_required %}required{% endif %}>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                {% endfor %}
-            </div>
-        </div>
-        {% empty %}
-        <div class="empty-form-msg">
-            <p>Форма создания заказа еще не настроена.</p>
-        </div>
-        {% endfor %}
-    </div>
-
-    <!-- Зафиксированный футер -->
-    <div class="drawer-footer">
-        <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Отмена</button>
-        <button type="submit" class="btn-submit-order">Создать заказ</button>
-    </div>
-</form>
+<!-- Контейнер, в который подгружается форма из form_inner.html -->
+<div id="form-change">
+    {% include 'orders/form_inner/form_inner.html' %}
+</div>

@@ -162,7 +162,7 @@
     background: #27273a;
     padding: 16px;
     border-radius: 8px;
-    border: 1px solid #32324a;
+    border: 1px solid #7444e4;
 }
 
 .section-title {
@@ -200,7 +200,7 @@
     width: 100%;
     padding: 9px 12px;
     background: #1e1e2d;
-    border: 1px solid #3f3f5a;
+    border: 1px solid #fb0d00;
     border-radius: 6px;
     color: #fff;
     font-size: 0.9rem;
@@ -216,7 +216,7 @@
 
 .drawer-footer {
     padding: 16px 24px;
-    background: #151521;
+    background: #c9c9cb;
     border-top: 1px solid #2b2b40;
     display: flex;
     justify-content: flex-end;
@@ -235,6 +235,42 @@
     cursor: pointer;
 }
 
+.custom-autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-hints-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #151521;
+    border: 1px solid #f30808;
+    border-radius: 6px;
+    z-index: 1050;
+    max-height: 180px;
+    overflow-y: auto;
+    margin: 4px 0 0 0;
+    padding: 0;
+    list-style: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.custom-hints-dropdown li {
+    padding: 9px 12px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #2b2b40;
+}
+
+.custom-hints-dropdown li:hover {
+    background: #27273a;
+    color: #3699ff;
+}
+
 .btn-cancel {
     background: #2b2b40;
     color: #a2a3b7;
@@ -251,7 +287,7 @@
     left: 0;
     right: 0;
     background: #151521;
-    border: 1px solid #3f3f5a;
+    border: none;
     border-radius: 6px;
     z-index: 1050;
     max-height: 200px;
@@ -288,4 +324,86 @@
 .suggestion-item .client-phone {
     color: #3699ff;
     font-size: 0.85rem;
+}
+
+/* Контейнер для чекбоксов в ряд */
+.custom-options-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Современный стильный чекбокс */
+.modern-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: #e4e6ef;
+    user-select: none;
+    background: #1e1e2d;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #3f3f5a;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 140px;
+}
+
+.modern-checkbox-label:hover {
+    border-color: #3699ff;
+    background: #27273a;
+}
+
+.modern-checkbox-label input[type="checkbox"] {
+    display: none;
+    /* Скрываем стандартный неуклюжий чекбокс */
+}
+
+/* Кастомный квадратик */
+.modern-checkbox-box {
+    width: 18px;
+    height: 18px;
+    background: #151521;
+    border: 2px solid #3f3f5a;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+/* Состояние при чеке */
+.modern-checkbox-label input[type="checkbox"]:checked~.modern-checkbox-box {
+    background: #3699ff;
+    border-color: #3699ff;
+}
+
+.modern-checkbox-label input[type="checkbox"]:checked~.modern-checkbox-box::after {
+    content: "\f00c";
+    /* Иконка галочки FontAwesome */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
+}
+
+/* Плавное появление блока суммы предоплаты */
+.prepay-amount-container {
+    animation: fadeInPrepay 0.25s ease-in-out;
+}
+
+@keyframes fadeInPrepay {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

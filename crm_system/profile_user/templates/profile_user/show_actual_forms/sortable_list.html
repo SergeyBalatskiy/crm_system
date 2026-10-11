@@ -2,7 +2,7 @@
 <div class="fields-sortable-list" id="sortable-{{ objects_show.id }}" data-section-id="{{ objects_show.id }}">
     {% for obj in objects_show.fields %}
     <div class="field-pill" data-key="{{ obj.field_key }}">
-        <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
+        <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮</span>
         <div class="outer-wrapper">
             <span class="field-name">{{ obj.label }}</span>
             <!-- Кнопка удаления -->

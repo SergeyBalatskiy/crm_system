@@ -121,7 +121,7 @@ function insertFieldIntoSlot(categoryId, fieldKey, fieldLabel) {
     // Отрисовка только что созданной, но еще не прошедшей сохранение формы
     const pillHTML = `
 <div class="field-pill" data-key="${fieldKey}">
-    <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮⋮</span>
+    <span class="drag-handle" title="Зажмите, чтобы перетащить">⋮</span>
     <div class="outer-wrapper">
         <span class="field-name">${fieldLabel}</span>
         
