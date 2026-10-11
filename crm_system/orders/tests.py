@@ -1,3 +1,5 @@
-from django.test import TestCase
+x = {}
 
-# Create your tests here.
+x['123'] = 123
+x['124'] = 21
+print(x)

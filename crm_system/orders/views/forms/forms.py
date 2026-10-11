@@ -31,6 +31,8 @@ class ShowFormForOrder(View):
         get_forms = FormsForOrder.objects.filter(user=request.user, type_of_order=type_of_order_selected).first()
         section = get_forms.json_forms.get('sections')
 
+        print(section)
+
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         context = {'sections' : section, 'current_type': type_of_order_selected}
 
@@ -57,7 +59,64 @@ class ShowFormForOrder(View):
         # Если чекбокс отмечен, вернет True. Если не отмечен — False.
         important = 'important' in request.POST
 
+        # Если есть предоплата:
         prepay = request.POST.get('prepay')
-
         if prepay:
             prepay_amount = request.POST.get('prepay_amount')
+
+        # Тип заказа:
+        type_of_order_selected = request.POST.get('type_of_order_selected')
+
+        # Получаю конкретный обьект формы (по типу заказа)
+        get_json_forms = FormsForOrder.objects.filter(user=request.user, type_of_order=type_of_order_selected).first()
+
+        # Список для инофрмации о клиенте
+        client_info = {}
+        # Список о информации устройства
+        device_info = {}
+        # Список о прочей информации
+        bonus_info = {}
+
+        # Ну а этот словарь у меня для сохранения заявки на ремонт в саму БД (Orders > form_with_order_information)
+        json_field_for_order = {}
+
+        sections = get_json_forms.json_forms.get('sections')
+
+        # Получаю по каждому обьекту
+        for section in sections:
+            # ЗАПИСЫВАЮ В КЛИЕНТ ИНФО ВСЕ ПОЛЯ (ДАЖЕ ПУСТЫЕ И ТЕ КОТОРЫЕ ПРИШЛИ)
+            if section['id'] == 'client_info':
+                for field in section.get('fields'):
+                    key = field.get('field_key')
+
+                    if key in request.POST:
+                        client_info[key] = request.POST.get(key)
+                    else:
+                        client_info[key] = ''
+
+                json_field_for_order[section['id']] = client_info
+
+            # ЗАПИСЫВАЮ В ДЕВАЙС ИНФО ВСЕ ПОЛЯ (ДАЖЕ ПУСТЫЕ И ТЕ КОТОРЫЕ ПРИШЛИ)
+            if section['id'] == 'device_info':
+                for field in section.get('fields'):
+                    key = field.get('field_key')
+
+                    if key in request.POST:
+                        device_info[key] = request.POST.get(key)
+                    else:
+                        device_info[key] = ''
+
+                json_field_for_order[section['id']] = device_info
+
+            # ЗАПИСЫВАЮ В БОНУС ИНФОРМАТИОН ВСЕ ПОЛЯ (ДАЖЕ ПУСТЫЕ И ТЕ КОТОРЫЕ ПРИШЛИ)
+            if section['id'] == 'bonus_information':
+                for field in section.get('fields'):
+                    key = field.get('field_key')
+
+                    if key in request.POST:
+                        bonus_info[key] = request.POST.get(key)
+                    else:
+                        bonus_info[key] = ''
+
+                json_field_for_order[section['id']] = bonus_info
+

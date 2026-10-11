@@ -1,6 +1,7 @@
 <form method="POST" hx-post="{% url 'show_form' %}" id="create-order-form" class="drawer-form-body">
     {% csrf_token %}
-    <input type="hidden" name="type_of_order" value="{{ current_type }}">
+    {% comment %} Передается в обработчик POST также и тип заказа {% endcomment %}
+    <input type="hidden" name="type_of_order_selected" value="{{ current_type }}">
 
     <!-- Прокручиваемая область с секциями -->
     <div class="drawer-sections-wrapper">
