@@ -29,7 +29,6 @@ class StorageInfo(models.Model):
     def __str__(self):
         return f'Название: {self.name_product}, Кол-во: {self.remainder}, связан с {self.user.get_full_name()}'
 
-
 class HistoryStorageInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='history_storage')
     type_of_operation_history = models.CharField(max_length=120, null=True, blank=True) # Тип операции? (Поступление, списание, возврат)

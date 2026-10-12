@@ -30,16 +30,20 @@ class Client(models.Model):
 class Orders(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='list_orders')
 
-    # Статус / Тип заказа
-    status = models.CharField(max_length=60, db_index=True)
+    # Создаю статус для заказа
+    name_category = models.CharField(max_length=100)
+    color_category = models.CharField(max_length=100)
+    category_eng = models.CharField(max_length=100)
+
+    # Тип заказа
     type_of_order = models.CharField(max_length=20)
     
     # Менеджер (кто оформил заявку)
-    manager = models.ForeignKey(WorkersInfo, db_index=True, on_delete=models.PROTECT)
+    manager = models.CharField(db_index=True, null=True, blank=True, max_length=100)
 
     # Информация о клиенте: ФИО / Номер телефона
     client= models.ForeignKey(Client, models.PROTECT, related_name='client_order')
-    
+
     # Информация о девайсе (устройстве): Тип устройства / Цвет устройства / Название устройства / Проблема с устройством 
     device_type = models.CharField(max_length=40, db_index=True) # Тип устройства: Телефон, Планшет, Ноутбук и т.д.
     color_of_device = models.CharField(max_length=40, db_index=True)
@@ -50,7 +54,7 @@ class Orders(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
 
     # Крайний срок:
-    dealdine = models.DateTimeField(null=True, blank=True)
+    deadline = models.DateTimeField(null=True, blank=True)
 
     # Само поле для JSON-форм и данных внутри неё:
     form_with_order_information = models.JSONField()
@@ -60,10 +64,10 @@ class Orders(models.Model):
 
     # Указываю предоплату, если галочка была выбрана в самой форме: (Decimalfield чтобы потом
     # добавлять в историю транзакций: ВНЕСЕНИЕ > Прочее > Предоплата)
-    prepay = models.DecimalField(default=0, decimal_places=0, max_digits=11)
+    prepay = models.DecimalField(decimal_places=0, max_digits=11)
 
     def __str__(self):
-        return f'Статус: {self.status}, Менеджер: {self.manager}, ФИО клиента: {self.client_name}, Номер: {self.client_phone}, Название девайса: {self.name_of_device}, Проблема с девайсом: {self.problem_with_device}, Был создан: {self.created_at}, Поле c JSON-формами: {self.form_with_order_information}'
+        return f'Статус: {self.name_category}, Менеджер: {self.manager}, ФИО клиента: {self.client.name}, Номер: {self.client.phone}, Название девайса: {self.name_of_device}, Проблема с девайсом: {self.problem_with_device}, Был создан: {self.created_at}, Поле c JSON-формами: {self.form_with_order_information}.'
 
 
 

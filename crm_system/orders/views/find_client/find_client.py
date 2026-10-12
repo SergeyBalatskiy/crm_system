@@ -30,17 +30,17 @@ class FindClientInformation(View):
         main_q = Q()
 
         # Поиск по "названию" клиента
-        name_client = request.GET.get('name_client', '').strip()
+        name_client = request.GET.get('name', '').strip()
         if name_client:
             main_q &= Q(name__icontains=name_client)
 
         # Поиск по телефону
-        phone_client = request.GET.get('phone_client', '').strip()
+        phone_client = request.GET.get('phone', '').strip()
         if phone_client:
             main_q &=Q(phone__icontains=phone_client)
 
         if not name_client and not phone_client:
-            qs=qs.none()
+            qs=qs
         else:
             # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
             qs = qs.filter(main_q)

@@ -67,19 +67,13 @@ class ShowAndFilterOrders(View):
             manager_fullname2=Concat('manager__name', Value(' '), 'manager__surname'),
             id_str=Cast('id', output_field=TextField()))
 
-        # Поиск по типу операции
-        status = request.GET.get('selected_order_status')
+        # Поиск по статусу заказа
+        status = request.GET.get('search_status_order')
         if status:
-
-            # {"name": "На ремонте", "color": "#ac03f4", "category":"in_process"},
-            # {"name": "На согласовании", "color": "#ff8c00", "category":"deferred"},
-            # {"name": "Готов", "color": "#2ecc71", "category":"success"},
-            # {"name": "Отказ", "color": "#e74c3c", "category":"finished"},
-
             """Суть заключается в том, что выбранный нами статус уже и будет нести в себе нужный для нас фильтр в БД"""
-            # С POST-запроса может прийти следующий статус (от status = request.GET.get('selected_order_status')):  
+            # С POST-запроса может прийти следующий статус (от status = request.GET.get('search_status_order')):  
             # in_process, deferred, success, finished
-            main_q &= Q(status=status)
+            main_q &= Q(category_eng=status)
 
         # Поиск по "Быстрому поиску"
         fast_search = request.GET.get('fast_search_all', '').strip()
@@ -116,3 +110,4 @@ class ShowAndFilterOrders(View):
         context = {'orders': qs}
 
         return render(request, 'orders/orders.html', context)
+

@@ -108,3 +108,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
+
+function handleClientFocus(currentInput) {
+    // Определяем, какое поле сейчас в фокусе, а какое — соседнее
+    const fieldName = currentInput.name;
+    const oppositeFieldKey = fieldName === 'name' ? 'phone' : 'name';
+
+    // Находим блок подсказок противоположного поля и очищаем его
+    const oppositeDropdown = document.getElementById('suggestions-' + oppositeFieldKey);
+    if (oppositeDropdown) {
+        oppositeDropdown.innerHTML = '';
+    }
+}

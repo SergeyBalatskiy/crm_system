@@ -26,9 +26,10 @@
                                 placeholder="Начните вводить {{ field.label|lower }}..."
                                 autocomplete="off"
                                 hx-get="{% url 'find_client' %}" 
-                                hx-trigger="keyup changed delay:300ms" 
+                                hx-trigger="focus, keyup changed delay:300ms" 
                                 hx-target="#suggestions-{{ field.field_key }}" 
                                 hx-swap="innerHTML"
+                                onfocus="handleClientFocus(this)"
                                 {% if field.is_required %}required{% endif %}>
 
                             <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
