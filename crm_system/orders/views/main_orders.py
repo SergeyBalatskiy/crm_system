@@ -45,7 +45,7 @@ class ShowAndFilterOrders(View):
         print(qs)
 
         # Если у нас НЕ пришел запрос через AJAX (или HTMX) — отдаем ТОЛЬКО кусок со списком
-        if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        if not request.headers.get('HX-Request'):
             context = {'orders' : qs}
             return render(request, 'orders/orders.html', context)
         
@@ -65,8 +65,6 @@ class ShowAndFilterOrders(View):
         В быстром поиске он позволит опираясь на определенный обьект по айдишнику, доставать сразу же действующую фамилию, имя и 
         потом тут же выдавать нужный нам результат"""
         qs = qs.annotate(
-            manager_fullname1=Concat('manager__surname', Value(' '), 'manager__name'),
-            manager_fullname2=Concat('manager__name', Value(' '), 'manager__surname'),
             id_str=Cast('id', output_field=TextField()))
 
         # Поиск по статусу заказа
@@ -77,6 +75,11 @@ class ShowAndFilterOrders(View):
             # in_process, deferred, success, finished
             main_q &= Q(category_eng=status)
 
+        # Поиск по типу заказа (ПЛАТНЫЙ / ГАРАНТИЙНЫЙ)
+        type_of_order_selected = request.GET.get('type_of_order_selected', '')
+        if type_of_order_selected:
+            main_q &= Q(type_of_order = type_of_order_selected)
+
         # Поиск по "Быстрому поиску"
         fast_search = request.GET.get('fast_search_all', '').strip()
         if fast_search:
@@ -84,12 +87,10 @@ class ShowAndFilterOrders(View):
             # Тут у меня в будущем будет фильтр по определенным полям...
             text_q = (
                 Q(id_str__icontains=fast_search) | 
-                Q(type_of_order__icontains=fast_search) |
                 Q(manager__icontains=fast_search) |
                 Q(client__name__icontains=fast_search) | 
                 Q(client__phone__icontains=fast_search) |
-                Q(manager_fullname1__icontains=fast_search) |
-                Q(manager_fullname2__icontains=fast_search) |
+                Q(manager__icontains=fast_search) |
                 Q(device_type__icontains=fast_search) |
                 Q(color_of_device__icontains=fast_search) |
                 Q(name_of_device__icontains=fast_search) | 
@@ -109,5 +110,5 @@ class ShowAndFilterOrders(View):
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         qs = qs.filter(main_q)
         context = {'orders': qs}
-        return render(request, 'orders/orders.html', context)
+        return render(request, 'orders/partials/orders_list.html', context)
 

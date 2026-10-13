@@ -120,3 +120,51 @@ function handleClientFocus(currentInput) {
         oppositeDropdown.innerHTML = '';
     }
 }
+
+function toggleDateRange(select) {
+    const rangeWrapper = document.getElementById('custom-date-range');
+    if (select.value === 'custom') {
+        rangeWrapper.classList.remove('hidden');
+    } else {
+        rangeWrapper.classList.add('hidden');
+        // Очищаем интуитивно даты при скрытии, чтобы не мешали фильтрации
+        document.getElementById('date_start_input').value = '';
+        document.getElementById('date_end_input').value = '';
+        // Триггерим событие change на форме, чтобы HTMX отправил запрос сброса дат
+        htmx.trigger('#filter-form', 'change');
+    }
+}
+
+function resetDateRange() {
+    const select = document.getElementById('history_date_select');
+    select.value = '';
+    toggleDateRange(select);
+}
+
+// Автоматически очищаем форму при обычной загрузке/перезагрузке страницы, если в URL нет параметров
+document.addEventListener("DOMContentLoaded", function () {
+    if (!window.location.search) {
+        const form = document.getElementById('filter-form');
+        if (form) {
+            form.reset();
+        }
+    }
+});
+
+function toggleDateRange(select) {
+    const rangeWrapper = document.getElementById('custom-date-range');
+    if (select.value === 'custom') {
+        rangeWrapper.classList.remove('hidden');
+    } else {
+        rangeWrapper.classList.add('hidden');
+        document.querySelector('input[name="date_start_input"]').value = '';
+        document.querySelector('input[name="date_end_input"]').value = '';
+        htmx.trigger('#filter-form', 'change');
+    }
+}
+
+function resetDateRange() {
+    const select = document.getElementById('history_date_select');
+    select.value = '';
+    toggleDateRange(select);
+}

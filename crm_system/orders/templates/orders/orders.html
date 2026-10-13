@@ -3,166 +3,87 @@
 
 {% block content %}
 
-<!-- Оверлей (затемнение фона при открытии) -->
+<!-- Оверлей (затемнение фона) -->
 <div id="drawer-overlay" class="drawer-overlay" onclick="closeOrderDrawer()"></div>
 
-<!-- Боковая шторка (Drawer) на 1/4 экрана справа -->
+<!-- Выезжающая шторка -->
 <div id="order-drawer" class="order-drawer">
-    <div id="drawer-content-loader">
-        <!-- Сюда HTMX подгрузит orders/forms/forms.html -->
-    </div>
+    <div id="drawer-content-loader"></div>
 </div>
 
-<div class="div-place-orders">
-    <div class="div-box-orders">
+<div class="crm-orders-wrapper">
+    <div class="crm-orders-container">
 
-        <!-- Шапка -->
-        <div class="order-header">
-            <h2>Заказы</h2>
-            {% if orders %}
-            <span class="order-count">Заказов всего: {{ orders|length }}</span>
-            {% endif %}
+        <!-- Верхняя панель управления -->
+        <div class="crm-top-panel">
+            <div class="crm-title-block">
+                <h2>Управление заказами</h2>
+                <span class="crm-counter">Активных: {{ orders|length }}</span>
+            </div>
 
-            <!-- Кнопка вызова формы через HTMX -->
             <button type="button" 
-                    class="btn-create-order"
+                    class="crm-btn-create"
                     hx-get="{% url 'show_form' %}" 
                     hx-target="#drawer-content-loader" 
                     hx-swap="innerHTML"
                     onclick="openOrderDrawer()">
-                <i class="fa-solid fa-plus"></i> Создать заказ
+                <i class="fa-solid fa-plus-circle"></i> Новая заявка
             </button>
         </div>
 
-        <!-- Панель фильтров -->
-        <form id="filter-form" method="GET" action="{% url 'orders' %}" class="filter-toolbar">
+        <!-- Панель фильтров (интерактивная) -->
+        <form id="filter-form" method="GET" action="{% url 'orders' %}" class="crm-filter-bar"
+              hx-get="{% url 'orders' %}"
+              hx-trigger="input changed delay:300ms, change"
+              hx-target="#orders-container"
+              hx-push-url="false"
+              hx-swap="innerHTML">
             
-            <!-- Поле быстрый поиск -->
-            <div class="search-input-wrapper">
-                <i class="fa-solid fa-magnifying-glass search-icon"></i>
-                <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по заказчику, устройству, неисправности..." autocomplete="off">
+            <!-- Поиск -->
+            <div class="crm-search-box">
+                <i class="fa-solid search-icon fa-magnifying-glass"></i>
+                <input type="text" name="fast_search_all" value="{{ request.GET.fast_search_all }}" placeholder="Поиск по клиенту, телефону, модели или ID..." autocomplete="new-password">
             </div>
 
-            <!-- Селект статуса заказа -->
-            <select class="custom-select" id="select_status_order" name="search_status_order" autocomplete="off">
-                <option value="">Все типы статусов заказа</option>
-                <option value="in_process">На ремонте</option>
-                <option value="deferred">На согласовании</option>
-                <option value="success">Готов</option>
-                <option value="finished">Завершен</option>
-                <option value="new">Новый</option>
+            <!-- Тип заказа -->
+            <select class="crm-select" name="type_of_order_selected" autocomplete="new-password">
+                <option value="">Все типы</option>
+                <option value="paid" {% if request.GET.type_of_order_selected == 'paid' %}selected{% endif %}>Платный</option>
+                <option value="warranty" {% if request.GET.type_of_order_selected == 'warranty' %}selected{% endif %}>Гарантийный</option>
             </select>
 
-            <!-- ГИБРИДНЫЙ БЛОК ДАТЫ -->
-            <div class="date-filter-container">
-                
-                <!-- 1. Селект быстрых пресетов -->
-                <select class="custom-select" id="history_date_select" name="search_date_operation" autocomplete="off">
+            <!-- Статус -->
+            <select class="crm-select" name="search_status_order" autocomplete="new-password">
+                <option value="">Все статусы</option>
+                <option value="in_process" {% if request.GET.search_status_order == 'in_process' %}selected{% endif %}>На ремонте</option>
+                <option value="deferred" {% if request.GET.search_status_order == 'deferred' %}selected{% endif %}>На согласовании</option>
+                <option value="success" {% if request.GET.search_status_order == 'success' %}selected{% endif %}>Готов</option>
+                <option value="finished" {% if request.GET.search_status_order == 'finished' %}selected{% endif %}>Завершен</option>
+                <option value="new" {% if request.GET.search_status_order == 'new' %}selected{% endif %}>Новый</option>
+            </select>
+
+            <!-- Даты -->
+            <div class="crm-date-wrapper">
+                <select class="crm-select" id="history_date_select" name="search_date_operation" autocomplete="new-password" onchange="toggleDateRange(this)">
                     <option value="">За всё время</option>
-                    <option value="date_today">Сегодня</option>
-                    <option value="date_yesterday">Вчера</option>
-                    <option value="date_this_week">За эту неделю</option>
-                    <option value="date_this_month">За месяц</option>
-                    <option value="custom">📅 Указать период...</option>
+                    <option value="date_today" {% if request.GET.search_date_operation == 'date_today' %}selected{% endif %}>Сегодня</option>
+                    <option value="date_yesterday" {% if request.GET.search_date_operation == 'date_yesterday' %}selected{% endif %}>Вчера</option>
+                    <option value="date_this_week" {% if request.GET.search_date_operation == 'date_this_week' %}selected{% endif %}>За неделю</option>
+                    <option value="custom" {% if request.GET.search_date_operation == 'custom' %}selected{% endif %}>📅 Период...</option>
                 </select>
 
-                <!-- 2. Календарь (От... До...) - по умолчанию скрыт -->
-                <div class="date-range-wrapper hidden" id="custom-date-range">
-                    <div class="date-field">
-                        <label for="date_start_input">От:</label>
-                        <input type="date" name="date_start_input" id="date_start_input" class="date-input" autocomplete="off">
-                    </div>
-                    <div class="date-field">
-                        <label for="date_end_input">До:</label>
-                        <input type="date" name="date_end_input" id="date_end_input" class="date-input" autocomplete="off">
-                    </div>
-                    <!-- Кнопка сброса обратно на селект -->
-                    <button type="button" class="btn-reset-date" id="btn-reset-date" title="Вернуться к быстрым фильтрам">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
+                <div class="crm-custom-dates {% if not request.GET.date_start_input and request.GET.search_date_operation != 'custom' %}hidden{% endif %}" id="custom-date-range">
+                    <input type="date" name="date_start_input" value="{{ request.GET.date_start_input }}" class="crm-date-input" autocomplete="new-password">
+                    <input type="date" name="date_end_input" value="{{ request.GET.date_end_input }}" class="crm-date-input" autocomplete="new-password">
+                    <button type="button" class="crm-date-reset" onclick="resetDateRange()"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-
             </div>
-
         </form>
 
-       <!-- Контейнер со списком карточек -->
-        {% for i in orders %}
-        <div class='place'>
-            Код: {{i.id}}
-            Статус: {{i.name_category}}
-            Крайний срок: {{i.deadline}}
-            Менеджер: {{i.manager}}
-            Создан: {{ i.created_at }}
-            Тип заказа: {{i.type_of_order}}
-            Тип устройства: {{i.device_type}}
-            Устройство: {{i.name_of_device}}
-            Неисправность: {{i.problem_with_device}}
-            Контрагент: {{i.cliemt.name}} / {{i.client.phone}}
+        <!-- Сетка карточек заказов (сюда HTMX подгружает только список) -->
+        <div id="orders-container" class="crm-cards-scroll">
+            {% include "orders/partials/orders_list.html" %}
         </div>
-        {% endfor %}
-
-{% comment %} 
-# Данная модель хранит в себе всех клиентов которые хотя бы раз обращались к нам
-class Client(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_for_order')
-    name = models.CharField(max_length=200, db_index=True)
-    phone = models.CharField(max_length=45, db_index=True)
-
-    class Meta:
-        # Говорю, что два поля должны быть уникальны в рамках строго этого пользователя!
-        unique_together = ('user' , 'phone')
-
-# Данная модель позволяет создать заявку с важными параметрами внутри нее 
-class Orders(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='list_orders')
-
-    # Создаю статус для заказа
-    name_category = models.CharField(max_length=100, default='Новый')
-    color_category = models.CharField(max_length=100, default='#3498db')
-    category_eng = models.CharField(max_length=100, default='new')
-
-    # Тип заказа
-    type_of_order = models.CharField(max_length=20)
-    
-    # Менеджер (кто оформил заявку)
-    manager = models.CharField(db_index=True, null=True, blank=True, max_length=100)
-
-    # Информация о клиенте: ФИО / Номер телефона
-    client= models.ForeignKey(Client, models.PROTECT, related_name='client_order')
-
-    # Информация о девайсе (устройстве): Тип устройства / Цвет устройства / Название устройства / Проблема с устройством 
-    device_type = models.CharField(max_length=40, db_index=True) # Тип устройства: Телефон, Планшет, Ноутбук и т.д.
-    color_of_device = models.CharField(max_length=40, db_index=True)
-    name_of_device = models.CharField(max_length=150, db_index=True)
-    problem_with_device = models.CharField(max_length=150, db_index=True)
-
-    # Было создано:
-    created_at = models.DateTimeField(default=timezone.now)
-
-    # Крайний срок:
-    deadline = models.DateTimeField(null=True, blank=True)
-
-    # Само поле для JSON-форм и данных внутри неё:
-    form_with_order_information = models.JSONField()
-
-    # Булево значение для: СРОЧНО
-    important = models.BooleanField(default=False)
-
-    # Указываю предоплату, если галочка была выбрана в самой форме: (Decimalfield чтобы потом
-    # добавлять в историю транзакций: ВНЕСЕНИЕ > Прочее > Предоплата)
-    prepay = models.DecimalField(decimal_places=0, max_digits=11)
-
-    def __str__(self):
-        return f'Статус: {self.name_category}, Менеджер: {self.manager}, ФИО клиента: {self.client.name}, Номер: {self.client.phone}, Название девайса: {self.name_of_device}, Проблема с девайсом: {self.problem_with_device}, Был создан: {self.created_at}, Поле c JSON-формами: {self.form_with_order_information}.'
-
-
-
-     {% endcomment %}
-
-    
-
-
 
     </div>
 </div>

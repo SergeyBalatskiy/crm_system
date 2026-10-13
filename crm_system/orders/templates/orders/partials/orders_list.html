@@ -1,0 +1,60 @@
+{% if orders %}
+    <div class="crm-cards-grid">
+        {% for i in orders %}
+        <div class="crm-order-card">
+            
+            <!-- Верх карточки: ID и Статус -->
+            <div class="crm-card-header">
+                <div class="crm-id-block">
+                    <span class="card-id">#{{ i.id }}</span>
+                    {% if i.type_of_order == 'paid' %}
+                        <span class="card-type-tag">Платный</span>
+                    {% else %}
+                         <span class="card-type-tag">Гарантийный</span>
+                    {% endif %}
+                </div>
+                
+                <div class="crm-status-badges">
+                    {% if i.important %}
+                    <span class="badge-urgent" title="Срочный заказ"><i class="fa-solid fa-bolt"></i> Срочно</span>
+                    {% endif %}
+                    <span class="card-status" style="background: {{ i.color_category|default:'#3699ff' }}15; color: {{ i.color_category|default:'#3699ff' }}; border: 1px solid {{ i.color_category|default:'#3699ff' }}30;">
+                        {{ i.name_category|default:"Новый" }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Основная информация по устройству -->
+            <div class="crm-card-body">
+                <div class="device-info-row">
+                    <i class="fa-solid fa-laptop-code device-ico"></i>
+                    <div>
+                        <h4 class="device-name">{{ i.name_of_device }}</h4>
+                        <p class="device-issue"><span>Проблема:</span> {{ i.problem_with_device }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Нижняя плашка: Клиент, Менеджер, Дата -->
+            <div class="crm-card-footer">
+                <div class="footer-client-info">
+                    <i class="fa-regular fa-user"></i>
+                    <span class="client-name">{{ i.client.name }}</span>
+                    <span class="client-phone">({{ i.client.phone }})</span>
+                </div>
+
+                <div class="footer-meta-info">
+                    <span class="meta-manager"><i class="fa-solid fa-user-tie"></i> {{ i.manager|default:"Не назначен" }}</span>
+                    <span class="meta-date"><i class="fa-regular fa-clock"></i> {{ i.created_at|date:"d.m H:i" }}</span>
+                </div>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="crm-empty-state">
+        <i class="fa-solid fa-box-open"></i>
+        <p>Заказы не найдены или еще не созданы</p>
+    </div>
+{% endif %}
