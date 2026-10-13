@@ -8,14 +8,6 @@ from auth_registration.models import Users
 
 User = get_user_model()
 
-# В случае удаления сотрудника, который связан с этим обьектом, менеджером записывается владелец!
-def get_main_user(request):
-    get_main_user = Users.objects.filter(user=request.user)
-    return f'{get_main_user.firs_name} {get_main_user.last_name}'
-
-def return_deleted_info():
-    return 'Пользователь был удален'
-
 # Данная модель хранит в себе всех клиентов которые хотя бы раз обращались к нам
 class Client(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='users_for_order')
@@ -31,9 +23,9 @@ class Orders(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='list_orders')
 
     # Создаю статус для заказа
-    name_category = models.CharField(max_length=100)
-    color_category = models.CharField(max_length=100)
-    category_eng = models.CharField(max_length=100)
+    name_category = models.CharField(max_length=100, default='Новый')
+    color_category = models.CharField(max_length=100, default='#3498db')
+    category_eng = models.CharField(max_length=100, default='new')
 
     # Тип заказа
     type_of_order = models.CharField(max_length=20)

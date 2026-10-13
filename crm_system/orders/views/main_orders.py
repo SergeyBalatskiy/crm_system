@@ -42,6 +42,8 @@ class ShowAndFilterOrders(View):
         # Фильтрую по самому свежему заказу!
         qs = Orders.objects.filter(user=request.user).order_by('-created_at')
 
+        print(qs)
+
         # Если у нас НЕ пришел запрос через AJAX (или HTMX) — отдаем ТОЛЬКО кусок со списком
         if not request.headers.get('x-requested-with') == 'XMLHttpRequest':
             context = {'orders' : qs}
@@ -106,8 +108,6 @@ class ShowAndFilterOrders(View):
         
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         qs = qs.filter(main_q)
-
         context = {'orders': qs}
-
         return render(request, 'orders/orders.html', context)
 
