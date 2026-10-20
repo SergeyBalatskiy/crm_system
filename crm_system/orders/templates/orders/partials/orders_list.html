@@ -1,17 +1,14 @@
+{% load phone_filters %}
 {% if orders %}
     <div class="crm-cards-grid">
         {% for i in orders %}
         <div class="crm-order-card">
             
-            <!-- Верх карточки: ID и Статус -->
+            <!-- Шапка карточки -->
             <div class="crm-card-header">
                 <div class="crm-id-block">
                     <span class="card-id">#{{ i.id }}</span>
-                    {% if i.type_of_order == 'paid' %}
-                        <span class="card-type-tag">Платный</span>
-                    {% else %}
-                         <span class="card-type-tag">Гарантийный</span>
-                    {% endif %}
+                    <span class="card-type-tag">{{ i.type_of_order|upper }}</span>
                 </div>
                 
                 <div class="crm-status-badges">
@@ -24,23 +21,27 @@
                 </div>
             </div>
 
-            <!-- Основная информация по устройству -->
+            <!-- Основной контент (Фиксированная высота) -->
             <div class="crm-card-body">
                 <div class="device-info-row">
                     <i class="fa-solid fa-laptop-code device-ico"></i>
-                    <div>
-                        <h4 class="device-name">{{ i.name_of_device }}</h4>
-                        <p class="device-issue"><span>Проблема:</span> {{ i.problem_with_device }}</p>
+                    <div class="device-text-block">
+                        <h4 class="device-name" title="{{ i.name_of_device }}">{{ i.name_of_device }}</h4>
+                        <div class="device-issue-wrapper">
+                            <p class="device-issue" title="{{ i.problem_with_device }}">
+                                <span>Проблема:</span> {{ i.problem_with_device }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Нижняя плашка: Клиент, Менеджер, Дата -->
+            <!-- Прижатый к низу Футер -->
             <div class="crm-card-footer">
                 <div class="footer-client-info">
                     <i class="fa-regular fa-user"></i>
                     <span class="client-name">{{ i.client.name }}</span>
-                    <span class="client-phone">({{ i.client.phone }})</span>
+                    <span class="client-phone">{{ i.client.phone|format_phone }}</span>
                 </div>
 
                 <div class="footer-meta-info">
