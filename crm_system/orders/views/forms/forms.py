@@ -31,10 +31,6 @@ class ShowFormForOrder(View):
         get_forms = FormsForOrder.objects.filter(user=request.user, type_of_order=type_of_order_selected).first()
         section = get_forms.json_forms.get('sections')
 
-        for i in section:
-            print(i)
-            print()
-
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         context = {'sections' : section, 'current_type': type_of_order_selected}
 

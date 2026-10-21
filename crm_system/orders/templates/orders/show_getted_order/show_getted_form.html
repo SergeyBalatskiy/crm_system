@@ -1,0 +1,66 @@
+<form method="POST" hx-post="{% url 'client_order' %}?get_id_order={{ get_order.id }}" id="edit-order-form" class="drawer-form-body">
+    {% csrf_token %}
+
+    <!-- Шапка шторки -->
+    <div class="drawer-header">
+        <h3><i class="fa-solid fa-pen-to-square"></i> Заявка #{{ get_order.id }}</h3>
+        <button type="button" class="btn-close-drawer" onclick="closeOrderDrawer()">
+            <i class="fa-solid fa-xmark"></i>
+        </button>
+    </div>
+
+    <!-- Прокручиваемая область с секциями -->
+    <div class="drawer-sections-wrapper">
+        
+        <!-- Секция: Тип заказа -->
+        <div class="form-section">
+            <h4 class="section-title">Тип заказа</h4>
+            <div class="form-group">
+                <select class="custom-select" name="type_of_order">
+                    <option value="paid" {% if get_order.type_of_order == 'paid' %}selected{% endif %}>Платный</option>
+                    <option value="warranty" {% if get_order.type_of_order == 'warranty' %}selected{% endif %}>Гарантийный</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Секция: Клиент -->
+        <div class="form-section">
+            <h4 class="section-title">Клиент</h4>
+            <div class="section-fields">
+                <div class="form-group">
+                    <label class="form-label">Имя клиента</label>
+                    <input type="text" name="client_name" value="{{ get_order.client.name }}" class="custom-input" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Телефон</label>
+                    <input type="text" name="client_phone" value="{{ get_order.client.phone }}" class="custom-input" autocomplete="off">
+                </div>
+            </div>
+        </div>
+
+        <!-- Секция: Устройство и неисправности -->
+        <div class="form-section">
+            <h4 class="section-title">Устройство и неисправности</h4>
+            <div class="section-fields">
+                <div class="form-group">
+                    <label class="form-label">Название девайса</label>
+                    <input type="text" name="name_of_device" value="{{ get_order.name_of_device }}" class="custom-input">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label class="form-label">Проблема с девайсом</label>
+                    <textarea name="problem_with_device" class="custom-textarea" rows="3">{{ get_order.problem_with_device }}</textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Дополнительные поля (если у тебя данные хранятся в JSON словаре get_order.form_with_order_information) -->
+        <!-- Можешь вывести их аналогично через подстановку значений -->
+
+    </div>
+
+    <!-- Зафиксированный футер с кнопкой сохранения -->
+    <div class="drawer-footer">
+        <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Отмена</button>
+        <button type="submit" class="btn-submit-order">Сохранить изменения</button>
+    </div>
+</form>
