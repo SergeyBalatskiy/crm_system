@@ -69,6 +69,7 @@
                     <option value="date_today" {% if request.GET.search_date_operation == 'date_today' %}selected{% endif %}>Сегодня</option>
                     <option value="date_yesterday" {% if request.GET.search_date_operation == 'date_yesterday' %}selected{% endif %}>Вчера</option>
                     <option value="date_this_week" {% if request.GET.search_date_operation == 'date_this_week' %}selected{% endif %}>За неделю</option>
+                    <option value="date_this_week" {% if request.GET.search_date_operation == 'date_this_month' %}selected{% endif %}>За месяц</option>
                     <option value="custom" {% if request.GET.search_date_operation == 'custom' %}selected{% endif %}>📅 Период...</option>
                 </select>
 

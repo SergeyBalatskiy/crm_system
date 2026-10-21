@@ -15,6 +15,7 @@ import json
 from django.db.models.functions import Cast
 from django.shortcuts import render
 from django.db.models import Q, Value
+from django.utils import timezone
 from django.db.models.functions import Concat
 
 # Данный класс отвечает за показ всех созданных заявок на ремонт (orders) + фильтр через уже знакомый метод
@@ -24,8 +25,6 @@ class ShowAndFilterOrders(View):
     # Надо еще подумать над тем, нужна ли она вообще здесь...
     @staticmethod
     def htmx_toast_error(message):
-        print('Сработала функция ерор')
-        print(message)
         """Возвращает 204 No Content"""
         response = HttpResponse(status=204)
         response['HX-Trigger'] = json.dumps({
@@ -41,8 +40,6 @@ class ShowAndFilterOrders(View):
         # Получаю абсолютно все заявки на ремонт (Действующие / Готовые / Выданные / Отложенные)
         # Фильтрую по самому свежему заказу!
         qs = Orders.objects.filter(user=request.user).order_by('-created_at')
-
-        print(qs)
 
         # Если у нас НЕ пришел запрос через AJAX (или HTMX) — отдаем ТОЛЬКО кусок со списком
         if not request.headers.get('HX-Request'):
@@ -97,6 +94,23 @@ class ShowAndFilterOrders(View):
                 Q(problem_with_device__icontains=fast_search))
                 # Привязываю к глобальному поиску
             main_q &=text_q
+
+        # Поиск по дате
+        date_selected = request.GET.get('search_date_operation')
+        if date_selected:
+            # Получение точного момента времени
+            now = timezone.now()
+            # Получение только даты (без времени)
+            today = now.date()
+            # Словарь с датами в зависимости от выбранного дня
+            dates_dict = {'date_today' : (today, now), 
+                        'date_yesterday' : (today - timedelta(days=1), today),
+                        'date_this_week' : (today - timedelta(days=7), now),
+                        'date_this_month' : (today - timedelta(days=30), now)
+                        }
+            date_finded = dates_dict.get(date_selected)
+            if date_finded:
+                main_q &= Q(created_at__range=date_finded)
 
         # Поиск по дате (состоит из СТАРТ и ФИНИШ)
         date_start_input = request.GET.get('date_start_input')
