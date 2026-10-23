@@ -17,6 +17,7 @@ from django.shortcuts import render
 from django.db.models import Q, Value
 from django.utils import timezone
 from django.db.models.functions import Concat
+from profile_user.models import FormsForOrder
 
 # Данный класс отвечает за показ конкретной информации о клиенте (о заказе)
 @method_decorator([login_required, never_cache], name='dispatch') 
@@ -26,10 +27,37 @@ class ShowClientOrder(View):
     def get(self, request, *args, **kwargs):
         get_id_order = request.GET.get('get_id_order')
         get_order = Orders.objects.filter(user = request.user, id=get_id_order).first()
-        context = {"get_order":get_order}
+
+        # Получаю действующую форму из Базы данных
+        get_original_form = FormsForOrder.objects.filter(user=request.user).first()
+        sections = get_original_form.json_forms.get('sections', [])
+
+        # Получаю уже введенные данные из созданной заявки в базе данных
+        saved_data = get_order.form_with_order_information.get('order_dict')
+        # "Упаковываю" каждые из элементов в словарь(чтобы можно было потом просто достать)
+        saved_map = {block['id']: block for block in saved_data}
+
+        # Прохожусь индивидуально по каждому обьекту из формы из базы данных (актуальной)
+        for section in sections:
+            # После того как взял обьект - мне нужно у этого обьекта запомнить айди его 
+            sec_id = section.get('id')
+            # Получаю именно обьект с уже введенными данными благодаря айдишнику из БД!
+            sec_saved_values = saved_map.get(sec_id, [])
+            for field in section.get('fields'):
+                f_key = field.get('field_get')
+                field['value'] = sec_saved_values.get(f_key)
+
         print(get_order)
+        print('0000')
+
+
+        context = {
+            'get_order' : get_order,
+            'sections' : sections,
+            'current_type' : get_order.type_of_order
+        }
         return render(request, 'orders/show_getted_order/show_getted_form.html', context)
-        
+
     # Отвечает за принятие каких-либо изменений(и их сохранение) в заявке
     @transaction.atomic
     def post(self, request, *args, **kwargs):

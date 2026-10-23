@@ -23,42 +23,69 @@
             </div>
         </div>
 
-        <!-- Секция: Клиент -->
+        <!-- Рендерим секции и поля точно так же, как в форме создания, но подставляем value -->
+        {% for section in sections %}
         <div class="form-section">
-            <h4 class="section-title">Клиент</h4>
+            <h4 class="section-title">{{ section.title }}</h4>
+
             <div class="section-fields">
-                <div class="form-group">
-                    <label class="form-label">Имя клиента</label>
-                    <input type="text" name="client_name" value="{{ get_order.client.name }}" class="custom-input" autocomplete="off">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Телефон</label>
-                    <input type="text" name="client_phone" value="{{ get_order.client.phone }}" class="custom-input" autocomplete="off">
-                </div>
+                {% for field in section.fields %}
+                    {% if field.field_key != 'empty_for_add' %}
+                    <div class="form-group" style="position: relative;">
+                        <label class="form-label">
+                            {{ field.label }}
+                            {% if field.is_required %}<span class="req-star">*</span>{% endif %}
+                        </label>
+
+                        <!-- Проверяем тип поля и выводим с уже готовым значением (field.value) -->
+                        {% if field.type == 'textarea' %}
+                            <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}>{{ field.value }}</textarea>
+
+                        {% elif field.hints %}
+                            <div class="custom-autocomplete-wrapper">
+                                <input type="text" 
+                                    name="{{ field.field_key }}" 
+                                    value="{{ field.value }}"
+                                    class="custom-input hint-input" 
+                                    placeholder="Выберите или введите..."
+                                    autocomplete="off"
+                                    onfocus="showHints(this)"
+                                    oninput="filterHints(this)"
+                                    {% if field.is_required %}required{% endif %}>
+
+                                <ul class="custom-hints-dropdown">
+                                    {% for hint in field.hints %}
+                                        <li onclick="selectHint(this, '{{ hint|escapejs }}')">{{ hint }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+
+                        {% elif field.type == 'checkbox' %}
+                            <label class="checkbox-container">
+                                <input type="checkbox" name="{{ field.field_key }}" value="true" {% if field.value == 'true' or field.value == True %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                Отметить как {{ field.label }}
+                            </label>
+
+                        {% else %}
+                            <input type="{{ field.type|default:'text' }}" 
+                                name="{{ field.field_key }}" 
+                                value="{{ field.value }}"
+                                class="custom-input" 
+                                placeholder="{{ field.label }}"
+                                autocomplete="off"
+                                {% if field.is_required %}required{% endif %}>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                {% endfor %}
             </div>
         </div>
-
-        <!-- Секция: Устройство и неисправности -->
-        <div class="form-section">
-            <h4 class="section-title">Устройство и неисправности</h4>
-            <div class="section-fields">
-                <div class="form-group">
-                    <label class="form-label">Название девайса</label>
-                    <input type="text" name="name_of_device" value="{{ get_order.name_of_device }}" class="custom-input">
-                </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <label class="form-label">Проблема с девайсом</label>
-                    <textarea name="problem_with_device" class="custom-textarea" rows="3">{{ get_order.problem_with_device }}</textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- Дополнительные поля (если у тебя данные хранятся в JSON словаре get_order.form_with_order_information) -->
-        <!-- Можешь вывести их аналогично через подстановку значений -->
+        {% endfor %}
 
     </div>
 
-    <!-- Зафиксированный футер с кнопкой сохранения -->
+    <!-- Зафиксированный футер -->
     <div class="drawer-footer">
         <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Отмена</button>
         <button type="submit" class="btn-submit-order">Сохранить изменения</button>
