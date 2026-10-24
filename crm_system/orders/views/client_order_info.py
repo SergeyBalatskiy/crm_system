@@ -3,12 +3,15 @@ from django.utils.decorators import method_decorator
 from django.shortcuts import render
 from django.db.models import Q, TextField
 from django.views import View
+from orders.models import Client
 from orders.models import Orders
 from services.forms import ServicesWorkForm
+from finance.models import CashAccount, FinanceHistoryInfo
 from django.views.decorators.cache import never_cache
 from django.db import transaction
 from django.http import HttpResponse
 from django.urls import reverse
+from django.db.models import F
 from django.contrib import messages
 from datetime import datetime, timedelta
 import json
@@ -50,15 +53,165 @@ class ShowClientOrder(View):
                 field['value'] = sec_saved_values.get(f_key)
 
         print(sections)
+        print()
+        print(get_order)
 
         context = {
             'get_order' : get_order,
             'sections' : sections,
-            'current_type' : get_order.type_of_order
+            'current_type' : get_order.type_of_order,
         }
         return render(request, 'orders/show_getted_order/show_getted_form.html', context)
 
     # Отвечает за принятие каких-либо изменений(и их сохранение) в заявке
     @transaction.atomic
     def post(self, request, *args, **kwargs):
-        ...
+
+        try:
+            # Получаю имя, телефон
+            name = request.POST.get('name', '').strip()
+            phone = request.POST.get('phone', '').strip()
+
+            # Благодаря этому айди получаю индивидуальный код заказа
+            get_id_order = request.GET.get('get_id_order')
+
+            # GET_or_CREATE - если обьекта нет, создаю и вношу в create_client
+            client, create_client = Client.objects.get_or_create(name=name, phone=phone, user=request.user)
+            # Отладка для себя
+            if client:
+                print(f'У нас новый клиент: {create_client}')
+
+            # Если чекбокс отмечен, вернет True. Если не отмечен — False.
+            important = 'important' in request.POST
+
+            # Получаю менеджера
+            manager = request.POST.get('manager')
+
+            # Получаю название модели устройства (если оно есть)
+            name_device = request.POST.get('model', '')
+
+            # Если есть предоплата: (думаю что проверку того что предоплата была изменена, нужно проверять непосредственно через JS)
+            # Если сумма была изменена, то даем ей записаться. Если нет - значит во время оправки запроса обнуляем.
+            has_prepay = request.POST.get('prepay_amount')
+            if has_prepay:
+                prepay_amount = int(has_prepay.replace(' ', '').replace('\xa0', '').strip())
+
+            # Тип заказа:
+            type_of_order = request.GET.get('type_of_order')
+
+            # Получаю конкретный обьект формы (по типу заказа)
+            get_json_forms = FormsForOrder.objects.filter(user=request.user, type_of_order=type_of_order).first()
+
+            # Список для инофрмации о клиенте
+            client_info = {}
+            # Список о информации устройства
+            device_info = {}
+            # Список о прочей информации
+            bonus_info = {}
+
+            # Ну а этот список у меня для сохранения заявки на ремонт в саму БД (Orders > form_with_order_information)
+            json_field_for_order = []
+
+            # Сам словарь который хранит уже все поля
+            order_dict = {}
+
+            # Получаю "оригинальные секции" из БД JSONfields (из PROFILE_USER > MODELS > FormsForOrder)
+            sections = get_json_forms.json_forms.get('sections')
+
+            # Получаю по каждому обьекту
+            for section in sections:
+                # ЗАПИСЫВАЮ В КЛИЕНТ ИНФО ВСЕ ПОЛЯ (ДАЖЕ ПУСТЫЕ И ТЕ КОТОРЫЕ ПРИШЛИ)
+                if section['id'] == 'client_info':
+                    for field in section.get('fields'):
+                        key = field.get('field_key')
+
+                        if key in request.POST:
+                            client_info[key] = request.POST.get(key)
+                        else:
+                            client_info[key] = ''
+
+                    # В этот словарь добавляю ключ по которому можно будет идентифицировать поле
+                    client_info['id'] = 'client_info'
+                    json_field_for_order.append(client_info)
+
+                # ЗАПИСЫВАЮ В ДЕВАЙС ИНФО ВСЕ ПОЛЯ (ДАЖЕ ПУСТЫЕ И ТЕ КОТОРЫЕ ПРИШЛИ)
+                if section['id'] == 'device_info':
+                    for field in section.get('fields'):
+                        key = field.get('field_key')
+
+                        if key in request.POST:
+                            device_info[key] = request.POST.get(key)
+                        else:
+                            device_info[key] = ''
+
+                    # В этот словарь добавляю ключ по которому можно будет идентифицировать поле
+                    device_info['id'] = 'device_info'
+                    json_field_for_order.append(device_info)
+
+                # ЗАПИСЫВАЮ В БОНУС ИНФОРМАТИОН ВСЕ ПОЛЯ (ДАЖЕ ПУСТЫЕ И ТЕ КОТОРЫЕ ПРИШЛИ)
+                if section['id'] == 'bonus_information':
+                    for field in section.get('fields'):
+                        key = field.get('field_key')
+
+                        if key in request.POST:
+                            bonus_info[key] = request.POST.get(key)
+                        else:
+                            bonus_info[key] = ''
+
+                    # В этот словарь добавляю ключ по которому можно будет идентифицировать поле
+                    bonus_info['id'] = 'bonus_information'
+                    json_field_for_order.append(bonus_info)
+
+            # Вставляю в этот словарь следуюего вида данные: {'order_dict' : [{...}, {...}, {...}]}
+            order_dict['order_dict'] = json_field_for_order
+
+            # Вот это надо обновить!
+            # Здесь должен быть гет ор креате и сохранение
+            # Получаю обьект на обновление данных в нем
+            order_to_update = Orders.objects.select_for_update().filter(user=request.user, id=get_id_order).first()
+
+            order_to_update.manager = manager
+            order_to_update.client = client
+            order_to_update.device_type = request.POST.get('type_of_device', '')
+            order_to_update.color_of_device = request.POST.get('color', '')
+            order_to_update.name_of_device = request.POST.get('model', '')
+            order_to_update.problem_with_device = request.POST.get('destroyed', '')
+            order_to_update.deadline = request.POST.get('deadline', None)
+            order_to_update.form_with_order_information = order_dict
+            order_to_update.important = important
+        
+            if prepay_amount > 0:
+                order_to_update.prepay = order_to_update.prepay+prepay_amount
+                # На уровне F выражения меняю баланс в положительную сторону из-за предоплаты
+                CashAccount.objects.filter(user=request.user).update(money_balance=F('money_balance') + prepay_amount)
+
+                # Получаю дату и время для дальнейшего использования в комментариях
+                now = datetime.now()
+                formatted_dmy = now.strftime('%d.%m.%Y')
+                formatted_hm = now.strftime('%H:%M')
+                
+                # Сделал историю операции финансовой если идет предоплата:
+                FinanceHistoryInfo.objects.create(user=request.user, 
+                type_of_operation=FinanceHistoryInfo.TypeOfOperation.INCOME, category_of_operation = FinanceHistoryInfo.CategoryOfOperation.OTHER,
+                number_in_the_operation = prepay_amount, product_name = name_device,
+                supplier = 'Предоплата', comment = f"Дополнительное внесение предоплаты в размере: {prepay_amount}, за: {name_device}. Клиент: {name}. Дата проведения операции: {formatted_dmy}, в {formatted_hm}")   
+
+            order_to_update.save()
+
+            print('Ничего не вылетело, все работает! Сохранение произошло.')
+
+            # Отвечаем клиенту: закрываем шторку и показываем уведомление
+            response = HttpResponse(status=200)
+            response['HX-Trigger'] = json.dumps({
+                'closeOrderDrawer': True,
+                'showToast': {
+                    'level': 'success',
+                    'message': 'Заказ успешно обновлен!'
+                }
+            })
+            return response
+    
+        except Exception as e:
+            msg = f'Возникла ошибка: {e}'
+            print(msg)
+            return HttpResponse(f'Возникла ошибка при создании заказа: {e}', status=400)

@@ -65,8 +65,9 @@ class ShowFormForOrder(View):
 
             # Если есть предоплата:
             prepay = request.POST.get('prepay')
+            
             if prepay:
-                prepay_amount = request.POST.get('prepay_amount').replace(' ', '').strip()
+                prepay_amount = int(request.POST.get('prepay_amount').replace(' ', '').replace('\xa0', '').strip())
             else:
                 prepay_amount = 0
 
@@ -157,7 +158,7 @@ class ShowFormForOrder(View):
                 FinanceHistoryInfo.objects.create(user=request.user, 
                 type_of_operation=FinanceHistoryInfo.TypeOfOperation.INCOME, category_of_operation = FinanceHistoryInfo.CategoryOfOperation.OTHER,
                 number_in_the_operation = prepay_amount, product_name = name_device,
-                supplier = 'Предоплата', comment = f"Внесение предоплаты в размере: {prepay_amount}, за: {name_device}. Клиент: {name}. Дата проведения операции: {formatted_dmy}, в {formatted_hm}")   
+                supplier = 'Предоплата', comment = f"Внесение предоплаты в размере: {prepay_amount}, за ремонт: {name_device}. Клиент: {name}. Дата проведения операции: {formatted_dmy}, в {formatted_hm}")   
 
             print('Ничего не вылетело, все работает! Сохранение произошло.')
             # Отвечаем клиенту: закрываем шторку и показываем уведомление
