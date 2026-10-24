@@ -43,13 +43,13 @@ class ShowClientOrder(View):
             sec_id = section.get('id')
             # Получаю именно обьект с уже введенными данными благодаря айдишнику из БД!
             sec_saved_values = saved_map.get(sec_id, [])
+            # Здесь проходит логика записывания введенных данных из полученных форм в ключ (данные записываются в как бы основной
+            # JSON (главный, который имеет предварительно пустое поле, и это поле в дальнейшем заполняется!)
             for field in section.get('fields'):
-                f_key = field.get('field_get')
+                f_key = field.get('field_key')
                 field['value'] = sec_saved_values.get(f_key)
 
-        print(get_order)
-        print('0000')
-
+        print(sections)
 
         context = {
             'get_order' : get_order,
