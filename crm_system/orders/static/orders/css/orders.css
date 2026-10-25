@@ -554,6 +554,69 @@
     padding-right: 4px;
 }
 
+/* Контейнер тумблера */
+.toggle-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 5px;
+}
+
+/* Оболочка переключателя */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* Скрываем стандартный чекбокс */
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Дорожка тумблера */
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #2b2b40;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px;
+    border: 1px solid #3f3f5f;
+}
+
+/* Бегущий кружок */
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+}
+
+/* Состояние при включении (checked): сдвиг кружка вправо и смена цвета */
+.toggle-switch input:checked+.toggle-slider {
+    background-color: #3699ff;
+    border-color: #3699ff;
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+    transform: translateX(22px);
+}
+
 .crm-cards-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -693,6 +756,47 @@
     /* Максимум 2 строки */
     -webkit-box-orient: vertical;
     overflow: hidden;
+}
+
+/* Стили для срочной карточки заказа */
+.crm-order-card.order-urgent {
+    border-color: #ffc107 !important;
+    box-shadow: 0 0 12px rgba(255, 193, 7, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Небольшая декоративная полоска-индикатор слева или сверху */
+.crm-order-card.order-urgent::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background-color: #ffc107;
+}
+
+/* Эффект легкой пульсации для иконки молнии в шапке */
+@keyframes urgentPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.crm-order-card.order-urgent .badge-urgent i {
+    animation: urgentPulse 1.8s infinite ease-in-out;
 }
 
 .device-issue span {

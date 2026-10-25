@@ -2,7 +2,7 @@
 {% if orders %}
     <div class="crm-cards-grid">
         {% for i in orders %}
-        <div class="crm-order-card"
+        <div class="crm-order-card {% if i.important %}order-urgent{% endif %}"
             hx-get="{% url 'client_order' %}?get_id_order={{ i.id }}"
             hx-target="#drawer-content-loader"
             hx-swap="innerHTML"

@@ -168,3 +168,50 @@ function resetDateRange() {
     select.value = '';
     toggleDateRange(select);
 }
+
+function togglePrepayInput(checkbox) {
+    const container = document.getElementById('prepay-amount-container');
+    if (!container) return;
+
+    if (checkbox.checked) {
+        container.style.display = 'block';
+        const input = container.querySelector('input');
+        if (input) input.focus();
+    } else {
+        container.style.display = 'none';
+        const input = container.querySelector('input');
+        if (input) input.value = ''; // Очищаем сумму при выключении тумблера
+    }
+}
+
+function validatePrepayForm(event) {
+    // Находим чекбокс (тумблер) предоплаты и инпут суммы
+    const prepayCheckbox = document.querySelector('input[name="prepay"]');
+    const prepayInput = document.querySelector('input[name="prepay_amount"]');
+
+    // Если тумблер включен
+    if (prepayCheckbox && prepayCheckbox.checked) {
+        // Проверяем значение поля ввода (очищаем от пробелов)
+        const value = prepayInput ? prepayInput.value.replace(/\s+/g, '').trim() : '';
+
+        // Если поле пустое или равно 0
+        if (!value || parseInt(value) === 0) {
+            event.preventDefault(); // Останавливаем отправку формы (включая HTMX-запрос)
+
+            // Выводим предупреждение (можно заменить на твою систему уведомлений/тостов)
+            alert('Тумблер предоплаты включен, но сумма не указана. Пожалуйста, введите сумму!');
+
+            if (prepayInput) {
+                prepayInput.focus(); // Фокусируемся на поле ввода
+                prepayInput.style.borderColor = '#e53e3e'; // Красная рамка для привлечения внимания
+
+                // Убираем красную рамку при начале ввода
+                prepayInput.oninput = function () {
+                    this.style.borderColor = '';
+                };
+            }
+            return false; // Отменяем отправку
+        }
+    }
+    return true; // Разрешаем отправку
+}

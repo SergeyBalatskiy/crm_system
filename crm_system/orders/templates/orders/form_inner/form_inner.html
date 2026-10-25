@@ -1,4 +1,4 @@
-<form method="POST" hx-post="{% url 'show_form' %}" id="create-order-form" class="drawer-form-body">
+<form method="POST" hx-post="{% url 'show_form' %}" id="create-order-form" class="drawer-form-body" onsubmit="return validatePrepayForm(event)">
     {% csrf_token %}
     {% comment %} Передается в обработчик POST также и тип заказа {% endcomment %}
     <input type="hidden" name="type_of_order_selected" value="{{ current_type }}">
@@ -56,11 +56,32 @@
                             <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}></textarea>
 
                         {% elif field.type == 'checkbox' %}
-                            <label class="checkbox-container">
-                                <input type="checkbox" name="{{ field.field_key }}" value="true">
-                                <span class="checkmark"></span>
-                                Отметить как {{ field.label }}
-                            </label>
+                            <div class="form-group-checkbox-wrapper" style="grid-column: 1 / -1;">
+                                <label class="toggle-switch-container">
+                                    <span class="toggle-switch">
+                                        <input type="checkbox" 
+                                            name="{{ field.field_key }}" 
+                                            value="true" 
+                                            id="checkbox-{{ field.field_key }}"
+                                            {% if field.value == 'true' or field.value == True or field.value == 'on' %}checked{% endif %}
+                                            {% if field.field_key == 'prepay' %}onchange="togglePrepayInput(this)"{% endif %}>
+                                        <span class="toggle-slider"></span>
+                                    </span>
+                                    <span class="form-label" style="margin-bottom: 0; cursor: pointer;">{{ field.label }}</span>
+                                </label>
+                            <!-- Если это поле предоплаты, динамически выводим поле ввода суммы под ним -->
+                            {% if field.field_key == 'prepay' %}
+                                <div id="prepay-amount-container" class="prepay-amount-container" style="display: none; margin-top: 12px; grid-column: 1 / -1;">
+                                    <label class="form-label">Сумма предоплаты (₽)</label>
+                                    <input type="text" 
+                                        name="prepay_amount" 
+                                        id="prepay-amount-input" 
+                                        class="custom-input" 
+                                        placeholder="Например: 1 500" 
+                                        autocomplete="off"
+                                        oninput="formatMoneyInput(this)">
+                                </div>
+                            {% endif %}
 
                         {% else %}
                             <input type="{{ field.type|default:'text' }}" 
@@ -72,35 +93,6 @@
                     </div>
                     {% endif %}
                 {% endfor %}
-                
-                {% if forloop.last %}
-                <div class="form-group options-group" style="grid-column: span 2; margin-top: 6px;">
-                    <div class="custom-options-row">
-                        <label class="modern-checkbox-label">
-                            <input type="checkbox" name="important" id="idImportant" value="true">
-                            <span class="modern-checkbox-box"></span>
-                            <i class="fa-solid fa-bolt" style="color: #ffc107;"></i> Срочный заказ
-                        </label>
-
-                        <label class="modern-checkbox-label">
-                            <input type="checkbox" name="prepay" id="idPrepay" value="true" onchange="togglePrepayInput(this)">
-                            <span class="modern-checkbox-box"></span>
-                            <i class="fa-solid fa-money-check-dollar" style="color: #2ecc71;"></i> Предоплата
-                        </label>
-                    </div>
-
-                    <div id="prepay-amount-container" class="prepay-amount-container" style="display: none; margin-top: 12px;">
-                        <label class="form-label">Сумма предоплаты (₽)</label>
-                        <input type="text" 
-                            name="prepay_amount" 
-                            id="prepay-amount-input" 
-                            class="custom-input" 
-                            placeholder="Например: 1 500" 
-                            autocomplete="off"
-                            oninput="formatMoneyInput(this)">
-                    </div>
-                </div>
-                {% endif %}
 
             </div>
         </div>

@@ -1,7 +1,8 @@
 <form method="POST" hx-post="{% url 'client_order' %}?get_id_order={{ get_order.id }}&type_of_order={{ get_order.type_of_order }}" id="edit-order-form" class="drawer-form-body">
     {% csrf_token %}
     
-    <!-- Передаем тип заказа скрытым полем для корректного чтения в POST -->
+    <!-- Передаем ID заказа и тип заказа скрытыми полями -->
+    <input type="hidden" name="id" value="{{ get_id }}">
     <input type="hidden" name="type_of_order" value="{{ get_order.type_of_order }}">
     
     <!-- Шапка шторки -->
@@ -12,33 +13,9 @@
         </button>
     </div>
 
-    <!-- Прокручиваемая область с секциями -->
+    <!-- Прокручиваемая область с динамическими секциями из формы -->
     <div class="drawer-sections-wrapper">
         
-        <!-- Секция: Информация о типе заказа и служебные флаги -->
-        <div class="form-section">
-            <h4 class="section-title">Параметры заказа</h4>
-            <div class="section-fields">
-                <div class="form-group">
-                    <label class="form-label">Тип заказа</label>
-                    <div class="custom-input" style="display: flex; align-items: center; background: #151521; color: #3699ff;">
-                        {{ get_order.type_of_order|title }}
-                    </div>
-                </div>
-
-                <!-- Чекбокс срочности (чтобы бэкенд видел important) -->
-                <div class="form-group" style="justify-content: center;">
-                    <label class="form-label">Важность</label>
-                    <label class="modern-checkbox-label" style="margin-top: 4px;">
-                        <input type="checkbox" name="important" {% if get_order.important %}checked{% endif %}>
-                        <span class="modern-checkbox-box"></span>
-                        <span><i class="fa-solid fa-bolt" style="color: #d97706;"></i> Срочный заказ</span>
-                    </label>
-                </div>
-            </div>
-        </div>
-
-        <!-- Рендерим динамические секции и поля из шаблона формы с подставленными values -->
         {% for section in sections %}
         <div class="form-section">
             <h4 class="section-title">{{ section.title }}</h4>
@@ -52,15 +29,15 @@
                             {% if field.is_required %}<span class="req-star">*</span>{% endif %}
                         </label>
 
-                        <!-- Проверяем тип поля и выводим с уже готовым значением (field.value) -->
+                        <!-- Проверяем тип поля и выводим с уже подставленным сохраненным значением (field.value) -->
                         {% if field.type == 'textarea' %}
-                            <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}>{{ field.value }}</textarea>
+                            <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
 
                         {% elif field.hints %}
                             <div class="custom-autocomplete-wrapper">
                                 <input type="text" 
                                     name="{{ field.field_key }}" 
-                                    value="{{ field.value }}"
+                                    value="{{ field.value|default:'' }}"
                                     class="custom-input hint-input" 
                                     placeholder="Выберите или введите..."
                                     autocomplete="off"
@@ -75,17 +52,45 @@
                                 </ul>
                             </div>
 
-                        {% elif field.type == 'checkbox' %}
-                            <label class="checkbox-container">
-                                <input type="checkbox" name="{{ field.field_key }}" value="true" {% if field.value == 'true' or field.value == True %}checked{% endif %}>
-                                <span class="checkmark"></span>
-                                Отметить как {{ field.label }}
-                            </label>
+                       {% elif field.type == 'checkbox' %}
+                            <div class="form-group-checkbox-wrapper" style="grid-column: 1 / -1;">
+                                <label class="toggle-switch-container">
+                                    <span class="toggle-switch">
+                                        <input type="checkbox" 
+                                            name="{{ field.field_key }}" 
+                                            value="true" 
+                                            id="checkbox-{{ field.field_key }}"
+                                            {% if field.value == 'true' or field.value == True or field.value == 'on' or get_order.prepay > 0 and field.field_key == 'prepay' %}checked{% endif %}
+                                            {% if field.field_key == 'prepay' %}onchange="togglePrepayInput(this)"{% endif %}>
+                                        <span class="toggle-slider"></span>
+                                    </span>
+                                    <span class="form-label" style="margin-bottom: 0; cursor: pointer;">{{ field.label }}</span>
+                                </label>
 
+                                <!-- Специфичный блок только для поля предоплаты -->
+                                {% if field.field_key == 'prepay' %}
+                                    <div id="prepay-amount-container" style="display: {% if get_order.prepay > 0 or field.value == 'true' or field.value == True %}block{% else %}none{% endif %}; margin-top: 12px; grid-column: 1 / -1;">
+                                        
+                                        <!-- Подсказка с уже внесенной суммой из базы -->
+                                        <div style="font-size: 13px; color: #3699ff; margin-bottom: 6px;">
+                                            <i class="fa-solid fa-wallet"></i> Уже внесено в кассу: <b>{{ get_order.prepay|default:0 }} ₽</b>
+                                        </div>
+
+                                        <label class="form-label" style="font-size: 12px; color: #a1a5b7; margin-bottom: 4px;">Добавить дополнительную предоплату</label>
+                                        <input type="text" 
+                                            name="prepay_amount" 
+                                            value=""
+                                            class="custom-input" 
+                                            placeholder="Введите сумму доплаты..."
+                                            autocomplete="off"
+                                            oninput="formatMoneyInput(this)">
+                                    </div>
+                                {% endif %}
+                            </div>
                         {% else %}
                             <input type="{{ field.type|default:'text' }}" 
                                 name="{{ field.field_key }}" 
-                                value="{{ field.value }}"
+                                value="{{ field.value|default:'' }}"
                                 class="custom-input" 
                                 placeholder="{{ field.label }}"
                                 autocomplete="off"
@@ -97,21 +102,6 @@
             </div>
         </div>
         {% endfor %}
-
-        <!-- Секция для внесения дополнительной предоплаты -->
-        <div class="form-section">
-            <h4 class="section-title">Финансы</h4>
-            <div class="section-fields">
-                <div class="form-group">
-                    <label class="form-label">Текущая предоплата</label>
-                    <input type="text" class="custom-input" value="{{ get_order.prepay|default:0 }} руб." disabled style="opacity: 0.7;">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Добавить доп. предоплату</label>
-                    <input type="text" name="prepay_amount" class="custom-input" value="0" placeholder="Введите сумму доплаты..." autocomplete="off">
-                </div>
-            </div>
-        </div>
 
     </div>
 

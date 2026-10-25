@@ -70,19 +70,12 @@ class ShowClientOrder(View):
         try:
             # Получаю имя, телефон
             name = request.POST.get('name', '').strip()
-            phone = request.POST.get('phone', '').strip()
 
             # Благодаря этому айди получаю индивидуальный код заказа
             get_id_order = request.GET.get('get_id_order')
 
-            # GET_or_CREATE - если обьекта нет, создаю и вношу в create_client
-            client, create_client = Client.objects.get_or_create(name=name, phone=phone, user=request.user)
-            # Отладка для себя
-            if client:
-                print(f'У нас новый клиент: {create_client}')
-
             # Если чекбокс отмечен, вернет True. Если не отмечен — False.
-            important = 'important' in request.POST
+            is_urgently = 'urgently' in request.POST
 
             # Получаю менеджера
             manager = request.POST.get('manager')
@@ -92,9 +85,12 @@ class ShowClientOrder(View):
 
             # Если есть предоплата: (думаю что проверку того что предоплата была изменена, нужно проверять непосредственно через JS)
             # Если сумма была изменена, то даем ей записаться. Если нет - значит во время оправки запроса обнуляем.
-            has_prepay = request.POST.get('prepay_amount')
-            if has_prepay:
-                prepay_amount = int(has_prepay.replace(' ', '').replace('\xa0', '').strip())
+            prepay = 'prepay' in request.POST
+
+            if prepay:
+                prepay_amount = int(request.POST.get('prepay_amount').replace(' ', '').replace('\xa0', '').strip())
+            else:
+                prepay_amount = 0
 
             # Тип заказа:
             type_of_order = request.GET.get('type_of_order')
@@ -170,16 +166,38 @@ class ShowClientOrder(View):
             # Получаю обьект на обновление данных в нем
             order_to_update = Orders.objects.select_for_update().filter(user=request.user, id=get_id_order).first()
 
+            print('Тут все норм 1')
             order_to_update.manager = manager
-            order_to_update.client = client
             order_to_update.device_type = request.POST.get('type_of_device', '')
             order_to_update.color_of_device = request.POST.get('color', '')
             order_to_update.name_of_device = request.POST.get('model', '')
             order_to_update.problem_with_device = request.POST.get('destroyed', '')
             order_to_update.deadline = request.POST.get('deadline', None)
+            print('Тут все норм 2')
             order_to_update.form_with_order_information = order_dict
-            order_to_update.important = important
-        
+            order_to_update.important = is_urgently
+
+            # Думаю что тут можно добавить проверку формата: была ли предоплата раньше?
+            # Если предоплата (сам тумблер) в положении ОФФ и предоплата в базе данных была раньше:
+            # Значит мы передумали делать предоплату, и ее нужно убрать!
+            if not prepay and order_to_update.prepay > 0:
+                # Здесь просто запоминаю саму сумму предоплаты чтобы потом удалить
+                saved_count_prepay = order_to_update.prepay
+                order_to_update.prepay = 0
+                # На уровне F выражения меняю баланс в отрицательную сторону из-за убирания
+                CashAccount.objects.filter(user=request.user).update(money_balance=F('money_balance') - saved_count_prepay)
+
+                # Получаю дату и время для дальнейшего использования в комментариях
+                now = datetime.now()
+                formatted_dmy = now.strftime('%d.%m.%Y')
+                formatted_hm = now.strftime('%H:%M')
+                
+                # Сделал историю операции финансовой если идет убирание предоплаты:
+                FinanceHistoryInfo.objects.create(user=request.user, 
+                type_of_operation=FinanceHistoryInfo.TypeOfOperation.OUTCOME, category_of_operation = FinanceHistoryInfo.CategoryOfOperation.OTHER,
+                number_in_the_operation = saved_count_prepay, product_name = name_device,
+                supplier = 'Отмена предоплаты', comment = f"Отмена предоплаты в размере: {saved_count_prepay}, за: {name_device}. Клиент: {name}. Дата проведения операции: {formatted_dmy}, в {formatted_hm}")   
+                
             if prepay_amount > 0:
                 order_to_update.prepay = order_to_update.prepay+prepay_amount
                 # На уровне F выражения меняю баланс в положительную сторону из-за предоплаты

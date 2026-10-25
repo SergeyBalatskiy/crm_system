@@ -34,6 +34,8 @@ class ShowFormForOrder(View):
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         context = {'sections' : section, 'current_type': type_of_order_selected}
 
+        print(section)
+
         # ЕСЛИ запрос пришел конкретно от селекта
         if request.headers.get('HX-Target') == 'form-change':
             return render(request, 'orders/form_inner/form_inner.html', context)
@@ -56,16 +58,16 @@ class ShowFormForOrder(View):
                 print(f'У нас новый клиент: {create_client}')
 
             # Если чекбокс отмечен, вернет True. Если не отмечен — False.
-            important = 'important' in request.POST
-
+            is_urgently = 'urgently' in request.POST
+            print('Импортант?')
+            print(is_urgently)
             manager = request.POST.get('manager')
 
             # Получаю название модели (если оно есть)
             name_device = request.POST.get('model', '')
 
             # Если есть предоплата:
-            prepay = request.POST.get('prepay')
-            
+            prepay = 'prepay' in request.POST
             if prepay:
                 prepay_amount = int(request.POST.get('prepay_amount').replace(' ', '').replace('\xa0', '').strip())
             else:
@@ -142,7 +144,7 @@ class ShowFormForOrder(View):
             Orders.objects.create(user = request.user, type_of_order = type_of_order_selected, manager = manager, client = client, 
             device_type = request.POST.get('type_of_device', ''), color_of_device = request.POST.get('color', ''),
             problem_with_device = request.POST.get('destroyed', ''), name_of_device = name_device,
-            deadline = request.POST.get('deadline', None), form_with_order_information = order_dict, important = important,
+            deadline = request.POST.get('deadline', None), form_with_order_information = order_dict, important = is_urgently,
             prepay = prepay_amount)
 
             if prepay_amount > 0:

@@ -1,4 +1,5 @@
 {% load humanize %}
+{% load comment_filters %}
 {% if history_finance %}
     {% for i in history_finance %}
     <div class="finance-card">
@@ -47,7 +48,7 @@
 
             <div class="info-cell full-width">
                 <span class="info-label">Комментарий</span>
-                <span class="info-value comment-text">{{ i.comment|default:"—" }}</span>
+                <span class="info-value comment-text">{{ i.comment|format_comment_numbers|default:"—" }}</span>
             </div>
         </div>
 
