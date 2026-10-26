@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from profile_user.forms import WorkersFormSet
 from django.contrib import messages
 from profile_user.models import WorkersInfo
-from auth_registration.models import Users
 from django.contrib import messages
 from django.views.decorators.cache import never_cache
 

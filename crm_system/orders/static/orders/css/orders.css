@@ -24,18 +24,18 @@
     top: 0;
     right: 0;
     width: 42vw;
-    /* Увеличили ширину для двух колонок */
     min-width: 560px;
-    /* Увеличили минимальную ширину */
-    height: 100vh;
+    height: 100vh !important;
+    /* Жестко фиксируем высоту экрана */
     background: #ffffff;
-    color: #fff;
     z-index: 1000;
-    transform: translateX(100%);
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden !important;
+    /* Запрещаем скролл всей шторки целиком */
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
 }
 
 .section-fields {
@@ -96,16 +96,22 @@
     flex: 1;
     display: flex;
     flex-direction: column;
+    height: 100%;
+    /* Занимает всю доступную высоту */
     min-height: 0;
-    /* Критично для Flexbox-скролла */
+    /* Критично для корректной работы скролла во флексе */
+    overflow: hidden;
+    /* Прячем общие скроллы, оставляя их только у секций */
     margin: 0;
 }
 
 /* Прокручиваемый блок с секциями */
 .drawer-sections-wrapper {
     flex: 1;
-    overflow-y: auto;
-    /* Включает вертикальный скролл */
+    min-height: 0 !important;
+    /* КРИТИЧНО: заставляет блок ограничиваться высотой и скроллиться */
+    overflow-y: auto !important;
+    /* Включает вертикальную прокрутку */
     padding: 20px 24px;
     display: flex;
     flex-direction: column;
@@ -174,7 +180,7 @@
     background: #f2f1f1dc;
     border: 1px solid #8950fc;
     border-radius: 6px;
-    color: #8950fc;
+    color: #000000;
     font-size: 15px;
     font-weight: 500;
     outline: none;
@@ -184,18 +190,70 @@
 .custom-input:focus,
 .custom-select:focus,
 .custom-textarea:focus {
-    border-color: #3699ff;
+    border-color: #8950fc;
+    box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.15);
 }
 
 .drawer-footer {
+    flex-shrink: 0 !important;
+    /* Запрещает кнопкам сжиматься */
     padding: 16px 24px;
     background: #ffffff;
-    border-top: 1px solid #2b2b40;
+    border-top: 1px solid #e4e6ef;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
-    flex-shrink: 0;
-    /* Запрещает футеру уплывать */
+}
+
+/* 1. Заставляем лоадер контента внутри шторки растягиваться на всю высоту и работать как flex-колонку */
+#drawer-content-loader {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* 2. Контейнер формы должен занимать остаток пространства и сжиматься */
+#form-change {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* 3. Сама форма тоже становится флекс-колонкой */
+.drawer-form-body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+}
+
+/* 4. Обертка с полями получает долгожданный скролл */
+.drawer-sections-wrapper {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    /* Включает скролл */
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 5. Футер жестко фиксируется внизу */
+.drawer-footer {
+    flex-shrink: 0 !important;
+    padding: 16px 24px;
+    background: #ffffff;
+    border-top: 1px solid #e4e6ef;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
 }
 
 .btn-submit-order {
@@ -225,8 +283,10 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: #dfdfe1;
-    border: 1px solid #f30808;
+    background: #ffffff;
+    /* Белый фон вместо серого */
+    border: 1px solid #8950fc;
+    /* Фиолетовая рамка вместо красной */
     border-radius: 6px;
     z-index: 1050;
     max-height: 180px;
@@ -234,20 +294,23 @@
     margin: 4px 0 0 0;
     padding: 0;
     list-style: none;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .custom-hints-dropdown li {
     padding: 9px 12px;
-    color: #fff;
+    color: #3f4254;
+    /* Темный читаемый текст вместо белого */
     cursor: pointer;
     font-size: 0.88rem;
-    border-bottom: 1px solid #2b2b40;
+    border-bottom: 1px solid #f1f1f2;
+    transition: background 0.15s, color 0.15s;
 }
 
 .custom-hints-dropdown li:hover {
-    background: #27273a;
-    color: #3699ff;
+    background: #f4f0ff;
+    /* Нежный фиолетовый фон при наведении */
+    color: #8950fc;
 }
 
 .btn-cancel {
@@ -273,13 +336,15 @@
     top: 100%;
     left: 0;
     right: 0;
-    background: #e2e2e2;
-    border: none;
+    background: #ffffff;
+    /* Белый фон */
+    border: 1px solid #8950fc;
+    /* Фиолетовая рамка */
     border-radius: 6px;
     z-index: 1050;
     max-height: 200px;
     overflow-y: auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     margin-top: 4px;
 }
 
@@ -290,8 +355,8 @@
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
-    border-bottom: 1px solid #2b2b40;
-    transition: background 0.2s;
+    border-bottom: 1px solid #f1f1f2;
+    transition: background 0.15s;
 }
 
 .suggestion-item:last-child {
@@ -299,18 +364,37 @@
 }
 
 .suggestion-item:hover {
-    background: #27273a;
+    background: #f4f0ff;
 }
 
 .suggestion-item .client-name {
-    color: #fff;
+    color: #3f4254;
+    /* Темный цвет имени */
     font-weight: 500;
     font-size: 0.9rem;
 }
 
 .suggestion-item .client-phone {
-    color: #3699ff;
+    color: #8950fc;
+    /* Фиолетовый акцент для телефона/роли */
     font-size: 0.85rem;
+}
+
+/* Полностью скрываем блоки подсказок, если они пустые (чтобы не было лишних полос под инпутами) */
+.client-dropdown-suggestions:empty,
+.custom-hints-dropdown:empty {
+    display: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.type_of_order_select {
+    border-bottom: 1px solid #8950fc;
+    /* Нейтральная линия границы */
+    background-color: #ffffff;
+    /* Белый фон, чтобы под ним ничего не просвечивало */
 }
 
 /* Контейнер для чекбоксов в ряд */

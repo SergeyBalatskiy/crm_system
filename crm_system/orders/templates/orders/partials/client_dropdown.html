@@ -1,10 +1,17 @@
+{% load phone_filters %}
 {% if client_info %}
-    <ul class="suggestions-list">
+    <ul class="suggestions-list" style="list-style: none; padding: 0; margin: 0;">
         {% for client in client_info %}
             <li class="suggestion-item" 
                 onclick="fillClientData('{{ client.name }}', '{{ client.phone }}')">
-                <span class="client-name">{{ client.name }}</span>
-                <span class="client-phone">{{ client.phone }}</span>
+                <span class="client-name" style="display: flex; align-items: center;">
+                <i class="fa fa-user-circle" style="margin-right: 8px; color: #101113;"></i>
+                {{ client.name }}</span>
+                {% if client.phone %}
+                <span class="client-phone" style="color: #101113;">{{ client.phone|format_phone }}</span>
+                {% else %}
+                <span class="client-phone" style="color: #101113; font-size: 0.8rem;">Телефон не указан</span>
+                {% endif %}
             </li>
         {% endfor %}
     </ul>

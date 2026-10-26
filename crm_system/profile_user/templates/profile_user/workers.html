@@ -97,19 +97,6 @@
             <!-- Список сотрудников -->
             <div class="workers-list">
 
-                <!-- Карточка Владельца -->
-                <div class="worker-place owner-place">
-                    <div class="worker-col">{{ user.first_name }}</div>
-                    <div class="worker-col">{{ user.last_name }}</div>
-                    <div class="worker-col">Владелец</div>
-                    <div class="worker-col">{{ user.phone_number }}</div>
-                    <div class="worker-action">
-                        <button type="button" class="btn-delete-worker btn-disabled"
-                            style="background-color: #94a3b8 !important; cursor: not-allowed; opacity: 0.75;" disabled
-                            title="Нельзя удалить владельца">Удалить</button>
-                    </div>
-                </div>
-
                 <!-- Строки с остальными сотрудниками -->
                 {% for worker in workers_information %}
                 <div class="worker-place" data-name="{{ worker.name }}" data-surname="{{ worker.surname }}">

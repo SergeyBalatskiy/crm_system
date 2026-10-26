@@ -215,3 +215,67 @@ function validatePrepayForm(event) {
     }
     return true; // Разрешаем отправку
 }
+
+function selectWorker(fieldKey, workerFullName) {
+    const input = document.getElementById(`id_${fieldKey}`);
+    if (input) {
+        input.value = workerFullName;
+    }
+    // Очищаем блок подсказок
+    const suggestionsDiv = document.getElementById(`suggestions-${fieldKey}`);
+    if (suggestionsDiv) {
+        suggestionsDiv.innerHTML = '';
+    }
+}
+
+function formatPhoneInput(input) {
+    // Очищаем всё, кроме цифр
+    let numbers = input.value.replace(/\D/g, '');
+
+    if (numbers.length === 0) {
+        input.value = '';
+        return;
+    }
+
+    // Если первая цифра 8, автоматически меняем на 7 (для привычного ввода)
+    if (numbers[0] === '8') {
+        numbers = '7' + numbers.slice(1);
+    }
+
+    let result = '+';
+
+    // Формируем строку по маске +X (XXX) XXX XX-XX
+    if (numbers.length > 0) {
+        result += numbers.substring(0, 1);
+    }
+    if (numbers.length > 1) {
+        result += ' (' + numbers.substring(1, 4);
+    }
+    if (numbers.length > 4) {
+        result += ') ' + numbers.substring(4, 7);
+    }
+    if (numbers.length > 7) {
+        result += ' ' + numbers.substring(7, 9);
+    }
+    if (numbers.length > 9) {
+        result += '-' + numbers.substring(9, 11);
+    }
+
+    input.value = result;
+}
+
+// Глобальный клик для закрытия выпадающих списков поиска клиентов/работников
+document.addEventListener('click', function (event) {
+    // Проверяем, был ли клик совершен вне блока формы группы (инпут + выпавший список)
+    const formGroups = document.querySelectorAll('.form-group');
+
+    formGroups.forEach(group => {
+        // Если клик произошел НЕ внутри текущей группы поля
+        if (!group.contains(event.target)) {
+            const dropdown = group.querySelector('.client-dropdown-suggestions');
+            if (dropdown) {
+                dropdown.innerHTML = ''; // Очищаем содержимое (список закрывается)
+            }
+        }
+    });
+});

@@ -89,6 +89,7 @@ class ShowClientOrder(View):
 
             if prepay:
                 prepay_amount = int(request.POST.get('prepay_amount').replace(' ', '').replace('\xa0', '').strip())
+                
             else:
                 prepay_amount = 0
 

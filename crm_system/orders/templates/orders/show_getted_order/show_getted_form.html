@@ -1,3 +1,4 @@
+{% load phone_filters %}
 <form method="POST" hx-post="{% url 'client_order' %}?get_id_order={{ get_order.id }}&type_of_order={{ get_order.type_of_order }}" id="edit-order-form" class="drawer-form-body">
     {% csrf_token %}
     
@@ -29,10 +30,49 @@
                             {% if field.is_required %}<span class="req-star">*</span>{% endif %}
                         </label>
 
-                        <!-- Проверяем тип поля и выводим с уже подставленным сохраненным значением (field.value) -->
-                        {% if field.type == 'textarea' %}
+                        <!-- 1. Если это поиск клиентов (имя или телефон) -->
+                        {% if field.field_key == 'name' or field.field_key == 'phone' %}
+                            <!-- 1. Поиск клиентов и телефона -->
+                            <input type="text" 
+                                name="{{ field.field_key }}" 
+                                id="id_{{ field.field_key }}"
+                                class="custom-input client-search-input" 
+                                placeholder="{% if field.field_key == 'phone' %}+7 (___) ___ __-___{% else %}Начните вводить {{ field.label|lower }}...{% endif %}"
+                                autocomplete="off"
+                                hx-get="{% url 'find_client' %}" 
+                                hx-trigger="focus, keyup changed delay:300ms" 
+                                hx-target="#suggestions-{{ field.field_key }}" 
+                                hx-swap="innerHTML"
+                                onfocus="handleClientFocus(this)"
+                                {% if field.field_key == 'phone' %}oninput="formatPhoneInput(this)"{% endif %}
+                                value="{{ field.value|default:'' }}"
+                                {% if field.is_required %}required{% endif %}>
+
+                            <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
+
+                        <!-- 2. Если это поиск работников (мастер или менеджер) — ПОДКЛЮЧАЕМ ТУ ЖЕ ЛОГИКУ -->
+                        {% elif field.field_key == 'master' or field.field_key == 'manager' %}
+                            <input type="text" 
+                                name="{{ field.field_key }}" 
+                                id="id_{{ field.field_key }}"
+                                value="{{ field.value|default:'' }}"
+                                class="custom-input client-search-input" 
+                                placeholder="Выберите или введите {{ field.label|lower }}..."
+                                autocomplete="off"
+                                hx-get="{% url 'find_worker' %}" 
+                                hx-trigger="focus, keyup changed delay:300ms" 
+                                hx-target="#suggestions-{{ field.field_key }}" 
+                                hx-swap="innerHTML"
+                                onfocus="handleClientFocus(this)"
+                                {% if field.is_required %}required{% endif %}>
+
+                            <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
+
+                        <!-- 3. Текстовое поле (textarea) -->
+                        {% elif field.type == 'textarea' %}
                             <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
 
+                        <!-- 4. Поля с подсказками (hints) -->
                         {% elif field.hints %}
                             <div class="custom-autocomplete-wrapper">
                                 <input type="text" 
@@ -52,7 +92,8 @@
                                 </ul>
                             </div>
 
-                       {% elif field.type == 'checkbox' %}
+                        <!-- 5. Чекбоксы -->
+                        {% elif field.type == 'checkbox' %}
                             <div class="form-group-checkbox-wrapper" style="grid-column: 1 / -1;">
                                 <label class="toggle-switch-container">
                                     <span class="toggle-switch">
@@ -67,15 +108,12 @@
                                     <span class="form-label" style="margin-bottom: 0; cursor: pointer;">{{ field.label }}</span>
                                 </label>
 
-                                <!-- Специфичный блок только для поля предоплаты -->
+                                <!-- Блок предоплаты -->
                                 {% if field.field_key == 'prepay' %}
                                     <div id="prepay-amount-container" style="display: {% if get_order.prepay > 0 or field.value == 'true' or field.value == True %}block{% else %}none{% endif %}; margin-top: 12px; grid-column: 1 / -1;">
-                                        
-                                        <!-- Подсказка с уже внесенной суммой из базы -->
                                         <div style="font-size: 13px; color: #3699ff; margin-bottom: 6px;">
                                             <i class="fa-solid fa-wallet"></i> Уже внесено в кассу: <b>{{ get_order.prepay|default:0 }} ₽</b>
                                         </div>
-
                                         <label class="form-label" style="font-size: 12px; color: #a1a5b7; margin-bottom: 4px;">Добавить дополнительную предоплату</label>
                                         <input type="text" 
                                             name="prepay_amount" 
@@ -87,6 +125,8 @@
                                     </div>
                                 {% endif %}
                             </div>
+
+                        <!-- 6. Стандартные поля ввода -->
                         {% else %}
                             <input type="{{ field.type|default:'text' }}" 
                                 name="{{ field.field_key }}" 

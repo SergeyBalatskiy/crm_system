@@ -1,5 +1,6 @@
 <form method="POST" hx-post="{% url 'show_form' %}" id="create-order-form" class="drawer-form-body" onsubmit="return validatePrepayForm(event)">
     {% csrf_token %}
+    
     {% comment %} Передается в обработчик POST также и тип заказа {% endcomment %}
     <input type="hidden" name="type_of_order_selected" value="{{ current_type }}">
 
@@ -19,21 +20,47 @@
                         </label>
 
                         {% if field.field_key == 'name' or field.field_key == 'phone' %}
+                            <!-- 1. Поиск клиентов и телефона -->
                             <input type="text" 
                                 name="{{ field.field_key }}" 
                                 id="id_{{ field.field_key }}"
                                 class="custom-input client-search-input" 
-                                placeholder="Начните вводить {{ field.label|lower }}..."
+                                placeholder="{% if field.field_key == 'phone' %}+7 (___) ___ __-___{% else %}Начните вводить {{ field.label|lower }}...{% endif %}"
                                 autocomplete="off"
                                 hx-get="{% url 'find_client' %}" 
                                 hx-trigger="focus, keyup changed delay:300ms" 
                                 hx-target="#suggestions-{{ field.field_key }}" 
                                 hx-swap="innerHTML"
                                 onfocus="handleClientFocus(this)"
+                                {% if field.field_key == 'phone' %}oninput="formatPhoneInput(this)"{% endif %}
+                                value="{{ field.value|default:'' }}"
                                 {% if field.is_required %}required{% endif %}>
 
                             <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
 
+                        {% elif field.field_key == 'master' or field.field_key == 'manager' %}
+                            <!-- 2. Поиск работников (мастер / менеджер) -->
+                            <input type="text" 
+                                name="{{ field.field_key }}" 
+                                id="id_{{ field.field_key }}"
+                                class="custom-input client-search-input" 
+                                placeholder="Выберите или введите {{ field.label|lower }}..."
+                                autocomplete="off"
+                                hx-get="{% url 'find_worker' %}" 
+                                hx-trigger="focus, keyup changed delay:300ms" 
+                                hx-target="#suggestions-{{ field.field_key }}" 
+                                hx-swap="innerHTML"
+                                onfocus="handleClientFocus(this)"
+                                value="{{ field.value|default:'' }}"
+                                {% if field.is_required %}required{% endif %}>
+
+                            <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
+
+                        <!-- 1. Сначала проверяем textarea, чтобы комментарии и большие поля рендерились правильно -->
+                        {% elif field.type == 'textarea' %}
+                            <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}></textarea>
+
+                        <!-- 2. Затем проверяем подсказки (hints) -->
                         {% elif field.hints %}
                             <div class="custom-autocomplete-wrapper">
                                 <input type="text" 
@@ -52,11 +79,9 @@
                                 </ul>
                             </div>
 
-                        {% elif field.type == 'textarea' %}
-                            <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}></textarea>
-
+                        <!-- 3. Чекбоксы (убрали grid-column: 1 / -1 с внешней обертки, чтобы они вставали в 2 колонки) -->
                         {% elif field.type == 'checkbox' %}
-                            <div class="form-group-checkbox-wrapper" style="grid-column: 1 / -1;">
+                            <div class="form-group-checkbox-wrapper">
                                 <label class="toggle-switch-container">
                                     <span class="toggle-switch">
                                         <input type="checkbox" 
@@ -69,7 +94,8 @@
                                     </span>
                                     <span class="form-label" style="margin-bottom: 0; cursor: pointer;">{{ field.label }}</span>
                                 </label>
-                            <!-- Если это поле предоплаты, динамически выводим поле ввода суммы под ним -->
+                            
+                            <!-- Если это поле предоплаты, динамически выводим поле ввода суммы под ним (ему оставляем grid-column на всю ширину) -->
                             {% if field.field_key == 'prepay' %}
                                 <div id="prepay-amount-container" class="prepay-amount-container" style="display: none; margin-top: 12px; grid-column: 1 / -1;">
                                     <label class="form-label">Сумма предоплаты (₽)</label>
@@ -77,11 +103,12 @@
                                         name="prepay_amount" 
                                         id="prepay-amount-input" 
                                         class="custom-input" 
-                                        placeholder="Например: 1 500" 
+                                        placeholder="Наример: 1 500" 
                                         autocomplete="off"
                                         oninput="formatMoneyInput(this)">
                                 </div>
                             {% endif %}
+                            </div>
 
                         {% else %}
                             <input type="{{ field.type|default:'text' }}" 

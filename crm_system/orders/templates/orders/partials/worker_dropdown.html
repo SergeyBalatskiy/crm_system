@@ -1,0 +1,12 @@
+{% if workers_info %}
+    {% for worker in workers_info %}
+    <div class="suggestion-item" onclick="selectWorker('{{ field_key }}', '{{ worker.name }} {{ worker.surname }}')">
+        <span class="client-name">{{ worker.name }} {{ worker.surname }}</span>
+        <span class="client-phone" style="color: #8950fc; font-size: 0.8rem;">{{ worker.role|default:'' }}</span>
+    </div>
+    {% endfor %}
+{% else %}
+    <div class="suggestion-item" style="color: #9ca3af; cursor: default;">
+        Работник не найден
+    </div>
+{% endif %}

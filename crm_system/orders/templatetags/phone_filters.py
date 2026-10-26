@@ -13,9 +13,9 @@ def format_phone(value):
     digits = re.sub(r'\D', '', str(value))
     
     if len(digits) == 11 and digits[0] in ('7', '8'):
-        return f"+7 {digits[1:4]} {digits[4:7]} {digits[7:9]}-{digits[9:11]}"
+        return f"+7 ({digits[1:4]}) {digits[4:7]} {digits[7:9]}-{digits[9:11]}"
     
     if len(digits) == 10:
-        return f"+7 {digits[0:3]} {digits[3:6]} {digits[6:8]}-{digits[8:10]}"
+        return f"+7 ({digits[0:3]}) {digits[3:6]} {digits[6:8]}-{digits[8:10]}"
         
     return value 

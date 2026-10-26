@@ -92,8 +92,10 @@ class ShowFormForOrder(View):
             # Сам словарь который хранит уже все поля
             order_dict = {}
 
+            print('тут ошибка?')
             sections = get_json_forms.json_forms.get('sections')
 
+            print('Нет')
             # Получаю по каждому обьекту
             for section in sections:
                 # ЗАПИСЫВАЮ В КЛИЕНТ ИНФО ВСЕ ПОЛЯ (ДАЖЕ ПУСТЫЕ И ТЕ КОТОРЫЕ ПРИШЛИ)
