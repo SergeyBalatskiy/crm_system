@@ -250,7 +250,7 @@
     flex-shrink: 0 !important;
     padding: 16px 24px;
     background: #ffffff;
-    border-top: 1px solid #e4e6ef;
+    border-top: 1px solid #8950fc;
     display: flex;
     justify-content: flex-end;
     gap: 12px;
@@ -741,12 +741,20 @@
 }
 
 .crm-order-card:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 8px 20px rgba(59, 130, 246, 0.12);
+    border-color: #8950fc;
+    box-shadow: 0 8px 20px #6e41c82d;
     transform: translateY(-1px);
     /* Сделали поднятие чуть мягче */
     z-index: 10;
     /* Поднимаем карточку выше остальных соседей при наведении */
+}
+
+/* Ховер-эффект специально для СРОЧНЫХ карточек заказов */
+.order-card.urgent:hover {
+    /* Используем ту же структуру, но с другим цветом (например, красно-оранжевым под стиль «Срочно») */
+    box-shadow: 0 8px 20px rgba(245, 4, 24, 0.876);
+    /* Красноватый оттенок с прозрачностью */
+    transform: translateY(-1px);
 }
 
 .crm-card-header {
@@ -764,15 +772,15 @@
 
 .card-id {
     font-weight: 700;
-    color: #1f2937;
+    color: #0e0e0e;
     font-size: 0.95rem;
 }
 
 .card-type-tag {
     font-size: 0.68rem;
     font-weight: 700;
-    background: #f1f5f9;
-    color: #475569;
+    background: #e3deebda;
+    color: #6c3eca;
     padding: 2px 6px;
     border-radius: 4px;
     letter-spacing: 0.5px;
@@ -817,7 +825,7 @@
 
 .device-ico {
     font-size: 1.25rem;
-    color: #2563eb;
+    color: #8950fc;
     background: #eff6ff;
     padding: 8px;
     border-radius: 8px;
@@ -893,6 +901,14 @@
     overflow: hidden;
 }
 
+.crm-order-card.order-urgent:hover {
+    box-shadow: 0 8px 20px rgba(239, 80, 66, 0.3);
+    /* Красноватая тень */
+    transform: translateY(-1px);
+    border-color: #ff4757;
+    /* Опционально: усиление рамки при наведении */
+}
+
 /* Аккуратная вертикальная полоска-индикатор слева с градиентом */
 .crm-order-card.order-urgent::before {
     content: "";
@@ -950,7 +966,7 @@
 }
 
 .client-phone {
-    color: #2563eb;
+    color: #000000;
     font-weight: 500;
     margin-left: auto;
     /* Номер телефона смещается вправо */

@@ -15,4 +15,30 @@
             </li>
         {% endfor %}
     </ul>
+
+    <script>
+        function fillClientData(name, phone) {
+            // 1. Заполняем имя
+            const nameInput = document.getElementById('id_name');
+            if (nameInput) {
+                nameInput.value = name;
+            }
+
+            // 2. Заполняем телефон
+            const phoneInput = document.getElementById('id_phone');
+            if (phoneInput) {
+                phoneInput.value = phone;
+                
+                // Если функция форматирования существует — вызываем её
+                if (typeof formatPhoneInput === 'function') {
+                    formatPhoneInput(phoneInput);
+                }
+            }
+
+            // 3. Закрываем выпадающий список
+            const suggestions = document.querySelectorAll('.client-dropdown-suggestions');
+            suggestions.forEach(el => el.innerHTML = '');
+        }
+    </script>
+
 {% endif %}

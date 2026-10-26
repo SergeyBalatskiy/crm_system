@@ -12,8 +12,12 @@
             <!-- Шапка карточки -->
             <div class="crm-card-header">
                 <div class="crm-id-block">
-                    <span class="card-id">#{{ i.id }}</span>
-                    <span class="card-type-tag">{{ i.type_of_order|upper }}</span>
+                    <span class="card-id">№ {{ i.id }}</span>
+                    {% if i.type_of_order == 'paid' %}
+                    <span class="card-type-tag">Платный</span>
+                    {% else %}
+                    <span class="card-type-tag">Гарантийный</span>
+                    {% endif %}
                 </div>
                 
                 <div class="crm-status-badges">
