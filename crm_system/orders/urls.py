@@ -9,4 +9,5 @@ urlpatterns = [
     path('find_client', FindClientInformation.as_view(), name='find_client'),
     path('client_order', ShowClientOrder.as_view(), name='client_order'),
     path('find_worker', FindWorkersInformation.as_view(), name='find_worker'),
+    path('create_service_work', ServiceWorkCreate.as_view(), name='create_service_work'),
 ]
