@@ -67,7 +67,7 @@ class CreateServiceWork(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='create_service_work')
     
     # Данное поле отвечает за соединение с УНИКАЛЬНЫМ КЛЮЧОМ определенного заказа
-    connected_id = models.ForeignKey(Orders, on_delete=models.CASCADE)
+    connected_id = models.IntegerField()
 
     # Оказанная услуга: (ее название)
     service_provided = models.CharField(max_length=300)
@@ -82,8 +82,8 @@ class CreateServiceWork(models.Model):
     # Здесь идет запоминание важной информации о товаре в случае отката (удаления работы)
     # ------------------------------------------------------------------
 
-    # Количество используемого товара в ремонте
-    quantity_was_used = models.IntegerField()
+    # Количество используемого товара (со склада) в ремонте
+    quantity_was_used = models.IntegerField(null=True, blank=True)
 
     # Цена товара в закупке
     detail_buy_price = models.DecimalField(decimal_places=0, max_digits=11, null=True, blank=True)
@@ -95,15 +95,15 @@ class CreateServiceWork(models.Model):
     detail_minimum_items_for_not = models.IntegerField(default=5)
 
     # Название используемой детали в ремонте
-    detail_name_was_used = models.CharField(max_length=120, null=False, blank=False)
+    detail_name_was_used = models.CharField(max_length=120, null=True, blank=True)
 
     # Поставщик 
     detail_supplier = models.CharField(max_length=120, blank=True, null=True)
 
-    # Индивидуальный код, который запоминается для определенной детали (если она еще есть в БД)
-    detail_id = models.IntegerField()
+    # Индивидуальный код, который запоминается для связывания с определенной деталью (если она еще есть в БД)
+    detail_id = models.IntegerField(null=True, blank=True)
 
     # Количество на момент закупки
-    detail_quantity_was_buyed = models.IntegerField()
-
+    detail_quantity_was_buyed = models.IntegerField(null=True, blank=True)
+    
     # ------------------------------------------------------------------

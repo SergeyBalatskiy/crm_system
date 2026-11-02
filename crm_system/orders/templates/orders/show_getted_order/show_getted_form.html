@@ -149,5 +149,11 @@
     <div class="drawer-footer">
         <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Отмена</button>
         <button type="submit" class="btn-submit-order">Сохранить изменения</button>
+        <button type="button" class="btn-secondary"
+            hx-get="{% url 'create_service_work' %}?get_id_order={{ get_order.id }}"
+            hx-target="#drawer-content-loader"
+            hx-swap="innerHTML">
+        Ход работ
+    </button>
     </div>
 </form>

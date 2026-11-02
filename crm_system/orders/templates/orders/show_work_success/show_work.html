@@ -1,0 +1,102 @@
+<div class="drawer-header">
+    <h3><i class="fa-solid fa-screwdriver-wrench"></i> Ход работ (Заказ №{{ connected_id }})</h3>
+    <button type="button" class="drawer-close-btn" onclick="closeOrderDrawer()">&times;</button>
+</div>
+
+<!-- Блок для отображения системных ошибок или предупреждений (например, нехватка на складе) -->
+{% if msg or error_message %}
+    <div class="alert alert-danger" style="margin: 15px 20px 0 20px; padding: 12px 15px; background: #ffe2e5; color: #f64e60; border-radius: 6px; font-size: 0.9rem; font-weight: 500;">
+        <i class="fa-solid fa-triangle-exclamation"></i> {{ msg|default:error_message }}
+    </div>
+{% endif %}
+
+<div class="drawer-body" style="padding: 20px; max-height: calc(100vh - 180px); overflow-y: auto;">
+    
+    <!-- 1. Секция: Список уже созданных и сохраненных ранее работ по этому заказу -->
+    {% if get_created_works_later %}
+        <div class="existing-works-section" style="margin-bottom: 25px;">
+            <h4 style="font-size: 0.95rem; color: #3f4254; margin-bottom: 12px; font-weight: 600;">Ранее выполненные работы:</h4>
+            
+            {% for work in get_created_works_later %}
+                <div class="work-item-card" style="background: #fcfcfc; border: 1px solid #ebedf2; padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                        <span style="font-weight: 600; color: #3f4254; font-size: 0.9rem;">{{ work.service_provided }}</span>
+                        <span style="font-weight: 600; color: #8950fc; font-size: 0.9rem;">{{ work.service_price }} руб.</span>
+                    </div>
+                    
+                    {% if work.detail_name_was_used %}
+                        <div style="font-size: 0.82rem; color: #7e8299; display: flex; justify-content: space-between;">
+                            <span>Деталь: <strong>{{ work.detail_name_was_used }}</strong></span>
+                            <span>Кол-во: <strong>{{ work.quantity_was_used }} шт.</strong></span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <hr style="border: none; border-top: 1px solid #ebedf2; margin-bottom: 20px;">
+    {% endif %}
+
+    <!-- 2. Секция: Форма для добавления НОВОЙ работы -->
+    <h4 style="font-size: 0.95rem; color: #3f4254; margin-bottom: 12px; font-weight: 600;">Добавить новую работу:</h4>
+    
+    <form hx-post="{% url 'create_service_work' %}" 
+          hx-target="#drawer-content-loader" 
+          hx-swap="innerHTML" 
+          class="drawer-form-content">
+        
+        {% csrf_token %}
+        
+        <!-- Передаем ID заказа на бэкенд скрытым полем -->
+        <input type="hidden" name="get_id_order" value="{{ connected_id }}">
+
+        <div class="work-item-card" style="background: #ffffff; border: 1px solid #ebedf2; padding: 15px; border-radius: 8px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            
+            <div class="mb-3" style="margin-bottom: 15px;">
+                <label class="form-label" style="font-size: 0.85rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.service_provided.label }}</label>
+                {{ create_work_form.service_provided }}
+                {{ create_work_form.service_provided.errors }}
+            </div>
+
+            <div class="row" style="display: flex; gap: 10px; margin-bottom: 15px;">
+                <div style="flex: 1;">
+                    <label class="form-label" style="font-size: 0.85rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.service_price.label }}</label>
+                    {{ create_work_form.service_price }}
+                    {{ create_work_form.service_price.errors }}
+                </div>
+                <div style="flex: 1;">
+                    <label class="form-label" style="font-size: 0.85rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.quantity_was_used.label }}</label>
+                    {{ create_work_form.quantity_was_used }}
+                    {{ create_work_form.quantity_was_used.errors }}
+                </div>
+            </div>
+
+            <div class="mb-3" style="margin-bottom: 15px;">
+                <label class="form-label" style="font-size: 0.85rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.detail_name_was_used.label }}</label>
+                {{ create_work_form.detail_name_was_used }}
+                {{ create_work_form.detail_name_was_used.errors }}
+            </div>
+
+            <div class="mb-2">
+                <label class="form-label" style="font-size: 0.85rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.detail_id.label }}</label>
+                {{ create_work_form.detail_id }}
+                {{ create_work_form.detail_id.errors }}
+            </div>
+        </div>
+
+        <!-- Зафиксированный футер с кнопками управления -->
+        <div class="drawer-footer" style="padding: 15px 20px; background: #fff; border-top: 1px solid #ebedf2; display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+            <!-- Кнопка возврата обратно к карточке заказа по GET запросу -->
+            <button type="button" class="btn-cancel" 
+                    hx-get="{% url 'client_order' %}?get_id_order={{ connected_id }}"
+                    hx-target="#drawer-content-loader"
+                    hx-swap="innerHTML"
+                    style="background: #f3f6f9; color: #3f4254; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                ← Назад к заказу
+            </button>
+
+            <button type="submit" class="btn-submit-order" style="background: #8950fc; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600;">
+                Сохранить работу
+            </button>
+        </div>
+    </form>
+</div>
