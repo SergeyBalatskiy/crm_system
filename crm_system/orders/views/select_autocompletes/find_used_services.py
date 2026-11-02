@@ -16,7 +16,7 @@ class ServicesSelectAutocomplete(Select2QuerySetView):
             
             qs = qs.filter(
                 Q(name_service_work__icontains=self.q) | 
-                Q(category__icontains=self.q) | 
+                Q(category__name_category_work__icontains=self.q) | 
                 Q(price_str__icontains=self.q)
             )
         return qs
