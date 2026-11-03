@@ -14,5 +14,7 @@ urlpatterns = [
     path('orders_autocomplete', OrdersDetailsAutocomplete.as_view(), name='orders_autocomplete'), 
     # Указываю на путь к обращению за рабочими услугами, чтобы отрбражать авто ответы для подсказок из БД
     path('services_autocomplete', ServicesSelectAutocomplete.as_view(), name='services_autocomplete'), 
+    # Создаю обработчик на удаление ошибочной "работы"
+    path('delete_services', DeleteServicesInOrder.as_view(), name='delete_services'), 
     
 ]

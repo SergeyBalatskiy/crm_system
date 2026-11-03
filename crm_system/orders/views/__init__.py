@@ -6,3 +6,4 @@ from .find_workers import FindWorkersInformation
 from .create_services import ServiceWorkCreate
 from .select_autocompletes.find_used_detail import OrdersDetailsAutocomplete
 from .select_autocompletes.find_used_services import ServicesSelectAutocomplete
+from .delete_services_work.delete_services_work import DeleteServicesInOrder

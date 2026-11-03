@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.contrib import messages
 from datetime import datetime, timedelta
 import json
+from django.db.models import Sum
 from django.db.models.functions import Cast
 from django.shortcuts import render
 from profile_user.models import WorkersInfo
@@ -68,7 +69,7 @@ class ServiceWorkCreate(View):
                         # Списываю с хранилища (удаляю) обьект + создаю историю удаления:
                         create_history_deleted = HistoryStorageInfo(user = self.request.user, type_of_operation_history = 'Списание', 
                         name_product_history = selected_detail_storage.name_product, individual_code_history = selected_detail_storage.individual_code,
-                        quantity_history = get_one_form.cleaned_data['quantity_was_used'], buy_price_history = selected_detail_storage.buy_price, 
+                        quantity_history = selected_detail_storage.quantity_was_used, buy_price_history = selected_detail_storage.buy_price, 
                         supplier_history = selected_detail_storage.supplier, remainder_history = 0)
 
                         # Сохраняю
@@ -81,39 +82,52 @@ class ServiceWorkCreate(View):
                         selected_detail_storage.delete()
                         print('Был последний товар, он списан и удален, вернул ничего, все прошло успешно')
 
-                        return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
-                        'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id})
+                        # return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
+                        # 'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id})
 
                     # Если при списании у нас товара больше нуля (1, 2, 5, 20, ...)
                     else:
                         create_history_deleted = HistoryStorageInfo(user = self.request.user, type_of_operation_history = 'Списание', 
                         name_product_history = selected_detail_storage.name_product, individual_code_history = selected_detail_storage.individual_code,
-                        quantity_history = get_one_form.cleaned_data['quantity_was_used'], buy_price_history = selected_detail_storage.buy_price, 
+                        quantity_history = selected_detail_storage.quantity_was_used, buy_price_history = selected_detail_storage.buy_price, 
                         supplier_history = selected_detail_storage.supplier, remainder_history = count_remainder)
                     
                         # Сохраняю созданный обьект в БД
-                        create_work_completed.save()
-
                         create_work_completed.user = self.request.user
                         create_work_completed.connected_id = get_id_order
                         create_work_completed.save() 
 
+                        # # Получение суммы итоговой ремонта
+                        # get_sum_repair = CreateServiceWork.objects.filter(user=self.request.user, connected_id = connected_id).aggregate(total_sum=Sum('service_price'))
+                        # total_price = get_sum_repair['total_sum']
+
                         print('На складе еще остался товар, история списания создана и сохранена')
 
                         # Ничего не возвращает так как мы просто создали оказываемую услугу
-                        return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
-                        'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id})
+                        # return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
+                        # 'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id})
+                
+                    # Получение суммы итоговой ремонта
+                    get_sum_repair = CreateServiceWork.objects.filter(user=self.request.user, connected_id = connected_id).aggregate(total_sum=Sum('service_price'))
+                    total_price = get_sum_repair['total_sum']
+                    return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
+                    'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id, 'total_price' : total_price})
                 
                 # Если айди нету, то просто сохраняю
                 else: 
                     create_work_completed.user = self.request.user
                     create_work_completed.connected_id = get_id_order
                     create_work_completed.save() 
+                    print(create_work_completed.service_provided)
+
+                    # Получение суммы итоговой ремонта
+                    get_sum_repair = CreateServiceWork.objects.filter(user=self.request.user, connected_id = connected_id).aggregate(total_sum=Sum('service_price'))
+                    total_price = get_sum_repair['total_sum']
 
                     print('Ничего не было выбрано, просто обычное создание текста без использования детали')
 
                     return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
-                    'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id})
+                    'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id, 'total_price' : total_price})
                     
         except Exception as e:
                 msg = f'Произошла ошибка: {e}'
@@ -128,20 +142,24 @@ class ServiceWorkCreate(View):
         # + получаю специально код самого заказа
         connected_id = request.GET.get('get_id_order')
 
+        get_sum_repair = CreateServiceWork.objects.filter(user=request.user, connected_id = connected_id).aggregate(total_sum=Sum('service_price'))
+        total_price = get_sum_repair['total_sum']
+
         # Плюс дополнительно если человек открывает разметку не в первый раз и там уже есть выполненные работы, то я иду в БД
         # и фильтрую по тому, что есть + с сортировкой по дате (от старого к новому)
         get_created_works_later = CreateServiceWork.objects.filter(user=request.user, connected_id=connected_id).order_by('service_was_created')
 
         # Беру форму с созданием названия работы, цены, (возможно названия детали и количества ее использования)
         create_work_form = WorkCreatingForm()
-        return render(request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id})
+        return render(request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form,
+        'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id, 'total_price' : total_price})
 
     def post(self, request, *args, **kwargs):
 
         # Получаю обьект с названием работы 
         get_one_form = WorkCreatingForm(data=self.request.POST)
 
-        # Получаю код заказа (чтобы можно было связать с заказом)
+        # Получаю код заказа (чтобы можно было связать с работой)
         get_id_order = request.POST.get('get_id_order')
 
         if get_one_form.is_valid():
