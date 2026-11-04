@@ -18,13 +18,342 @@
     visibility: visible;
 }
 
+.btn-close-drawer {
+    background: transparent;
+    border: none;
+    color: #7e8299;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-close-drawer:hover {
+    color: #f64e60;
+}
+
+/* Область прокрутки */
+.drawer-sections-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #f8f9fa;
+}
+
+/* Секции формы */
+.form-section {
+    background: #7444e4;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #7444e4 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+}
+
+.section-title {
+    margin: 0 0 16px 0;
+    font-size: 0.85rem;
+    color: #8950fc;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 700;
+}
+
+.section-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* Метки полей */
+.form-label {
+    font-size: 0.82rem;
+    color: #3f4254;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.req-star {
+    color: #f64e60;
+    margin-left: 2px;
+}
+
+/* Поля ввода и Textarea */
+.custom-input,
+.custom-textarea {
+    width: 100% !important;
+    padding: 10px 14px !important;
+    background: #fcfcfc !important;
+    border: 1px solid #e4e6ef !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    color: #3f4254 !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+.custom-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group:has(.custom-textarea) {
+    grid-column: span 2;
+}
+
+/* Фокус на полях */
+.custom-input:focus,
+.custom-textarea:focus {
+    border-color: #8950fc !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.12) !important;
+}
+
+/* Чекбоксы / тумблеры */
+.form-group-checkbox-wrapper {
+    grid-column: span 2;
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #ebedf2;
+}
+
+.toggle-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbccd2;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+    background-color: #8950fc;
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+    transform: translateX(20px);
+}
+
+/* Футер и кнопки */
+.drawer-footer {
+    flex-shrink: 0;
+    padding: 16px 24px;
+    background: #ffffff;
+    border-top: 1px solid #ebedf2;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.btn-cancel {
+    background: #f3f6f9;
+    color: #3f4254;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-cancel:hover {
+    background: #e4e6ef;
+}
+
+.btn-submit-order {
+    background: #8950fc;
+    color: #ffffff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(137, 80, 252, 0.3);
+    transition: all 0.2s;
+}
+
+.btn-submit-order:hover {
+    background: #7333ea;
+}
+
+.btn-secondary {
+    background: #e1effe;
+    color: #7333ea;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #d1e5fe;
+}
+
+/* Выпадающие подсказки */
+.client-dropdown-suggestions,
+.custom-hints-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #8950fc;
+    border-radius: 6px;
+    z-index: 1050;
+    max-height: 180px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+}
+
+.suggestion-item,
+.custom-hints-dropdown li {
+    padding: 9px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f2;
+    font-size: 0.88rem;
+    color: #3f4254;
+    transition: background 0.15s;
+}
+
+.suggestion-item:hover,
+.custom-hints-dropdown li:hover {
+    background: #f4f0ff;
+    color: #8950fc;
+}
+
+.client-dropdown-suggestions:empty,
+.custom-hints-dropdown:empty {
+    display: none !important;
+    border: none !important;
+}
+
+/* Общие стили для текстовых и числовых полей ввода */
+#drawer-content-loader input[type="text"],
+#drawer-content-loader input[type="number"],
+#drawer-content-loader input.form-control {
+    width: 100% !important;
+    height: 42px !important;
+    padding: 8px 14px !important;
+    background: #fcfcfc !important;
+    border: 1px solid #e4e6ef !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    color: #3f4254 !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+/* Эффект при фокусе (клик в поле) */
+#drawer-content-loader input[type="text"]:focus,
+#drawer-content-loader input[type="number"]:focus,
+#drawer-content-loader input.form-control:focus {
+    border-color: #8950fc !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.12) !important;
+}
+
+/* Поле только для чтения (Код товара) */
+#drawer-content-loader input.readonly-input {
+    background: #f3f6f9 !important;
+    color: #7e8299 !important;
+    cursor: not-allowed !important;
+}
+
+/* Настройка внешнего вида виджетов Select2 под дизайн полей */
+#drawer-content-loader .select2-container--default .select2-selection--single {
+    height: 42px !important;
+    padding: 6px 12px !important;
+    background: #fcfcfc !important;
+    border: 1px solid #e4e6ef !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.2s ease !important;
+}
+
+#drawer-content-loader .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #3f4254 !important;
+    line-height: normal !important;
+    padding-left: 0 !important;
+    font-size: 0.9rem !important;
+}
+
+#drawer-content-loader .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+    right: 10px !important;
+}
+
+/* Фокус на Select2 */
+#drawer-content-loader .select2-container--default.select2-container--focus .select2-selection--single,
+#drawer-content-loader .select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #8950fc !important;
+    box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.12) !important;
+    background: #ffffff !important;
+}
+
 /* Панель, выезжающая справа */
 .order-drawer {
     position: fixed;
     top: 0;
     right: 0;
-    width: 42vw;
-    min-width: 560px;
+    width: 43vw;
+    min-width: 580px;
     height: 100vh !important;
     /* Жестко фиксируем высоту экрана */
     background: #ffffff;
@@ -526,7 +855,7 @@
 
 .crm-counter {
     background: #e0f2fe;
-    color: #0284c7;
+    color: #8950fc;
     padding: 4px 12px;
     border-radius: 30px;
     font-size: 0.8rem;

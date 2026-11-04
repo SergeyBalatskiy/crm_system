@@ -78,12 +78,15 @@ class CreateServiceWork(models.Model):
     # Цена оказанной услуги
     service_price = models.DecimalField(decimal_places=0, max_digits=11)
 
+    # Количество дней гарантии работы
+    days_of_garanty = models.DecimalField(decimal_places=0, max_digits=11, default=30)
+
     # ------------------------------------------------------------------
     # Здесь идет запоминание важной информации о товаре в случае отката (удаления работы)
     # ------------------------------------------------------------------
 
     # Количество используемого товара (со склада) в ремонте
-    quantity_was_used = models.IntegerField(null=True, blank=True)
+    quantity_was_used = models.IntegerField(null=True, blank=True, default=1)
 
     # Цена товара в закупке
     detail_buy_price = models.DecimalField(decimal_places=0, max_digits=11, null=True, blank=True)

@@ -8,12 +8,13 @@ class WorkCreatingForm(forms.ModelForm):
 
     class Meta:
         model = CreateServiceWork
-        fields = ('service_provided', 'service_price', 'quantity_was_used', 'detail_name_was_used', 'detail_id')
+        fields = ('service_provided', 'quantity_was_used', 'days_of_garanty', 'service_price', 'detail_name_was_used', 'detail_id')
 
-        labels = {'service_provided' : 'Название услуги',
-                  'service_price' : 'Цена услуги',
-                  'quantity_was_used' : 'Количество (в используемых в деталях)',
-                  'detail_name_was_used' : 'Название используемой детали',
+        labels = {'service_provided' : 'Наименование',
+                  'quantity_was_used' : 'Кол-во',
+                  'days_of_garanty' : 'Гарантия, дней',
+                  'service_price' : 'Цена, руб',
+                  'detail_name_was_used' : 'Название товара',
                   'detail_id' : 'Код товара'
                   }
 
@@ -32,7 +33,7 @@ class WorkCreatingForm(forms.ModelForm):
                 'data-placeholder' : 'Выберите или введите услугу...',
                 'data-tags' : 'true', 'style' : 'width: 100%;',
             }), 
-
+            'days_of_garanty': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'placeholder': 'Гарантия'}),
             'service_price': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'placeholder': 'Цена услуги'}),
             'quantity_was_used': forms.TextInput(attrs={'class': 'form-control', 'inputmode': 'numeric', 'placeholder': 'Количество'}),
         }
@@ -58,6 +59,9 @@ class WorkCreatingForm(forms.ModelForm):
 
         if quantity_was_used and not name_selected_product:
             self.add_error('quantity_was_used', 'Нельзя списать товар, который не выбран!')
+
+        if name_selected_product and not quantity_was_used:
+            self.add_error('detail_name_was_used', 'Необходимо указать количество используемого товара!')
 
         return cleaned_data
        

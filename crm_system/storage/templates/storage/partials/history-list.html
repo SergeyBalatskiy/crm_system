@@ -7,6 +7,8 @@
         </div>
         {% if item_history.type_of_operation_history == "Возврат без возмещения денежных средств" %}
             <span class="badge badge-danger">{{ item_history.type_of_operation_history }}</span>
+        {% elif item_history.type_of_operation_history == "Использование в ремонте" %}
+            <span class="badge badge-work">{{ item_history.type_of_operation_history }}</span>
         {% elif item_history.type_of_operation_history == "Гарантийный возврат" %}
             <span class="badge badge-warning">{{ item_history.type_of_operation_history }}</span>
         {% elif item_history.type_of_operation_history == "Продажа товара" %}

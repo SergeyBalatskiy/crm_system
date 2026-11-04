@@ -157,9 +157,15 @@
     border: 1px solid #fef08a;
 }
 
+.badge-work {
+    background-color: #fefce8;
+    color: #f54905;
+    border: 1px solid #d68f0c;
+}
+
 .badge-danger {
     background-color: #fef2f2;
-    color: #b91c1c;
+    color: #d21515;
     border: 1px solid #fecaca;
 }
 

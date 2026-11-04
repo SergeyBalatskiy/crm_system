@@ -43,6 +43,7 @@ class ServiceWorkCreate(View):
                     get_id_from_storage = create_work_completed.detail_id
                     # Беру обьект
                     selected_detail_storage = StorageInfo.objects.select_for_update().get(user=self.request.user, id=get_id_from_storage)
+                    print(selected_detail_storage)
                     create_work_completed.detail_buy_price = selected_detail_storage.buy_price
                     create_work_completed.detail_retail_price = selected_detail_storage.retail_price
                     create_work_completed.detail_minimum_items_for_not = selected_detail_storage.minimum_items_for_notification
@@ -67,46 +68,42 @@ class ServiceWorkCreate(View):
                     # Если при списании товара со склада, количество оказалось равно нулю, то:
                     elif count_remainder == 0:
                         # Списываю с хранилища (удаляю) обьект + создаю историю удаления:
-                        create_history_deleted = HistoryStorageInfo(user = self.request.user, type_of_operation_history = 'Списание', 
+                        create_history_deleted = HistoryStorageInfo(user = self.request.user, type_of_operation_history = 'Использование в ремонте', 
                         name_product_history = selected_detail_storage.name_product, individual_code_history = selected_detail_storage.individual_code,
-                        quantity_history = selected_detail_storage.quantity_was_used, buy_price_history = selected_detail_storage.buy_price, 
+                        quantity_history = get_one_form.cleaned_data['quantity_was_used'], buy_price_history = selected_detail_storage.buy_price, 
                         supplier_history = selected_detail_storage.supplier, remainder_history = 0)
 
-                        # Сохраняю
+                        # Удаляю деталь используемую при работе из хранилища
+                        selected_detail_storage.delete()
+                        # Создаю историю о списании товара в момент работы
                         create_history_deleted.save()
 
                         # Сохраняю созданный обьект в БД
                         create_work_completed.save()
 
-                        # Удаляю
-                        selected_detail_storage.delete()
                         print('Был последний товар, он списан и удален, вернул ничего, все прошло успешно')
-
-                        # return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
-                        # 'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id})
 
                     # Если при списании у нас товара больше нуля (1, 2, 5, 20, ...)
                     else:
-                        create_history_deleted = HistoryStorageInfo(user = self.request.user, type_of_operation_history = 'Списание', 
+                        create_history_deleted = HistoryStorageInfo(user = self.request.user, type_of_operation_history = 'Использование в ремонте', 
                         name_product_history = selected_detail_storage.name_product, individual_code_history = selected_detail_storage.individual_code,
-                        quantity_history = selected_detail_storage.quantity_was_used, buy_price_history = selected_detail_storage.buy_price, 
+                        quantity_history = get_one_form.cleaned_data['quantity_was_used'], buy_price_history = selected_detail_storage.buy_price, 
                         supplier_history = selected_detail_storage.supplier, remainder_history = count_remainder)
-                    
+
+                        # Сохраняю новое количество товара на складе
+                        selected_detail_storage.remainder = count_remainder
+                        selected_detail_storage.save()
+                        print('Количество товара изменено.')
+
+                        # Создаю и сохраняю историю операции
+                        create_history_deleted.save()
+
                         # Сохраняю созданный обьект в БД
                         create_work_completed.user = self.request.user
                         create_work_completed.connected_id = get_id_order
                         create_work_completed.save() 
-
-                        # # Получение суммы итоговой ремонта
-                        # get_sum_repair = CreateServiceWork.objects.filter(user=self.request.user, connected_id = connected_id).aggregate(total_sum=Sum('service_price'))
-                        # total_price = get_sum_repair['total_sum']
-
                         print('На складе еще остался товар, история списания создана и сохранена')
 
-                        # Ничего не возвращает так как мы просто создали оказываемую услугу
-                        # return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
-                        # 'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id})
-                
                     # Получение суммы итоговой ремонта
                     get_sum_repair = CreateServiceWork.objects.filter(user=self.request.user, connected_id = connected_id).aggregate(total_sum=Sum('service_price'))
                     total_price = get_sum_repair['total_sum']
@@ -170,5 +167,5 @@ class ServiceWorkCreate(View):
             return self.form_valid(get_one_form, get_id_order)
 
         # Показываем на текущем шаблоне форму, в случае если она не валидна
-        print('Вернул респонс')
+        print(get_one_form.errors)
         return HttpResponse(status=204)

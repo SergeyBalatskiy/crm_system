@@ -25,9 +25,8 @@ class ServicesSelectAutocomplete(Select2QuerySetView):
             return [
                 {
                     'id': self.get_result_value(result), 
-                    'text': f"Услуга: {result.name_service_work or '-'} | Категория: {result.category} | Цена: {result.price}",
+                    'text': f"{result.name_service_work or '-'} | Категория: {result.category} | Цена: {result.price}",
                     'name': result.name_service_work,
-                   
                 }
                 for result in context['object_list']
             ]
