@@ -45,13 +45,6 @@ class WorkCreatingForm(forms.ModelForm):
             raise ValidationError('Необходимо указать название оказываемой услуги!')
         return service_provided
 
-    # Идет проверка на корректность ввода (чтобы не было пустым) + очистка:
-    def clean_service_price(self):
-        service_price = self.cleaned_data.get('service_price')
-        if not service_price:
-            raise ValidationError('Необходимо указать цену оказываемой услуги!')
-        return service_price
-
     def clean(self):
         cleaned_data=super().clean()
         name_selected_product = cleaned_data.get('detail_name_was_used')

@@ -156,16 +156,30 @@ class ServiceWorkCreate(View):
         # Получаю обьект с названием работы 
         get_one_form = WorkCreatingForm(data=self.request.POST)
 
-        # Получаю код заказа (чтобы можно было связать с работой)
-        get_id_order = request.POST.get('get_id_order')
+        # получаю специально код самого заказа
+        connected_id = request.POST.get('get_id_order')
+
+        # Получаю обьект 
+        get_service_work = CreateServiceWork.objects.filter(user=request.user, connected_id=connected_id)
+        get_created_works_later = get_service_work.order_by('service_was_created')
+
+        get_sum_repair = get_service_work.aggregate(total_sum=Sum('service_price'))
+        total_price = get_sum_repair['total_sum']
 
         if get_one_form.is_valid():
 
             service_provided = get_one_form.cleaned_data['service_provided']
             quantity_was_used = get_one_form.cleaned_data['quantity_was_used']
 
-            return self.form_valid(get_one_form, get_id_order)
+            return self.form_valid(get_one_form, connected_id)
 
-        # Показываем на текущем шаблоне форму, в случае если она не валидна
-        print(get_one_form.errors)
-        return HttpResponse(status=204)
+        context = {
+            'connected_id' : connected_id,
+            'create_work_form' : get_one_form,
+            'get_created_works_later' : get_created_works_later,
+            'total_price' : total_price, 
+            'error_message' : 'Пожалуйста, заполните обязательные поля!'
+        }
+
+        # Возврат контекста если форма не валидна
+        return render(request, 'orders/show_work_success/show_work.html', context)

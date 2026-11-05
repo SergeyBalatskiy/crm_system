@@ -10,9 +10,10 @@
 
     <!-- Блок для системных ошибок или предупреждений -->
     {% if msg or error_message %}
-        <div style="flex-shrink: 0; margin: 15px 25px 0 25px; padding: 12px 15px; background: #ffe2e5; color: #f64e60; border-radius: 6px; font-size: 0.9rem; font-weight: 500;">
-            <i class="fa-solid fa-triangle-exclamation"></i> {{ msg|default:error_message }}
-        </div>
+    <div id="error-alert" style="flex-shrink: 0; margin: 15px 25px 0 25px; padding: 12px 15px; background: #ffe2e5; color: #f64e60; border-radius: 6px; font-size: 0.9rem; font-weight: 500; transition: opacity 0.5s ease;">
+        <i class="fa-solid fa-triangle-exclamation"></i> 
+        {{ msg|default:error_message|default:"Пожалуйста, заполните обязательные поля!" }}
+    </div>
     {% endif %}
 
     <!-- Форма -->
@@ -35,7 +36,6 @@
                 <div style="margin-bottom: 15px;">
                     <label style="font-size: 0.82rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.service_provided.label }}</label>
                     {{ create_work_form.service_provided }}
-                    {{ create_work_form.service_provided.errors }}
                 </div>
 
                 <!-- 2. Гарантия и 3. Цена (в одну строку) -->
@@ -43,12 +43,13 @@
                     <div style="flex: 1;">
                         <label style="font-size: 0.82rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.days_of_garanty.label }}</label>
                         {{ create_work_form.days_of_garanty }}
-                        {{ create_work_form.days_of_garanty.errors }}
+                  
                     </div>
                     <div style="flex: 1;">
                         <label style="font-size: 0.82rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.service_price.label }}</label>
                         {{ create_work_form.service_price }}
-                        {{ create_work_form.service_price.errors }}
+                
+
                     </div>
                 </div>
 
@@ -58,28 +59,28 @@
                         <i id="toggle-icon" class="fa-solid fa-plus"></i> <span id="toggle-text">Привязать деталь со склада</span>
                     </button>
 
-                    <!-- Скрытый блок деталей -->
+                    <!-- Скрытый блок деталей (Название сверху, Код и Кол-во снизу) -->
                     <div id="detail-section-fields" style="display: none; margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ebedf2;">
                         
-                        <!-- Код детали и Количество в строку -->
-                        <div style="display: flex; gap: 12px; margin-bottom: 12px;">
+                        <!-- Название товара (вверху) -->
+                        <div style="margin-bottom: 12px;">
+                            <label style="font-size: 0.8rem; color: #7e8299; display: block; margin-bottom: 4px; font-weight: 600;">{{ create_work_form.detail_name_was_used.label }}</label>
+                            {{ create_work_form.detail_name_was_used }}
+     
+                        </div>
+
+                        <!-- Код товара и Количество в строку (внизу) -->
+                        <div style="display: flex; gap: 12px;">
                             <div style="flex: 1;">
                                 <label style="font-size: 0.8rem; color: #7e8299; display: block; margin-bottom: 4px; font-weight: 600;">{{ create_work_form.detail_id.label }}</label>
                                 {{ create_work_form.detail_id }}
-                                {{ create_work_form.detail_id.errors }}
+                         
                             </div>
                             <div style="flex: 1;">
                                 <label style="font-size: 0.8rem; color: #7e8299; display: block; margin-bottom: 4px; font-weight: 600;">{{ create_work_form.quantity_was_used.label }}</label>
                                 {{ create_work_form.quantity_was_used }}
-                                {{ create_work_form.quantity_was_used.errors }}
+            
                             </div>
-                        </div>
-
-                        <!-- Название детали -->
-                        <div>
-                            <label style="font-size: 0.8rem; color: #7e8299; display: block; margin-bottom: 4px; font-weight: 600;">{{ create_work_form.detail_name_was_used.label }}</label>
-                            {{ create_work_form.detail_name_was_used }}
-                            {{ create_work_form.detail_name_was_used.errors }}
                         </div>
 
                     </div>
@@ -124,7 +125,6 @@
                                             <div style="font-size: 0.78rem; color: #5e6278; background: #f3f6f9; padding: 5px 8px; border-radius: 6px; margin-top: 6px; display: flex; justify-content: space-between;">
                                                 <span>📦 Деталь: <strong>{{ work.detail_name_was_used }}</strong></span>
                                                 <span style="color: #7e8299;">Код: {{ work.detail_id|default:"-" }}</span>
-                                                <h1>{{ work }}</h1>
                                             </div>
                                         {% endif %}
 
@@ -180,7 +180,6 @@
 </div>
 
 <script>
-
     function makeDrawerWide() {
         var drawer = document.querySelector('#drawer-content-loader').closest('.order-drawer');
         if (drawer) {
@@ -220,6 +219,7 @@
         makeDrawerWide();
         initSelect2Elements();
         checkQuantityState();
+        initNumericValidations();
     });
 
     document.body.addEventListener('htmx:afterSwap', function(event) {
@@ -230,12 +230,105 @@
                 setTimeout(function() {
                     initSelect2Elements();
                     checkQuantityState();
+                    initNumericValidations();
                 }, 50);
             } else {
                 resetWideDrawerWidth();
             }
         }
     });
+
+    // Перехват отправки формы для удаления пробелов перед отправкой в Django
+    document.addEventListener('submit', function(e) {
+        var form = e.target;
+        if (form.matches('form') || form.querySelector('#id_service_price')) {
+            var priceInput = form.querySelector('#id_service_price');
+            var warrantyInput = form.querySelector('#id_days_of_garanty');
+            var quantityInput = form.querySelector('#id_quantity_was_used');
+
+            if (priceInput) {
+                priceInput.value = priceInput.value.replace(/\s+/g, '');
+            }
+            if (warrantyInput) {
+                warrantyInput.value = warrantyInput.value.replace(/\s+/g, '');
+            }
+            if (quantityInput) {
+                var detailId = form.querySelector('#id_detail_id');
+                if (!detailId || !detailId.value.trim()) {
+                    quantityInput.value = '0'; // Если деталь не выбрана, строго 0
+                } else {
+                    quantityInput.value = quantityInput.value.replace(/\s+/g, '');
+                }
+            }
+        }
+    }, true);
+
+    // Защита числовых полей от букв, минусов и точек
+    function initNumericValidations() {
+        var numericFields = ['id_service_price', 'id_days_of_garanty', 'id_quantity_was_used'];
+
+        numericFields.forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) {
+                // Запрещаем ввод букв, минусов и точек на уровне нажатия клавиш
+                el.addEventListener('keydown', function(e) {
+                    // Разрешенные клавиши: цифры, Backspace, Delete, Tab, Стрелки, Enter
+                    var allowedKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'Enter'];
+                    if (allowedKeys.includes(e.key)) return;
+                    
+                    // Блокируем минус, плюс, точку, e и т.д.
+                    if (e.key < '0' || e.key > '9') {
+                        e.preventDefault();
+                    }
+                });
+
+                // Обработка ввода (на случай вставки текста через буфер обмена)
+                el.addEventListener('input', function(e) {
+                    var cleanVal = this.value.replace(/[^\d]/g, '');
+                    
+                    if (id === 'id_service_price') {
+                        // Для цены форматируем с пробелами по тысячам
+                        if (cleanVal !== '') {
+                            this.value = Number(cleanVal).toLocaleString('ru-RU');
+                        } else {
+                            this.value = '';
+                        }
+                    } else {
+                        // Для гарантии и количества — просто чистые цифры без нулей в начале (если > 0)
+                        this.value = cleanVal;
+                    }
+                });
+            }
+        });
+    }
+
+    // Функция для автоматического скрытия блока ошибок через 5 секунд
+    function initAutoDismissAlerts() {
+        var alertBox = document.getElementById('error-alert');
+        if (alertBox) {
+            // Через 5 секунд запускаем плавное исчезновение
+            setTimeout(function() {
+                alertBox.style.opacity = '0';
+                // Спустя еще 0.5 секунды (время transition) полностью скрываем элемент
+                setTimeout(function() {
+                    alertBox.style.display = 'none';
+                }, 500);
+            }, 5000);
+        }
+    }
+
+    // Запускаем при загрузке
+    document.addEventListener("DOMContentLoaded", function() {
+        initAutoDismissAlerts();
+    });
+
+    // Запускаем после каждого ответа HTMX (когда форма возвращает ошибки)
+    document.body.addEventListener('htmx:afterSwap', function(event) {
+        if (event.detail.target.id === 'drawer-content-loader') {
+            initAutoDismissAlerts();
+        }
+    });
+
 
     function toggleDetailSection() {
         var section = document.getElementById('detail-section-fields');
@@ -286,13 +379,6 @@
         }
     }
 
-    function formatMoney(val) {
-        if (!val) return '';
-        var num = String(val).replace(/\s+/g, '').replace(',', '.');
-        if (isNaN(num)) return val;
-        return Number(num).toLocaleString('ru-RU');
-    }
-
     function initSelect2Elements() {
         if (typeof jQuery !== 'undefined' && jQuery.fn.select2) {
             
@@ -330,19 +416,20 @@
                     var data = e.params.data;
                     var cleanName = data.name || data.text.split('|')[0].trim();
 
-                    // Создаем временный option с чистым именем, чтобы Select2 не терял отображение
                     if (! $serviceSelect.find("option[value='" + cleanName + "']").length) {
                         var newOption = new Option(cleanName, cleanName, true, true);
                         $serviceSelect.append(newOption);
                     }
                     $serviceSelect.val(cleanName).trigger('change');
 
-                    // Заполнение и форматирование цены
+                    // Заполнение и форматирование цены с пробелами по тысячам
                     if (data.text) {
                         var match = data.text.match(/Цена:\s*([0-9\s,.]+)/i);
                         if (match && match[1]) {
-                            var cleanPrice = match[1].trim().replace(/\s+/g, '');
-                            jQuery('#id_service_price').val(formatMoney(cleanPrice));
+                            var cleanPrice = match[1].trim().replace(/\D/g, '');
+                            if (cleanPrice) {
+                                jQuery('#id_service_price').val(Number(cleanPrice).toLocaleString('ru-RU'));
+                            }
                         }
                     }
                 });
@@ -352,7 +439,7 @@
             var $detailSelect = jQuery('#id_detail_name_was_used');
             if ($detailSelect.length) {
                 if ($detailSelect.data('select2')) {
-                    $detailSelect.select2('destroy');
+                    $detailSelect.destroy ? $detailSelect.select2('destroy') : $detailSelect.select2('destroy');
                 }
                 $detailSelect.select2({
                     width: '100%',
@@ -376,14 +463,12 @@
                     var data = e.params.data;
                     var cleanName = data.name || data.text;
 
-                    // Добавляем Option с чистым названием детали
                     if (! $detailSelect.find("option[value='" + cleanName + "']").length) {
                         var newOption = new Option(cleanName, cleanName, true, true);
                         $detailSelect.append(newOption);
                     }
                     $detailSelect.val(cleanName).trigger('change');
 
-                    // Проставляем код детали и активируем количество
                     if (data.code) {
                         document.getElementById('id_detail_id').value = data.code;
                     }
