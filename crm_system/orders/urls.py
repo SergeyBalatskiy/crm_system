@@ -16,5 +16,7 @@ urlpatterns = [
     path('services_autocomplete', ServicesSelectAutocomplete.as_view(), name='services_autocomplete'), 
     # Создаю обработчик на удаление ошибочной "работы"
     path('delete_services', DeleteServicesInOrder.as_view(), name='delete_services'), 
-    
+    # Указывается обработчик на изменение статуса заказа
+    path('change_status_order', ChangeStatusOrder.as_view(), name='change_status_order'), 
+        
 ]
