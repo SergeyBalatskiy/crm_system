@@ -6,7 +6,7 @@ from django.db.models import Q, TextField
 from django.db.models.functions import Cast
 from orders.models import CreateServiceWork
 from django.db.models import Sum
-from storage.models import StorageInfo
+from storage.models import StorageInfo, HistoryStorageInfo
 from orders.forms import WorkCreatingForm
 from django.shortcuts import render
 
@@ -47,6 +47,9 @@ class DeleteServicesInOrder(Select2QuerySetView):
                 get_to_update.remainder = get_to_update.remainder + find_service_work.quantity_was_used
                 get_to_update.save()
 
+                # Получаю актуальное количество товара после сохранения чтобы передать в историю операций склада
+                actual_remainder = get_to_update.remainder
+
             else:
                 # Если обьекта нету, значит, нужно его создать...
                 created_returned_detail = StorageInfo.objects.create(user=request.user, name_product = find_service_work.detail_name_was_used, quantity_at_the_purchase = service_work.detail_quantity_was_buyed,
@@ -56,9 +59,13 @@ class DeleteServicesInOrder(Select2QuerySetView):
                 # Записываем айдишник (individual_code) + сохраняем
                 created_returned_detail.individual_code = created_returned_detail.id
                 created_returned_detail.save()
+                actual_remainder = created_returned_detail.remainder
 
             # СДЕЛАТЬ ТУТ ОБЩУЮ ЛОГИКУ ДОБАВЛЕНИЯ ИСТОРИИ ПОСТУПЛЕНИЯ ТОВАРА ОБРАТНО
-            create_history = ...
+            create_history = HistoryStorageInfo.objects.create(user=request.user, type_of_operation_history='Возврат с ремонта', 
+            name_product_history=find_service_work.detail_name_was_used, individual_code_history=find_service_work.detail_id,
+            supplier_history=find_service_work.detail_supplier, quantity_history=find_service_work.quantity_was_used,
+            buy_price_history=find_service_work.detail_buy_price, remainder_history=actual_remainder)
 
             # После всех манипуляций - удаляем окончательно нашу работу
             find_service_work.delete()

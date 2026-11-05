@@ -43,7 +43,8 @@ class FilterHistoryCustomView(View):
                                    'removal_data':'Возврат без возмещения денежных средств',
                                    'garanty_removal_data':'Гарантийный возврат',
                                    'sell_data' : 'Продажа товара',
-                                   'used_in_services' : 'Использование в ремонте'}
+                                   'used_in_services' : 'Использование в ремонте',
+                                   'returned_from_services' : 'Возврат с ремонта'}
             op_value = operations_dict.get(operation)
             if op_value:
                 main_q &= Q(type_of_operation_history=op_value)
