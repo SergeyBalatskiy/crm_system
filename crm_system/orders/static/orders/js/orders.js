@@ -48,6 +48,83 @@ function toggleStatusPopover(event, popoverId) {
     }
 }
 
+document.body.addEventListener('showToast', function (event) {
+    var detail = event.detail;
+    if (!detail) return;
+
+    var message = detail.message || 'Заказ успешно обновлен!';
+    var container = document.getElementById('header-toast-container');
+
+    if (container) {
+        // Рендерим красивую зеленую плашку прямо в шапке
+        container.innerHTML = `
+            <div style="background: #e8fff3; color: #50cd89; padding: 5px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; display: flex; align-items: center; gap: 6px; border: 1px solid #c9f7f5; white-space: nowrap;">
+                <i class="fa-solid fa-circle-check"></i> ${message}
+            </div>
+        `;
+
+        // Автоматически убираем сообщение через 3.5 секунды
+        setTimeout(function () {
+            container.innerHTML = '';
+        }, 3500);
+    }
+});
+
+// Функция для отрисовки красивого всплывающего уведомления в стиле вашей CRM
+function showToastNotification(message, level) {
+    // Удаляем старый тоаст, если он уже висит
+    var existingToast = document.getElementById('crm-dynamic-toast');
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+    // Создаем элемент тоаста
+    var toast = document.createElement('div');
+    toast.id = 'crm-dynamic-toast';
+
+    // Цвет в зависимости от статуса (успех — фиолетовый/зеленый, ошибка — красный)
+    var bgCol = level === 'success' ? '#8950fc' : '#f64e60';
+
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: ${bgCol};
+        color: #ffffff;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 0.9rem;
+        font-weight: 600;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+    `;
+
+    toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> <span>${message}</span>`;
+    document.body.appendChild(toast);
+
+    // Плавное появление
+    setTimeout(function () {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    }, 10);
+
+    // Автоматическое скрытие через 3.5 секунды
+    setTimeout(function () {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(20px)';
+        setTimeout(function () {
+            toast.remove();
+        }, 300);
+    }, 3500);
+}
+
 // Глобальный клик: закрывает поповеры, если кликнули в любое другое место экрана
 document.addEventListener('click', function (e) {
     document.querySelectorAll('.status-popover-box').forEach(function (box) {

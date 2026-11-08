@@ -193,9 +193,9 @@
     background: #e1effe;
     color: #7333ea;
     border: none;
-    padding: 9.5px 14px;
+    padding: 8.9px 14px;
     border-radius: 6px;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
@@ -1022,7 +1022,6 @@
     padding-top: 6px;
 }
 
-/* Карточка заказа */
 .crm-order-card {
     background: #ffffff;
     border: 1px solid #e2e8f0;
@@ -1035,6 +1034,16 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
     box-sizing: border-box;
     position: relative;
+    overflow: visible !important;
+    /* Обязательно, чтобы меню не обрезалось границами карточки */
+    z-index: 1;
+    /* Базовый слой для всех карточек */
+}
+
+/* Автоматически поднимаем карточку со словом "активно/открыто" поверх остальных */
+.crm-order-card:has(.status-popover-box[style*="display: block"]) {
+    z-index: 100 !important;
+    /* Эта карточка теперь всегда поверх соседей снизу */
 }
 
 .crm-order-card:hover {

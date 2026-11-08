@@ -19,6 +19,7 @@ from django.db.models import Q, Value
 from django.db.models.functions import Concat
 from profile_user.models import StatusCategory
 from orders.models import Orders
+from profile_user.models import FormsForOrder
 
 # Данный класс отвечает за показ и изменение категории статуса заказа
 @method_decorator([login_required, never_cache], name='dispatch') 
@@ -30,6 +31,10 @@ class ChangeStatusOrder(View):
         # Получаю айдишник нашего заказа
         get_id_order = request.GET.get('get_id_order')
 
+        # Находимся ли в форме?
+        type_of_order = request.GET.get('type_of_order')
+        print('Узнал, что получил тип заказа!')
+
         # Получаю все существующие категории
         get_all_categories = StatusCategory.objects.filter(user=request.user)
         context = {'get_id_order' : get_id_order}
@@ -40,6 +45,11 @@ class ChangeStatusOrder(View):
         context['finished'] = get_all_categories.filter(category='finished')
         context['deferred'] = get_all_categories.filter(category='deferred')
 
+        if type_of_order:
+            context['type_of_order'] = type_of_order
+            print(type_of_order)
+            return render(request, 'orders/partials/change_category_in_form.html', context)
+
         return render(request, 'orders/partials/change_current_category.html', context)
 
     # Получает айдишник конкретной актуальной категории, и, делает ее актуальной
@@ -48,7 +58,9 @@ class ChangeStatusOrder(View):
             # Получаю айдишник категории
             get_id_category = request.POST.get('actual_id')
 
-            print(get_id_category)
+            # Узнаю, находимся ли мы в самой форме? (Получив инфу о типе заказа)
+            type_of_order = request.POST.get('type_of_order')
+            print(type_of_order)
 
             # Получаю айдишник заказа
             get_id_order = request.POST.get('get_id_order')
@@ -67,8 +79,41 @@ class ChangeStatusOrder(View):
             update_category.category_eng = get_selected_category.category
             update_category.save()
 
-            return HttpResponse(status=204)
+            # Если есть тип заказа, то нужно просто выводить весь шаблон с формами
+            if type_of_order != None:
+                print('Сработал этот блок!')
+                get_order = Orders.objects.filter(user=request.user, id=get_id_order).first()
+                get_original_form = FormsForOrder.objects.filter(user=request.user, type_of_order=type_of_order).first()
+                print(get_original_form)
+                sections = get_original_form.json_forms.get('sections', [])
 
+                saved_data = get_order.form_with_order_information.get('order_dict', [])
+                saved_map = {block['id']: block for block in saved_data}
+
+                for section in sections:
+                    sec_id = section.get('id')
+                    sec_saved_values = saved_map.get(sec_id, {})
+                    for field in section.get('fields'):
+                        f_key = field.get('field_key')
+                        field['value'] = sec_saved_values.get(f_key)
+                context = {
+                    'get_id_order': get_id_order,
+                    'get_order': get_order,
+                    'sections': sections,
+                    'current_type': get_order.type_of_order,
+                    'save_success' : True,
+                }
+                response = render(request, 'orders/show_getted_order/show_getted_form.html', context)
+
+                # Запрос на обновление основного поля с нашими заказами
+                response['HX-Trigger'] = json.dumps({'refreshOrders': True,})
+                return response
+
+            response = HttpResponse(status=204)
+            # Запрос на обновление основного поля с нашими заказами
+            response['HX-Trigger'] = json.dumps({'refreshOrders': True,})
+            return response
+            
         # Хочу тут как то выводить если случится какая то ошибка...
         except Exception as e:
             msg = f'Ошибка: {e}'

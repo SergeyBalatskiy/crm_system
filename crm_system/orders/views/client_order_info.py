@@ -52,11 +52,10 @@ class ShowClientOrder(View):
                 f_key = field.get('field_key')
                 field['value'] = sec_saved_values.get(f_key)
 
-        print(sections)
-        print()
-        print(get_order)
-
         context = {
+
+            # Передается специально айдишник заказа 
+            'get_id_order' : get_id_order,
             'get_order' : get_order,
             'sections' : sections,
             'current_type' : get_order.type_of_order,
@@ -219,15 +218,35 @@ class ShowClientOrder(View):
 
             print('Ничего не вылетело, все работает! Сохранение произошло.')
 
-            # Отвечаем клиенту: закрываем шторку и показываем уведомление
-            response = HttpResponse(status=200)
+            get_order = Orders.objects.filter(user=request.user, id=get_id_order).first()
+            get_original_form = FormsForOrder.objects.filter(user=request.user, type_of_order=type_of_order).first()
+            sections = get_original_form.json_forms.get('sections', [])
+
+            saved_data = get_order.form_with_order_information.get('order_dict', [])
+            saved_map = {block['id']: block for block in saved_data}
+
+            for section in sections:
+                sec_id = section.get('id')
+                sec_saved_values = saved_map.get(sec_id, {})
+                for field in section.get('fields'):
+                    f_key = field.get('field_key')
+                    field['value'] = sec_saved_values.get(f_key)
+
+            context = {
+                'get_id_order': get_id_order,
+                'get_order': get_order,
+                'sections': sections,
+                'current_type': get_order.type_of_order,
+                'save_success' : True,
+            }
+
+            response = render(request, 'orders/show_getted_order/show_getted_form.html', context)
+
+            # Запрос на обновление основного поля с нашими заказами
             response['HX-Trigger'] = json.dumps({
-                'closeOrderDrawer': True,
-                'showToast': {
-                    'level': 'success',
-                    'message': 'Заказ успешно обновлен!'
-                }
+                'refreshOrders': True,
             })
+            
             return response
     
         except Exception as e:

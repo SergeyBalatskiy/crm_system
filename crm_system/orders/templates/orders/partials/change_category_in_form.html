@@ -1,0 +1,74 @@
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 8px; background: #ffffff; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); width: 220px; max-height: 320px; overflow-y: auto;">
+    
+    <div style="font-size: 0.7rem; color: #7e8299; padding: 2px 4px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; border-bottom: 1px solid #ebedf2; margin-bottom: 2px;">Изменить статус:</div>
+    
+    <!-- Группа: В работе -->
+    {% if in_process %}
+        <div style="font-size: 0.68rem; color: #bd44e6; font-weight: 700; text-transform: uppercase; margin-top: 4px; padding-left: 4px;">В работе</div>
+        {% for cat in in_process %}
+            <div hx-post="{% url 'change_status_order' %}"
+                 hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}", "type_of_order": "{{ type_of_order }}"}'
+                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                 style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
+                 onmouseover="this.style.background='#f4f0ff'; this.style.color='#8950fc';"
+                 onmouseout="this.style.background='transparent'; this.style.color='#3f4254';">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ cat.color }}; flex-shrink: 0;"></span>
+                <span style="font-size: 0.82rem; font-weight: 500;">{{ cat.name }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Группа: Отложенные -->
+    {% if deferred %}
+        <div style="font-size: 0.68rem; color: #f64e60; font-weight: 700; text-transform: uppercase; margin-top: 4px; padding-left: 4px; border-top: 1px solid #f1f1f2; padding-top: 6px;">Отложенные</div>
+        {% for cat in deferred %}
+            <div hx-post="{% url 'change_status_order' %}"
+                 hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}", "type_of_order": "{{ type_of_order }}"}'
+                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                 style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
+                 onmouseover="this.style.background='#f4f0ff'; this.style.color='#8950fc';"
+                 onmouseout="this.style.background='transparent'; this.style.color='#3f4254';">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ cat.color }}; flex-shrink: 0;"></span>
+                <span style="font-size: 0.82rem; font-weight: 500;">{{ cat.name }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+
+    <!-- Группа: Готовые -->
+    {% if success %}
+        <div style="font-size: 0.68rem; color: #0dc913; font-weight: 700; text-transform: uppercase; margin-top: 4px; padding-left: 4px; border-top: 1px solid #f1f1f2; padding-top: 6px;">Готовые</div>
+        {% for cat in success %}
+            <div hx-post="{% url 'change_status_order' %}"
+                 hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}", "type_of_order": "{{ type_of_order }}"}'
+                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                 style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
+                 onmouseover="this.style.background='#f4f0ff'; this.style.color='#8950fc';"
+                 onmouseout="this.style.background='transparent'; this.style.color='#3f4254';">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ cat.color }}; flex-shrink: 0;"></span>
+                <span style="font-size: 0.82rem; font-weight: 500;">{{ cat.name }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Группа: Выданные -->
+    {% if finished %}
+        <div style="font-size: 0.68rem; color: #9a9c9b; font-weight: 700; text-transform: uppercase; margin-top: 4px; padding-left: 4px; border-top: 1px solid #f1f1f2; padding-top: 6px;">Выданные</div>
+        {% for cat in finished %}
+            <div hx-post="{% url 'change_status_order' %}"
+                 hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}", "type_of_order": "{{ type_of_order }}"}'
+                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                 style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
+                 onmouseover="this.style.background='#f4f0ff'; this.style.color='#8950fc';"
+                 onmouseout="this.style.background='transparent'; this.style.color='#3f4254';">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background-color: {{ cat.color }}; flex-shrink: 0;"></span>
+                <span style="font-size: 0.82rem; font-weight: 500;">{{ cat.name }}</span>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <!-- Если пусто -->
+    {% if not in_process and not deferred and not finished and not success %}
+        <div style="padding: 10px; font-size: 0.8rem; color: #9ca3af; text-align: center;">Нет доступных статусов</div>
+    {% endif %}
+</div>

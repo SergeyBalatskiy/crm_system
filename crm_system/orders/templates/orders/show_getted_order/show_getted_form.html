@@ -1,6 +1,9 @@
 {% load phone_filters %}
-<form method="POST" hx-post="{% url 'client_order' %}?get_id_order={{ get_order.id }}&type_of_order={{ get_order.type_of_order }}" id="edit-order-form" class="drawer-form-body">
-    
+<form method="POST" hx-post="{% url 'client_order' %}?get_id_order={{ get_order.id }}&type_of_order={{ get_order.type_of_order }}" 
+    hx-target="#drawer-content-loader" 
+    hx-swap="innerHTML" 
+    id="edit-order-form" 
+    class="drawer-form-body">
     {% csrf_token %}
 
     <!-- Передаем ID заказа и тип заказа скрытыми полями -->
@@ -8,11 +11,34 @@
     <input type="hidden" name="type_of_order" value="{{ get_order.type_of_order }}">
     
     <!-- Шапка шторки -->
-    <div class="drawer-header">
+    <div class="drawer-header" style="display: flex; justify-content: space-between; align-items: center;">
         <h3><i class="fa-solid fa-pen-to-square" style="color: #8950fc;"></i> Заявка #{{ get_order.id }}</h3>
-        <button type="button" class="btn-close-drawer" onclick="closeOrderDrawer()">
-            <i class="fa-solid fa-xmark"></i>
-        </button>
+        
+        <!-- Правая часть шапки: сообщение + крестик -->
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <!-- Контейнер с сообщением -->
+            <div id="header-toast-container">
+                {% if save_success %}
+                <div id="header-success-msg" style="background: #e8fff3; color: #2ad813; padding: 6px 15px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 6px; border: 1px solid #c9f7f5; white-space: nowrap; transition: opacity 0.5s ease;">
+                    <i class="fa-solid fa-circle-check"></i> Заказ успешно обновлен!
+                </div>
+                <script>
+                    // Автоматически скрываем плашку через 3.5 секунды
+                    setTimeout(function() {
+                        var msg = document.getElementById('header-success-msg');
+                        if (msg) {
+                            msg.style.opacity = '0';
+                            setTimeout(function() { msg.remove(); }, 500);
+                        }
+                    }, 3500);
+                </script>
+                {% endif %}
+            </div>
+
+            <button type="button" class="btn-close-drawer" onclick="closeOrderDrawer()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
     </div>
 
     <!-- Прокручиваемая область с динамическими секциями из формы -->
@@ -147,13 +173,32 @@
 
     <!-- Зафиксированный футер -->
     <div class="drawer-footer">
-        <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Отмена</button>
-        <button type="submit" class="btn-submit-order">Сохранить изменения</button>
+        <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Закрыть</button>
+                
+       <div style="position: relative; display: inline-block;">
+            <button type="button" 
+                hx-get="{% url 'change_status_order' %}?get_id_order={{ get_id_order }}&type_of_order={{ get_order.type_of_order }}" 
+                hx-target="#status-popover-drawer-{{ get_id_order }}"  
+                hx-swap="innerHTML"
+                onclick="toggleStatusPopover(event, 'status-popover-drawer-{{ get_id_order }}')"
+                style="background: {{ get_order.color_category|default:'#8950fc' }}; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer;">
+                {{ get_order.name_category }}
+            </button>
+
+            <!-- Уникальный ID для поповера в шторке, открывается вверх (bottom) -->
+            <div id="status-popover-drawer-{{ get_id_order }}" class="status-popover-box" 
+                style="display: none; position: absolute; right: 0; bottom: calc(100% + 8px); background: #ffffff; border: 1px solid #ebedf2; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 1000;"
+                onclick="event.stopPropagation()">
+                <!-- Сюда подгрузится список статусов через HTMX -->
+            </div>
+        </div>
+
         <button type="button" class="btn-secondary"
             hx-get="{% url 'create_service_work' %}?get_id_order={{ get_order.id }}"
             hx-target="#drawer-content-loader"
             hx-swap="innerHTML">
             Ход работ
         </button>
+        <button type="submit" class="btn-submit-order">Сохранить изменения</button>
     </div>
 </form>

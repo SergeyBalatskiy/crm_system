@@ -9,7 +9,7 @@
             <div hx-post="{% url 'change_status_order' %}"
                  hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}"}'
                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                 hx-on::after-request="if(event.detail.successful) { location.reload(); }"
+                 hx-swap="none"
                  style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
                  onmouseover="this.style.background='#f4f0ff'; this.style.color='#8950fc';"
                  onmouseout="this.style.background='transparent'; this.style.color='#3f4254';">
@@ -26,7 +26,7 @@
             <div hx-post="{% url 'change_status_order' %}"
                  hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}"}'
                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                 hx-on::after-request="if(event.detail.successful) { location.reload(); }"
+                 hx-swap="none"
                  style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
                  onmouseover="this.style.background='#f4f0ff'; this.style.color='#8950fc';"
                  onmouseout="this.style.background='transparent'; this.style.color='#3f4254';">
@@ -44,7 +44,7 @@
             <div hx-post="{% url 'change_status_order' %}"
                  hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}"}'
                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                 hx-on::after-request="if(event.detail.successful) { location.reload(); }"
+                 hx-swap="none"
                  style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
                  onmouseover="this.style.background='#f4f0ff'; this.style.color='#8950fc';"
                  onmouseout="this.style.background='transparent'; this.style.color='#3f4254';">
@@ -61,7 +61,7 @@
             <div hx-post="{% url 'change_status_order' %}"
                  hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}"}'
                  hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                 hx-on::after-request="if(event.detail.successful) { location.reload(); }"
+                 hx-swap="none"
                  style="display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: background 0.15s;"
                  onmouseover="this.style.background='#f4f0ff'; this.style.color='#8950fc';"
                  onmouseout="this.style.background='transparent'; this.style.color='#3f4254';">

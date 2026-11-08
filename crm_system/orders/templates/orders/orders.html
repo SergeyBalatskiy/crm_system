@@ -34,7 +34,7 @@
         <!-- Панель фильтров (интерактивная) -->
         <form id="filter-form" method="GET" action="{% url 'orders' %}" class="crm-filter-bar"
               hx-get="{% url 'orders' %}"
-              hx-trigger="input changed delay:300ms, change"
+              hx-trigger="input changed delay:300ms, change, refreshOrders from:body"
               hx-target="#orders-container"
               hx-push-url="false"
               hx-swap="innerHTML">
