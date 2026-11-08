@@ -40,7 +40,7 @@ class StatusCategory(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='status_info')
     name = models.CharField(max_length=100, null=True)
     color = models.CharField(max_length=100, null=True)
-    category = models.CharField(max_length=100, null=True)
+    category = models.CharField(max_length=100, null=True) # Категория на английском 
     
     def __str__(self):
         return f'Цвет: {self.color}, Название: {self.name}, Категория: {self.category}, Владелец: {self.user}'

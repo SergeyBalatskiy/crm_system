@@ -28,6 +28,33 @@ function showHints(input) {
     }
 }
 
+// Функция переключения видимости поповера
+function toggleStatusPopover(event, popoverId) {
+    event.stopPropagation(); // Останавливаем клик, чтобы не открывалась карточка заказа
+
+    var popover = document.getElementById(popoverId);
+    var isVisible = popover.style.display === 'block';
+
+    // Закрываем все остальные открытые поповеры на странице
+    document.querySelectorAll('.status-popover-box').forEach(function (box) {
+        box.style.display = 'none';
+    });
+
+    // Переключаем текущий
+    if (!isVisible) {
+        popover.style.display = 'block';
+    } else {
+        popover.style.display = 'none';
+    }
+}
+
+// Глобальный клик: закрывает поповеры, если кликнули в любое другое место экрана
+document.addEventListener('click', function (e) {
+    document.querySelectorAll('.status-popover-box').forEach(function (box) {
+        box.style.display = 'none';
+    });
+});
+
 // Фильтрация при наборе текста
 function filterHints(input) {
     const filter = input.value.toLowerCase();

@@ -18,7 +18,7 @@
         <div class="crm-top-panel">
             <div class="crm-title-block">
                 <h2>Управление заказами</h2>
-                <span class="crm-counter">Активных: {{ orders|length }}</span>
+                <span class="crm-counter">Новых заказов: {{ new_counts }}</span>
             </div>
 
             <button type="button" 
@@ -55,11 +55,12 @@
             <!-- Статус -->
             <select class="crm-select" name="search_status_order" autocomplete="new-password">
                 <option value="">Все статусы</option>
-                <option value="in_process" {% if request.GET.search_status_order == 'in_process' %}selected{% endif %}>На ремонте</option>
-                <option value="deferred" {% if request.GET.search_status_order == 'deferred' %}selected{% endif %}>На согласовании</option>
-                <option value="success" {% if request.GET.search_status_order == 'success' %}selected{% endif %}>Готов</option>
-                <option value="finished" {% if request.GET.search_status_order == 'finished' %}selected{% endif %}>Завершен</option>
-                <option value="new" {% if request.GET.search_status_order == 'new' %}selected{% endif %}>Новый</option>
+                <option value="new" {% if request.GET.search_status_order == 'new' %}selected{% endif %}>Новые</option>
+                <option value="in_process" {% if request.GET.search_status_order == 'in_process' %}selected{% endif %}>В работе</option>
+                <option value="deferred" {% if request.GET.search_status_order == 'deferred' %}selected{% endif %}>Отложенные</option>  
+                <option value="success" {% if request.GET.search_status_order == 'success' %}selected{% endif %}>Готовые</option>
+                <option value="finished" {% if request.GET.search_status_order == 'finished' %}selected{% endif %}>Выданные</option>
+             
             </select>
 
             <!-- Даты -->

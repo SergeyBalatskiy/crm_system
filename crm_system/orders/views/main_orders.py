@@ -13,6 +13,7 @@ from django.contrib import messages
 from datetime import datetime, timedelta
 import json
 from django.db.models.functions import Cast
+from django.db.models import Count
 from django.shortcuts import render
 from django.db.models import Q, Value
 from django.utils import timezone
@@ -41,9 +42,12 @@ class ShowAndFilterOrders(View):
         # Фильтрую по самому свежему заказу!
         qs = Orders.objects.filter(user=request.user).order_by('-created_at')
 
+        # Счетчик для показа только новых заказов:
+        new_counts = len(qs.filter(user=request.user, category_eng = 'new'))
+        print(new_counts)
         # Если у нас НЕ пришел запрос через AJAX (или HTMX) — отдаем ТОЛЬКО кусок со списком
         if not request.headers.get('HX-Request'):
-            context = {'orders' : qs}
+            context = {'orders' : qs, 'new_counts' : new_counts}
             return render(request, 'orders/orders.html', context)
         
         # В противном случае:

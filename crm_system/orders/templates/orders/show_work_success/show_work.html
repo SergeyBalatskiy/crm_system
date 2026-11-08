@@ -393,6 +393,7 @@
                     dropdownParent: jQuery('#drawer-content-loader'),
                     tags: true,
                     placeholder: 'Выберите или введите услугу...',
+                    allowClear: true,
                     ajax: {
                         url: '{% url "services_autocomplete" %}',
                         dataType: 'json',
@@ -412,6 +413,7 @@
                     }
                 });
 
+                // Выбор услуги
                 $serviceSelect.off('select2:select').on('select2:select', function (e) {
                     var data = e.params.data;
                     var cleanName = data.name || data.text.split('|')[0].trim();
@@ -422,7 +424,6 @@
                     }
                     $serviceSelect.val(cleanName).trigger('change');
 
-                    // Заполнение и форматирование цены с пробелами по тысячам
                     if (data.text) {
                         var match = data.text.match(/Цена:\s*([0-9\s,.]+)/i);
                         if (match && match[1]) {
@@ -433,18 +434,24 @@
                         }
                     }
                 });
+
+                // Сброс услуги (если очистили крестиком)
+                $serviceSelect.off('select2:clear').on('select2:clear', function (e) {
+                    jQuery('#id_service_price').val('');
+                });
             }
 
             // 2. Детали со склада
             var $detailSelect = jQuery('#id_detail_name_was_used');
             if ($detailSelect.length) {
                 if ($detailSelect.data('select2')) {
-                    $detailSelect.destroy ? $detailSelect.select2('destroy') : $detailSelect.select2('destroy');
+                    $detailSelect.select2('destroy');
                 }
                 $detailSelect.select2({
                     width: '100%',
                     dropdownParent: jQuery('#drawer-content-loader'),
                     placeholder: 'Выберите деталь, используемую при работе...',
+                    allowClear: true,
                     ajax: {
                         url: '{% url "orders_autocomplete" %}',
                         dataType: 'json',
@@ -459,6 +466,7 @@
                     }
                 });
 
+                // Выбор детали
                 $detailSelect.off('select2:select').on('select2:select', function (e) {
                     var data = e.params.data;
                     var cleanName = data.name || data.text;
@@ -474,7 +482,18 @@
                     }
                     checkQuantityState();
                 });
+
+                // Сброс детали (Очищаем код товара, количество и блокируем его обратно)
+                $detailSelect.off('select2:clear').on('select2:clear', function (e) {
+                    document.getElementById('id_detail_id').value = '';
+                    var qtyInput = document.getElementById('id_quantity_was_used');
+                    if (qtyInput) {
+                        qtyInput.value = '';
+                    }
+                    checkQuantityState();
+                });
             }
         }
     }
+
 </script>

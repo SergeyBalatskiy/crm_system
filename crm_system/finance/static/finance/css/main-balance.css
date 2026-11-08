@@ -46,7 +46,7 @@
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #5735a8
+    color: #8950fc
 }
 
 /* Баланс кассы */
@@ -62,7 +62,7 @@
 }
 
 .cash-card-badge i {
-    color: #7444e4;
+    color: #8950fc;
     font-size: 18px;
 }
 
@@ -76,12 +76,12 @@
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    background-color: #7444e4;
+    background-color: #8950fc;
     color: #ffffff;
     padding: 10px 20px;
     border-radius: 14px;
     font-weight: 600;
-    font-size: 14px;
+    font-size: 16px;
     text-decoration: none;
     transition: all 0.2s ease;
 }
@@ -102,8 +102,12 @@
 
 .search-input-wrapper {
     position: relative;
-    flex: 1;
-    min-width: 260px;
+    flex: 1 1 480px;
+    /* 1 — может расти, 1 — может сжиматься, 280px — базовый размер */
+    max-width: 400px;
+    /* Жесткое ограничение максимальной ширины */
+    min-width: 180px;
+    /* Минимальная ширина, до которой поле может сжаться при нехватке места */
 }
 
 .search-icon {

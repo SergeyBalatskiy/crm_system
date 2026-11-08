@@ -1,6 +1,6 @@
 {% load phone_filters %}
 {% if orders %}
-    <div class="crm-cards-grid">
+    <div class="crm-cards-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 20px;">
         {% for i in orders %}
         <div class="crm-order-card {% if i.important %}order-urgent{% endif %}"
             hx-get="{% url 'client_order' %}?get_id_order={{ i.id }}"
@@ -9,46 +9,43 @@
             onclick="openOrderDrawer()"
             style="cursor: pointer;">
                     
-            <!-- Шапка карточки -->
-            <div class="crm-card-header">
-                <div class="crm-id-block">
-                    <span class="card-id">№ {{ i.id }}</span>
-                    {% if i.type_of_order == 'paid' %}
-                    <span class="card-type-tag">Платный</span>
-                    {% else %}
-                    <span class="card-type-tag">Гарантийный</span>
-                    {% endif %}
+            <!-- Шапка карточки: Название слева, бейджи справа -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                <div class="device-info-row" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                    <i class="fa-solid fa-laptop-code device-ico"></i>
+                    <h4 class="device-name" title="{{ i.name_of_device }}" style="margin: 0;">{{ i.name_of_device }}</h4>
                 </div>
-                
-                <div class="crm-status-badges">
+
+                <div class="crm-status-badges" style="position: relative; display: flex; align-items: center; gap: 6px;">
                     {% if i.important %}
                     <span class="badge-urgent" title="Срочный заказ"><i class="fa-solid fa-bolt"></i> Срочно</span>
                     {% endif %}
-   
-                    <button hx-get="{% url 'change_status_order' %}" 
-                        hx-target="#modal-container" 
-                        hx-swap="innerHTML">
-                        {{i.name_category}}
+
+                    <!-- Кнопка статуса, которая вызывает поповер -->
+                    <button type="button" 
+                        hx-get="{% url 'change_status_order' %}?get_id_order={{ i.id }}" 
+                        hx-target="#status-popover-{{ i.id }}"  
+                        hx-swap="innerHTML"
+                        onclick="toggleStatusPopover(event, 'status-popover-{{ i.id }}')"
+                        style="background: {{ i.color_category|default:'#8950fc' }}; color: #fff; border: none; padding: 4.3px 12px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+                        {{ i.name_category }}
                     </button>
 
-                    <!-- Сюда вставится ответ от сервера -->
-                    <div id="modal-container"></div>
-
+                    <!-- Компактное выпадающее окошко (поповер), спрятанное по умолчанию -->
+                    <div id="status-popover-{{ i.id }}" class="status-popover-box" 
+                        style="display: none; position: absolute; right: 0; top: calc(100% + 6px); background: #ffffff; border: 1px solid #ebedf2; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 1000;"
+                        onclick="event.stopPropagation()">
+                        <!-- Сюда подгрузится список статусов через HTMX -->
+                    </div>
                 </div>
             </div>
 
             <!-- Основной контент (Фиксированная высота) -->
             <div class="crm-card-body">
-                <div class="device-info-row">
-                    <i class="fa-solid fa-laptop-code device-ico"></i>
-                    <div class="device-text-block">
-                        <h4 class="device-name" title="{{ i.name_of_device }}">{{ i.name_of_device }}</h4>
-                        <div class="device-issue-wrapper">
-                            <p class="device-issue" title="{{ i.problem_with_device }}">
-                                <span>Проблема:</span> {{ i.problem_with_device }}
-                            </p>
-                        </div>
-                    </div>
+                <div class="device-issue-wrapper">
+                    <p class="device-issue" title="{{ i.problem_with_device }}">
+                        <span>Проблема:</span> {{ i.problem_with_device }}
+                    </p>
                 </div>
             </div>
 
