@@ -79,10 +79,16 @@ class ChangeStatusOrder(View):
             update_category.category_eng = get_selected_category.category
             update_category.save()
 
+            # Получаю сам заказ
+            get_order = Orders.objects.filter(user=request.user)
+            
+            # Счетчик для показа только новых заказов:
+            new_counts = len(get_order.filter(user=request.user, category_eng = 'new'))
+
             # Если есть тип заказа, то нужно просто выводить весь шаблон с формами
             if type_of_order != None:
                 print('Сработал этот блок!')
-                get_order = Orders.objects.filter(user=request.user, id=get_id_order).first()
+                get_order = get_order.filter(id=get_id_order).first()
                 get_original_form = FormsForOrder.objects.filter(user=request.user, type_of_order=type_of_order).first()
                 print(get_original_form)
                 sections = get_original_form.json_forms.get('sections', [])
@@ -106,12 +112,12 @@ class ChangeStatusOrder(View):
                 response = render(request, 'orders/show_getted_order/show_getted_form.html', context)
 
                 # Запрос на обновление основного поля с нашими заказами
-                response['HX-Trigger'] = json.dumps({'refreshOrders': True,})
+                response['HX-Trigger'] = json.dumps({'refreshOrders': True,  'updateNewCounter' : new_counts})
                 return response
 
             response = HttpResponse(status=204)
             # Запрос на обновление основного поля с нашими заказами
-            response['HX-Trigger'] = json.dumps({'refreshOrders': True,})
+            response['HX-Trigger'] = json.dumps({'refreshOrders': True, 'updateNewCounter' : new_counts})
             return response
             
         # Хочу тут как то выводить если случится какая то ошибка...

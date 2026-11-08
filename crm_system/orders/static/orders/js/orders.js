@@ -125,6 +125,21 @@ function showToastNotification(message, level) {
     }, 3500);
 }
 
+document.body.addEventListener('updateNewCounter', function (event) {
+    var detail = event.detail;
+
+    // Универсальная защита: если прилетел объект, пытаемся достать значение, иначе берем как есть
+    var newCount = (typeof detail === 'object' && detail !== null)
+        ? (detail.count !== undefined ? detail.count : Object.values(detail)[0])
+        : detail;
+
+    // Находим элемент счетчика и обновляем текст
+    var counterEl = document.querySelector('.crm-counter');
+    if (counterEl) {
+        counterEl.textContent = 'Новых заказов: ' + newCount;
+    }
+});
+
 // Глобальный клик: закрывает поповеры, если кликнули в любое другое место экрана
 document.addEventListener('click', function (e) {
     document.querySelectorAll('.status-popover-box').forEach(function (box) {
