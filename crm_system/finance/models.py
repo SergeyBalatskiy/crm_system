@@ -24,9 +24,10 @@ class FinanceHistoryInfo(models.Model):
         BUY = 'Покупка', 'Покупка'
         WARRANTY = 'Гарантийный возврат', 'Гарантийный возврат'
         OTHER = 'Прочее', 'Прочее'
+        COMPLETED_WORK = 'Оказание ремонтных услуг', 'Оказание ремонтных услуг'
     
     category_of_operation = models.CharField(
-        max_length=22, choices=CategoryOfOperation.choices
+        max_length=27, choices=CategoryOfOperation.choices
         ) # Тип операции: Продажа товара / Гарантийное списание / Прочие расходы
     
     number_in_the_operation = models.DecimalField(max_digits=11, decimal_places=0) # Число (сумма), которая фигурирует в операции (с копейками)

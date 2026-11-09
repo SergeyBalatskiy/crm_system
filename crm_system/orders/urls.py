@@ -18,5 +18,7 @@ urlpatterns = [
     path('delete_services', DeleteServicesInOrder.as_view(), name='delete_services'), 
     # Указывается обработчик на изменение статуса заказа
     path('change_status_order', ChangeStatusOrder.as_view(), name='change_status_order'), 
+    # Показывает и принимает выбранную оплату с внесением в кассу (основную)
+    path('pay_process', ShowAndPayView.as_view(), name='pay_process')
         
 ]

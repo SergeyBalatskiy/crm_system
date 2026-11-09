@@ -163,11 +163,11 @@ class ServiceWorkCreate(View):
         get_service_work = CreateServiceWork.objects.filter(user=request.user, connected_id=connected_id)
         get_created_works_later = get_service_work.order_by('service_was_created')
 
+        # Получаю итоговую сумму за все услуги
         get_sum_repair = get_service_work.aggregate(total_sum=Sum('service_price'))
         total_price = get_sum_repair['total_sum']
 
         if get_one_form.is_valid():
-
             service_provided = get_one_form.cleaned_data['service_provided']
             quantity_was_used = get_one_form.cleaned_data['quantity_was_used']
 

@@ -8,3 +8,4 @@ from .select_autocompletes.find_used_detail import OrdersDetailsAutocomplete
 from .select_autocompletes.find_used_services import ServicesSelectAutocomplete
 from .delete_services_work.delete_services_work import DeleteServicesInOrder
 from .change_status_order.change_status_order import ChangeStatusOrder
+from .pay_process.pay_process import ShowAndPayView

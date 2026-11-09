@@ -69,7 +69,7 @@ class CreateServiceWork(models.Model):
     # Данное поле отвечает за соединение с УНИКАЛЬНЫМ КЛЮЧОМ определенного заказа
     connected_id = models.IntegerField()
 
-    # Оказанная услуга: (ее название)
+    # Название услуги:
     service_provided = models.CharField(max_length=300)
 
     # Дата оказанной услуги:
