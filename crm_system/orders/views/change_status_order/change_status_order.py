@@ -18,7 +18,8 @@ from profile_user.models import WorkersInfo
 from django.db.models import Q, Value
 from django.db.models.functions import Concat
 from profile_user.models import StatusCategory
-from orders.models import Orders
+from orders.models import Orders, CreateServiceWork
+from django.db.models import Sum
 from profile_user.models import FormsForOrder
 
 # Данный класс отвечает за показ и изменение категории статуса заказа
@@ -54,18 +55,16 @@ class ChangeStatusOrder(View):
 
     # Получает айдишник конкретной актуальной категории, и, делает ее актуальной
     def post(self, request, *args, **kwargs):
+
         try:
             # Получаю айдишник категории
             get_id_category = request.POST.get('actual_id')
 
             # Узнаю, находимся ли мы в самой форме? (Получив инфу о типе заказа)
             type_of_order = request.POST.get('type_of_order')
-            print(type_of_order)
-
+        
             # Получаю айдишник заказа
             get_id_order = request.POST.get('get_id_order')
-
-            print(get_id_order)
 
             # Получаю категорию из БД
             get_selected_category = StatusCategory.objects.get(user=request.user, id=get_id_category)
@@ -79,9 +78,8 @@ class ChangeStatusOrder(View):
             update_category.category_eng = get_selected_category.category
             update_category.save()
 
-            # Получаю сам заказ
+            # Получаю множество заказов, где имеется статус : "Новый"
             get_order = Orders.objects.filter(user=request.user)
-            
             # Счетчик для показа только новых заказов:
             new_counts = len(get_order.filter(user=request.user, category_eng = 'new'))
 
@@ -89,7 +87,27 @@ class ChangeStatusOrder(View):
             # то нужно выводить еще один шаблон страницы сбоку с карточкой об оплате...
             if get_selected_category.name == 'Выдан':
 
-                ...
+                # Получение итоговой суммы ремонта:
+                get_sum_repair = CreateServiceWork.objects.filter(user=self.request.user, connected_id = get_id_order).aggregate(total_sum=Sum('service_price'))
+                total_price = get_sum_repair['total_sum']
+
+                # Получаю имя клиента для дальнейшей отправки
+                get_name_client = update_category.client.name
+
+                pay_context = {
+                    'get_order' : update_category, 
+                    'summary_price' : total_price, 
+                    'client_name' : get_name_client
+                }
+
+                response = render(request, 'orders/partials/show_process_pay.html', pay_context)
+
+                # Обновление визуальной составляющей на главной странице + в самой форме
+                response['HX-Trigger'] = json.dumps({
+                    'refreshOrders': True,
+                    'updateNewCounter': new_counts,
+                })
+                return response
 
             # Если есть тип заказа, то нужно просто выводить весь шаблон с формами
             if type_of_order != None:

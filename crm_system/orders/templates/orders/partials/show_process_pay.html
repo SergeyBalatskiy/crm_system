@@ -1,0 +1,74 @@
+<!-- Затемнение фона второго сайдбара -->
+<div class="payment-drawer-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 1050; display: flex; justify-content: flex-end;">
+    
+    <!-- Само окно оплаты (правый сайдбар поверх всего) -->
+    <div class="payment-drawer-panel" style="width: 450px; background: #ffffff; height: 100%; box-shadow: -5px 0 25px rgba(0,0,0,0.15); display: flex; flex-direction: column; z-index: 1051; padding: 24px; box-sizing: border-box; animation: slideInRight 0.3s ease;">
+        
+        <!-- Шапка сайдбара оплаты -->
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #ebedf2; padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 1.2rem; font-weight: 700; color: #3f4254;">Оплата заказа №{{ get_order.id }}</h3>
+            <button type="button" onclick="closePaymentDrawer()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer; color: #7e8299;">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Форма отправки оплаты на бэкенд -->
+        <form hx-post="{% url 'pay_process' %}" 
+              hx-target="#payment-drawer-container" 
+              hx-swap="innerHTML"
+              style="display: flex; flex-direction: column; gap: 16px; flex: 1;">
+            {% csrf_token %}
+            
+            <input type="hidden" name="id_order" value="{{ get_order.id }}">
+            <input type="hidden" name="name_client" value="{{ client_name }}">
+            <!-- Скрытый summary_price убран, теперь значение берется прямо из инпута ниже -->
+
+            <!-- Интерактивное поле суммы к оплате -->
+            <div style="background: #f4f0ff; padding: 14px 16px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; border: 1px solid #e2d9fc;">
+                <label for="summary-price-field" style="font-size: 0.85rem; color: #7e8299; font-weight: 600; text-transform: uppercase;">Сумма к оплате (₽):</label>
+                <input type="text" 
+                       id="summary-price-field"
+                       name="summary_price" 
+                       value="{{ summary_price }}"
+                       class="custom-input" 
+                       style="font-size: 1.3rem; color: #8950fc; font-weight: 700; background: #ffffff; border: 1px solid #d1c4e9; padding: 8px 12px; border-radius: 6px; width: 100%; box-sizing: border-box; outline: none;"
+                       autocomplete="off"
+                       required>
+            </div>
+
+            <!-- Клиент -->
+            <div style="font-size: 0.9rem; color: #3f4254;">
+                <b>Клиент:</b> {{ client_name }}
+            </div>
+
+            <!-- Выбор типа оплаты (Наличные / Картой) -->
+            <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                <label style="font-size: 0.85rem; font-weight: 600; color: #7e8299; text-transform: uppercase;">Выберите способ оплаты:</label>
+                
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #ebedf2; border-radius: 8px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.borderColor='#8950fc'" onmouseout="this.style.borderColor='#ebedf2'">
+                    <input type="radio" name="selected_type_pay" value="Наличными" checked style="accent-color: #8950fc;">
+                    <i class="fa-solid fa-money-bill-wave" style="color: #50cd89; font-size: 1.1rem;"></i>
+                    <span style="font-weight: 600; font-size: 0.95rem;">Наличными</span>
+                </label>
+
+                <label style="display: flex; align-items: center; gap: 10px; padding: 12px; border: 1px solid #ebedf2; border-radius: 8px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.borderColor='#8950fc'" onmouseout="this.style.borderColor='#ebedf2'">
+                    <input type="radio" name="selected_type_pay" value="Картой" style="accent-color: #8950fc;">
+                    <i class="fa-solid fa-credit-card" style="color: #8950fc; font-size: 1.1rem;"></i>
+                    <span style="font-weight: 600; font-size: 0.95rem;">Картой (онлайн / терминал)</span>
+                </label>
+            </div>
+
+            <!-- Кнопка подтверждения -->
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid #ebedf2; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" onclick="closePaymentDrawer()" style="padding: 10px 16px; background: #f3f6f9; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; color: #7e8299;">Отмена</button>
+                <button type="submit" style="padding: 10px 20px; background: #8950fc; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">Провести оплату</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function closePaymentDrawer() {
+        document.getElementById('payment-drawer-container').innerHTML = '';
+    }
+</script>

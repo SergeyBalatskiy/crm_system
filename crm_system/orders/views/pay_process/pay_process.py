@@ -28,11 +28,6 @@ from finance.models import CashAccount
 @method_decorator([login_required, never_cache], name='dispatch') 
 class ShowAndPayView(View):
 
-    # Отдаю показ об оплате 
-    def get(self, request, *args, **kwargs):
-
-       return render(request, 'orders/partials/show_process_pay.html')
-       
     # Регистрирую саму оплату 
     @transaction.atomic
     def post(self, request, *args, **kwargs):
@@ -41,7 +36,8 @@ class ShowAndPayView(View):
         name_client = request.POST.get('name_client')
 
         # Итоговая цена к оплате
-        summary_price = request.POST.get('summary_price')
+        summary_price = request.POST.get('summary_price').replace("\xa0", '')
+        print(summary_price)
 
         # Тип оплаты: (НАЛИЧНЫЕ / КАРТОЙ)
         selected_type_pay = request.POST.get('selected_type_pay')
@@ -50,7 +46,7 @@ class ShowAndPayView(View):
         id_order = request.POST.get('id_order')
 
         try:
-
+            # Получаю данные по заказу
             get_order = Orders.objects.get(user=request.user, id=id_order)
 
             # Получаю весь список оказанных работ, которые соединены с именно этим типом заказа
@@ -58,23 +54,39 @@ class ShowAndPayView(View):
             str_of_services = ''
             # Через цикл делаю перечислением те услуги, которые связаны с этим заказом
             for service in get_all_services:
-                str_of_services += f'{service.service_provided}, цена: {service.service_price}.'
-            str_of_services+=f'Итоговая оплата: {summary_price}, Оплата: {selected_type_pay}.'
+                str_of_services += f'{service.service_provided}, цена: {service.service_price} руб., '
+            str_of_services+=f'Итого к оплате: {summary_price} руб., Оплата: {selected_type_pay}.'
+            print(str_of_services)
 
             # Создание истории операции(финансовой) на внесение средств 
             create_finance_history = FinanceHistoryInfo.objects.create(user=request.user,
             type_of_operation=FinanceHistoryInfo.TypeOfOperation.INCOME, category_of_operation=FinanceHistoryInfo.CategoryOfOperation.COMPLETED_WORK,
             number_in_the_operation=summary_price, product_name=f'Ремонтная услуга по заказу №{get_order.id}', 
-            supplier=name_client, comment=f'Оказание ремонтных услуг клиенту {name_client}, устройство: {get_order.name_of_device}. Услуги: {str_of_services}')
+            supplier=name_client, comment=f'Оказание ремонтных услуг клиенту: {name_client}, устройство: {get_order.name_of_device}. Услуги: {str_of_services}')
 
             # Внесение денег в кассу:
             # На уровне F выражения меняю баланс в положительную сторону (так как продажа)
             CashAccount.objects.filter(user=request.user).update(money_balance=F('money_balance') + summary_price)
 
+            print('Финансовая операция оплаты прошла успешно!')
+            # Возвращается пустой ответ с закрытием сайдбара
+            response = HttpResponse(status=200)
+            response.content = """
+                <script>
+                    // Закрываем оба сайдбара и обновляем интерфейс
+                    document.getElementById('payment-drawer-container').innerHTML = '';
+                    if (typeof closeOrderDrawer === 'function') { closeOrderDrawer(); }
+                </script>
+            """
+            response['HX-Trigger'] = json.dumps({
+                'refreshOrders': True,
+            })
+            return response
+
         except Exception as e:
 
             msg = f'Ошибка: {e}'
-            ...
-
+            print(msg)
+            return HttpResponse(status=400)
 
 

@@ -3,16 +3,18 @@ from django import template
 
 register = template.Library()
 
-@register.filter(name="format_comment_numbers")
+@register.filter(name='format_comment_numbers')
 def format_comment_numbers(value):
-    if not isinstance(value, str):
-        value = str(value)
+    if not value:
+        return ""
+    
+    def replace_num(match):
+        num_str = match.group(0)
+        if len(num_str) <= 3:
+            return num_str
+        try:
+            return f"{int(num_str):,}".replace(",", " ")
+        except ValueError:
+            return num_str
 
-    def replace_match(match):
-        # возвращает автоматически назад значение
-        number = match.group(0)
-        # Форматирование числа с пробелом
-        return f"{int(number):,}".replace(',', ' ')
-
-    # Если найдено число:
-    return re.sub(r'\d{4}', replace_match, value)
+    return re.sub(r'\d+', replace_num, str(value))
