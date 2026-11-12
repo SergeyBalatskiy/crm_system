@@ -25,8 +25,10 @@ from profile_user.models import StatusCategory
 from orders.models import Orders, CreateServiceWork
 from finance.models import FinanceHistoryInfo
 from finance.models import CashAccount
+from num2words import num2words
 
 
+# Отвечает за написание Имени и Первой буквы фамилии "Игорь Л."
 def format_initials(initials):
 
     if not initials:
@@ -35,6 +37,16 @@ def format_initials(initials):
     index = initials.index(" ")
     format_int = initials[0 : index + 2]
     return format_int + "."
+
+
+# Отвечает за превращение числа в пропись
+def number_in_words(number):
+    if not number:
+        return ""
+
+    number_text = num2words(number, lang="ru")
+
+    return number_text.capitalize()
 
 
 # Словарь, где ключ это триггер-переменная, значение это данные, которые нужно вставить
@@ -75,11 +87,11 @@ DOCUMENT_VARIABLES = {
     "<МенеджерСокр>": lambda order, services, **kwargs: format_initials(
         getattr(order, "manager", "")
     ),
-    "<НазваниеОрганизации>": lambda order, services, service_inf: str(
-        getattr(service_inf, "name_service", "")
+    "<НазваниеОрганизации>": lambda order, services, company_inf: str(
+        getattr(company_inf, "name_service", "")
     ),
-    "<АдресОрганизации>": lambda order, services, service_inf: str(
-        getattr(service_inf, "address", "")
+    "<АдресОрганизации>": lambda order, services, company_inf: str(
+        getattr(company_inf, "address", "")
     ),
     # Финансы
     "<СуммаЧека>": lambda order, services, **kwargs: (
@@ -88,11 +100,12 @@ DOCUMENT_VARIABLES = {
     "<Скидка>": lambda order, services, **kwargs: str(getattr(order, "discount", 0)),
     "<ИтогоЦена>": lambda order, services, **kwargs: (
         str(sum(s.service_price for s in services) - order.discount)
-        if services
-        else "0"
     ),
     "<ВсегоПозиций>": lambda order, services, **kwargs: str(
         len(services) if services else 0
+    ),
+    "<ИтогоПрописьюТекстом>": lambda order, services, **kwargs: number_in_words(
+        sum(s.service_price for s in services) - order.discount
     ),
 }
 
@@ -212,6 +225,10 @@ class ShowAndPayView(View):
             )
 
             print("Финансовая операция оплаты прошла успешно!")
+
+            # После финансовой операции нужно сделать так, чтобы вызывалась функция на печать шаблона
+            ...
+
             # Возвращается пустой ответ с закрытием сайдбара
             response = HttpResponse(status=200)
             response.content = """

@@ -1,12 +1,14 @@
-def format_initials(initials):
-    if not initials:
+# Отвечает за превращение числа в пропись
+from num2words import num2words
+
+
+def number_in_words(number):
+    if not number:
         return ""
 
-    index = initials.index(" ")
+    number_text = num2words(number, lang="ru")
 
-    format_int = initials[0 : index + 2]
-
-    return format_int + "."
+    return number_text.capitalize()
 
 
-print(format_initials("Иван Андреевич"))
+print(number_in_words(1000))
