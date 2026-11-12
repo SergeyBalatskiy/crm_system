@@ -26,6 +26,7 @@ from orders.models import Orders, CreateServiceWork
 from finance.models import FinanceHistoryInfo
 from finance.models import CashAccount
 from num2words import num2words
+from profile_user.models import DocumentInformation, ServiceInfo
 
 
 # Отвечает за написание Имени и Первой буквы фамилии "Игорь Л."
@@ -51,61 +52,82 @@ def number_in_words(number):
 
 # Словарь, где ключ это триггер-переменная, значение это данные, которые нужно вставить
 DOCUMENT_VARIABLES = {
-    "<НомерЗаказа>": lambda order, services, **kwargs: str(order.id),
-    "<ДатаВыдачи>": lambda order, services, **kwargs: datetime.now().strftime(
+    "<НомерЗаказа>": lambda order, services=None, company_inf=None, **kwargs: str(
+        order.id
+    ),
+    "<ДатаВыдачи>": lambda order, services=None, company_inf=None, **kwargs: datetime.now().strftime(
         "%d.%m.%Y, %H:%M"
     ),
-    "<ТипЗаказа>": lambda order, services, **kwargs: str(
+    "<ТипЗаказа>": lambda order, services=None, company_inf=None, **kwargs: str(
         getattr(order, "type_of_order", "")
     ),
     # Клиент
-    "<Контрагент>": lambda order, services, **kwargs: str(
-        getattr(order, "client.name", "")
+    "<Контрагент>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(order.client, "name", "")
+        if hasattr(order, "client") and order.client
+        else getattr(order, "name_client", "")
     ),
-    "<НомерКонтрагента>": lambda order, services, **kwargs: str(
-        getattr(order, "client.phone", "")
+    "<НомерКонтрагента>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(order.client, "phone", "")
+        if hasattr(order, "client") and order.client
+        else getattr(order, "phone_client", "")
     ),
-    "<КонтрагентСокр>": lambda order, services, **kwargs: format_initials(
-        getattr(order, "client.name", "")
-    ),
-    # Устройство
-    "<Марка>": lambda order, services, **kwargs: str(
-        getattr(order, "device_company", "")
-    ),
-    "<Модель>": lambda order, services, **kwargs: str(
-        getattr(order, "name_of_device", "")
-    ),
-    "<Неисправность>": lambda order, services, **kwargs: str(
-        getattr(order, "problem_with_device", "")
+    "<КонтрагентСокр>": lambda order, services=None, company_inf=None, **kwargs: format_initials(
+        str(
+            getattr(order.client, "name", "")
+            if hasattr(order, "client") and order.client
+            else getattr(order, "name_client", "")
+        )
     ),
     # Прочее
-    "<Вердикт>": lambda order, services, **kwargs: str(
+    "<Рекомендации>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(order, "problem_with_device", "")
+    ),
+    # Устройство
+    "<Марка>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(order, "device_company", "")
+    ),
+    "<Модель>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(order, "name_of_device", "")
+    ),
+    "<Неисправность>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(order, "problem_with_device", "")
+    ),
+    "<Вердикт>": lambda order, services=None, company_inf=None, **kwargs: str(
         getattr(order, "problem_with_device", "")
     ),
     # Сервисный центр
-    "<Менеджер>": lambda order, services, **kwargs: str(getattr(order, "manager", "")),
-    "<МенеджерСокр>": lambda order, services, **kwargs: format_initials(
+    "<Менеджер>": lambda order, services=None, company_inf=None, **kwargs: str(
         getattr(order, "manager", "")
     ),
-    "<НазваниеОрганизации>": lambda order, services, company_inf: str(
-        getattr(company_inf, "name_service", "")
+    "<МенеджерСокр>": lambda order, services=None, company_inf=None, **kwargs: format_initials(
+        str(getattr(order, "manager", ""))
     ),
-    "<АдресОрганизации>": lambda order, services, company_inf: str(
-        getattr(company_inf, "address", "")
+    "<НазваниеОрганизации>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(company_inf, "name_service", "") if company_inf else ""
+    ),
+    "<АдресОрганизации>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(company_inf, "address", "") if company_inf else ""
     ),
     # Финансы
-    "<СуммаЧека>": lambda order, services, **kwargs: (
+    "<СуммаЧека>": lambda order, services=None, company_inf=None, **kwargs: (
         str(sum(s.service_price for s in services)) if services else "0"
     ),
-    "<Скидка>": lambda order, services, **kwargs: str(getattr(order, "discount", 0)),
-    "<ИтогоЦена>": lambda order, services, **kwargs: (
-        str(sum(s.service_price for s in services) - order.discount)
+    "<Скидка>": lambda order, services=None, company_inf=None, **kwargs: str(
+        getattr(order, "discount", 0) or 0
     ),
-    "<ВсегоПозиций>": lambda order, services, **kwargs: str(
+    "<ИтогоЦена>": lambda order, services=None, company_inf=None, **kwargs: (
+        str(
+            (sum(s.service_price for s in services) if services else 0)
+            - (getattr(order, "discount", 0) or 0)
+        )
+    ),
+    "<ВсегоПозиций>": lambda order, services=None, company_inf=None, **kwargs: str(
         len(services) if services else 0
     ),
-    "<ИтогоПрописьюТекстом>": lambda order, services, **kwargs: number_in_words(
-        sum(s.service_price for s in services) - order.discount
+    "<ИтогоПрописьюТекстом>": lambda order, services=None, company_inf=None, **kwargs: number_in_words(
+        (sum(s.service_price for s in services) if services else 0)
+        - (getattr(order, "discount", 0) or 0)
     ),
 }
 
@@ -120,9 +142,12 @@ class ShowAndPayView(View):
     # Информация о сервисе
     def replace_fields_for_document(template_html, order, services, company_inf):
 
+        # Заменяю символы от tinyMCE на "<>"
+        template_html = template_html.replace("&lt;", "<").replace("&gt;", ">")
+
         # Нахожу то самое место с названием оказываемой услуги и говорим что после написания нужно переносить
         # на новую строку
-        row_pattern = r"(<tr[^>]*>.*?<НазваниеОказываемойУслуги>.*?</tr>)"
+        row_pattern = r"(<tr[^>]*>(?:(?!<\/tr>).)*?<НазваниеОказываемойУслуги>(?:(?!<\/tr>).)*?<\/tr>)"
         match = re.search(row_pattern, template_html, re.DOTALL | re.IGNORECASE)
 
         # Если есть такое место:
@@ -137,19 +162,24 @@ class ShowAndPayView(View):
                 # чтобы вставлять потом в саму строку (одну)
                 row_html = single_row_template
                 row_html = row_html.replace("<Номер>", str(idx))
+                get_detail = getattr(service, "detail_id")
                 row_html = row_html.replace(
-                    "<КодДетали>", str(getattr(services, "detail_id", ""))
+                    "<КодДетали>", str(get_detail if get_detail is not None else "")
+                )
+
+                row_html = row_html.replace(
+                    "<НазваниеОказываемойУслуги>", str(service.service_provided)
                 )
                 row_html = row_html.replace(
-                    "<НазваниеОказываемойУслуги>", str(services.service_provided)
+                    "<Количество>", str(getattr(service, "quantity_was_used", "0"))
                 )
                 row_html = row_html.replace(
-                    "<Гарантия>", str(getattr(services, "days_of_garanty", "0"))
+                    "<Гарантия>", str(getattr(service, "days_of_garanty", "0"))
                 )
                 row_html = row_html.replace(
-                    "<СтоимостьУслуги>", str(services.service_price)
+                    "<СтоимостьУслуги>", str(service.service_price)
                 )
-                summary_price += services.service_price
+                summary_price += service.service_price
                 row_html = row_html.replace("<СуммаУслуг>", str(summary_price))
                 generated_rows += row_html
 
@@ -165,7 +195,8 @@ class ShowAndPayView(View):
                     replacement_value = get_value_func(order, services, company_inf)
                     # Вставка полученного результата от replacement_value
                     template_html = template_html.replace(tag, str(replacement_value))
-                except Exception:
+                except Exception as e:
+                    print(f"Произошла ошибка: ключ: {tag}, {get_value_func}, {e}")
                     # Если у какого-то поля нет данных, просто заменяем на пустую строку, чтобы тег не мозолил глаза
                     template_html = template_html.replace(tag, "")
 
@@ -227,22 +258,33 @@ class ShowAndPayView(View):
             print("Финансовая операция оплаты прошла успешно!")
 
             # После финансовой операции нужно сделать так, чтобы вызывалась функция на печать шаблона
-            ...
 
-            # Возвращается пустой ответ с закрытием сайдбара
-            response = HttpResponse(status=200)
-            response.content = """
-                <script>
-                    // Закрываем оба сайдбара и обновляем интерфейс
-                    document.getElementById('payment-drawer-container').innerHTML = '';
-                    if (typeof closeOrderDrawer === 'function') { closeOrderDrawer(); }
-                </script>
-            """
-            response["HX-Trigger"] = json.dumps(
-                {
-                    "refreshOrders": True,
-                }
+            # Получаю сначала "Шаблон Акта о выполненных работах":
+            document_html = DocumentInformation.objects.get(
+                user=request.user, name="Акт о выполненных работах"
             )
+
+            # Данные по заказу уже хранятся в: get_order
+
+            # Получаю все работы, привязанные к нашему заказу:
+            services = CreateServiceWork.objects.filter(
+                user=request.user, connected_id=get_order.id
+            )
+
+            # Получаю данные о сервисном центре
+            company_inf = ServiceInfo.objects.get(user=request.user)
+
+            rendered_document = ShowAndPayView.replace_fields_for_document(
+                document_html.content, get_order, services, company_inf
+            )
+
+            context = {"order": get_order, "rendered_document": rendered_document}
+
+            # Отдается шаблон самой печати акта о выполненных работах
+            response = render(
+                request, "orders/tinymce_documents/print_success_work.html", context
+            )
+
             return response
 
         except Exception as e:
