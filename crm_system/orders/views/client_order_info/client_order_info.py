@@ -171,6 +171,7 @@ class ShowClientOrder(View):
             order_to_update.device_type = request.POST.get('type_of_device', '')
             order_to_update.color_of_device = request.POST.get('color', '')
             order_to_update.name_of_device = request.POST.get('model', '')
+            order_to_update.device_company = request.POST.get('device_company', '')
             order_to_update.problem_with_device = request.POST.get('destroyed', '')
             order_to_update.deadline = request.POST.get('deadline', None)
             print('Тут все норм 2')

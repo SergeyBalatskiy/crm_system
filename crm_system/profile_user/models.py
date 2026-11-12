@@ -22,7 +22,7 @@ class ServiceInfo(models.Model):
     def __str__(self):
         return f'Сервисный центр: {self.name_service}, Адрес:{self.address}, связан с {self.user.get_full_name()}'
 
-# Здесь все то же самое
+# Здесь таблица с работниками СЦ
 class WorkersInfo(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='employee')
     name = models.CharField(max_length=100, null=True)

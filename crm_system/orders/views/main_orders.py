@@ -95,6 +95,7 @@ class ShowAndFilterOrders(View):
                 Q(device_type__icontains=fast_search) |
                 Q(color_of_device__icontains=fast_search) |
                 Q(name_of_device__icontains=fast_search) | 
+                Q(device_company__icontains=fast_search) | 
                 Q(problem_with_device__icontains=fast_search))
                 # Привязываю к глобальному поиску
             main_q &=text_q

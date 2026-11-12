@@ -40,8 +40,17 @@ class Orders(models.Model):
     # Информация о девайсе (устройстве): Тип устройства / Цвет устройства / Название устройства / Проблема с устройством 
     device_type = models.CharField(max_length=40, db_index=True) # Тип устройства: Телефон, Планшет, Ноутбук и т.д.
     color_of_device = models.CharField(max_length=40, db_index=True)
+    
+    # Модель устройства
     name_of_device = models.CharField(max_length=150, db_index=True)
+
+    # Марка устройства
+    device_company = models.CharField(max_length=50, db_index=True, null=True, blank=True)
+    
     problem_with_device = models.CharField(max_length=150, db_index=True)
+
+    # Скидка (в рублях)
+    discount = models.DecimalField(decimal_places=0, max_digits=11, null=True, blank=True)
 
     # Было создано:
     created_at = models.DateTimeField(default=timezone.now)

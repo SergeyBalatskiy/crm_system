@@ -66,6 +66,9 @@ class ShowFormForOrder(View):
             # Получаю название модели (если оно есть)
             name_device = request.POST.get('model', '')
 
+            # Получаю марку устройства (если оно есть)
+            device_company = request.POST.get('device_company')
+
             # Если есть предоплата:
             prepay = 'prepay' in request.POST
             if prepay:
@@ -145,7 +148,7 @@ class ShowFormForOrder(View):
 
             Orders.objects.create(user = request.user, type_of_order = type_of_order_selected, manager = manager, client = client, 
             device_type = request.POST.get('type_of_device', ''), color_of_device = request.POST.get('color', ''),
-            problem_with_device = request.POST.get('destroyed', ''), name_of_device = name_device,
+            problem_with_device = request.POST.get('destroyed', ''), name_of_device = name_device, device_company = device_company,
             deadline = request.POST.get('deadline', None), form_with_order_information = order_dict, important = is_urgently,
             prepay = prepay_amount)
 
