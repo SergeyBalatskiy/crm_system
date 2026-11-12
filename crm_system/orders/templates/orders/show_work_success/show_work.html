@@ -87,6 +87,40 @@
                 </div>
             </div>
 
+            {% comment %} Где-то снизу должна быть кнопка со скидкой (либо в рублях либо в %) {% endcomment %}
+            {% comment %} Но главное чтобы была отдельно, должна работать как AJAX запрос в бд, где она берет {% endcomment %}
+            {% comment %} сумму ремонта, и потом все отсчитывает и возвращает назад уже готовую сумму {% endcomment %}
+            {% comment %} Скорее всего передается сюда все что нужно чтобы правильно отсчитать {% endcomment %}
+            <!-- Форма-обертка для отправки всех данных по скидке -->
+            <form hx-post="{% url 'discount-calculation' %}" 
+                hx-trigger="change, keyup changed delay:300ms from:input[name='discount_value']" 
+                hx-target="#total-price-block">
+                
+                <!-- Скрытый ID заказа -->
+                <input type="hidden" name="connected_id" value="{{ connected_id }}">
+
+                <div class="input-group">
+                    <!-- Поле ввода значения скидки -->
+                    <input type="number" 
+                        name="discount_value" 
+                        value="{{ get_dicount_later|default:0 }}" 
+                        class="form-control" 
+                        placeholder="Скидка"
+                        step="any">
+                        
+                    <!-- Переключатель типов скидки (рубли или проценты) -->
+                    <select name="discount_type" class="form-select" style="max-width: 100px;">
+                        <option value="rub" {% if order.discount_type == 'rub' %}selected{% endif %}>₽</option>
+                        <option value="percent" {% if order.discount_type == 'percent' %}selected{% endif %}>%</option>
+                    </select>
+                </div>
+            </form>
+
+            <!-- Блок, куда прилетит пересчитанная итоговая сумма -->
+            <div id="total-price-block" class="mt-2">
+                <strong>Итого к оплате: {{ final_price }} руб.</strong>
+            </div>
+
             <!-- ПРАВАЯ КОЛОНКА: История выполненных работ -->
             <div style="flex: 1; background: #ffffff; border: 1px solid #ebedf2; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; overflow: hidden; min-width: 0;">
                 
