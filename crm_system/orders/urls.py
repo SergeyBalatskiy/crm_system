@@ -18,7 +18,7 @@ urlpatterns = [
         OrdersDetailsAutocomplete.as_view(),
         name="orders_autocomplete",
     ),
-    # Указываю на путь к обращению за рабочими услугами, чтобы отрбражать авто ответы для подсказок из БД
+    # Указываю на путь к обращению за рабочими услугами, чтобы отображать авто ответы для подсказок из БД
     path(
         "services_autocomplete",
         ServicesSelectAutocomplete.as_view(),
@@ -34,8 +34,8 @@ urlpatterns = [
     path("pay_process", ShowAndPayView.as_view(), name="pay_process"),
     # Указываю на путь, чтобы можно было подсчитать скидку всех работ
     path(
-        "discount-calculation",
+        "discount_calculation",
         DiscountCalculation.as_view(),
-        name="discount-calculation",
+        name="discount_calculation",
     ),
 ]

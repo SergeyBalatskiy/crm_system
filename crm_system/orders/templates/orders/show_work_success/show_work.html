@@ -92,13 +92,13 @@
             {% comment %} сумму ремонта, и потом все отсчитывает и возвращает назад уже готовую сумму {% endcomment %}
             {% comment %} Скорее всего передается сюда все что нужно чтобы правильно отсчитать {% endcomment %}
             <!-- Форма-обертка для отправки всех данных по скидке -->
-            <form hx-post="{% url 'discount-calculation' %}" 
-                hx-trigger="change, keyup changed delay:300ms from:input[name='discount_value']" 
-                hx-target="#total-price-block">
+            <!-- Блок расчета скидки с мгновенным откликом в реальном времени -->
+            <div style="display: flex; align-items: center; gap: 10px;"
+                 hx-post="{% url 'discount_calculation' %}" 
+                 hx-trigger="change, input from:input[name='discount_value']" 
+                 hx-target="#total-price-block"
+                 hx-include="[name='discount_value'], [name='discount_type'], [name='connected_id']">
                 
-                <!-- Скрытый ID заказа -->
-                <input type="hidden" name="connected_id" value="{{ connected_id }}">
-
                 <div class="input-group">
                     <!-- Поле ввода значения скидки -->
                     <input type="number" 
@@ -114,7 +114,7 @@
                         <option value="percent" {% if order.discount_type == 'percent' %}selected{% endif %}>%</option>
                     </select>
                 </div>
-            </form>
+            </div>
 
             <!-- Блок, куда прилетит пересчитанная итоговая сумма -->
             <div id="total-price-block" class="mt-2">

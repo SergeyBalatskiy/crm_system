@@ -80,6 +80,7 @@ DOCUMENT_VARIABLES = {
         )
     ),
     # Прочее
+    # ЗДЕСЬ НУЖНО ПОКАЗЫВАТЬ НОВОЕ ПОЛЕ С ПРЕДОПЛАТОЙ ЕСЛИ ЕЕ ВНЕСЛИ
     "<Рекомендации>": lambda order, services=None, company_inf=None, **kwargs: str(
         getattr(order, "problem_with_device", "")
     ),

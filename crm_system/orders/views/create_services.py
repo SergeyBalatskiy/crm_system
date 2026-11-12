@@ -214,7 +214,7 @@ class ServiceWorkCreate(View):
         connected_id = request.GET.get("get_id_order")
 
         # Получаю скидку(действующую, если она уже есть в бд)
-        get_order = Orders.objects.get(user=request, id=connected_id)
+        get_order = Orders.objects.get(user=request.user, id=connected_id)
         get_dicount_later = get_order.discount
 
         # Сумма всех работ
