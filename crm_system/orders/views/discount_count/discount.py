@@ -12,8 +12,9 @@ from django.urls import reverse
 from django.contrib import messages
 from datetime import datetime, timedelta
 from django.db.models import Sum
+from django.http import JsonResponse
 from django.db.models.functions import Cast
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.db.models import Q, Value
 from django.db.models.functions import Concat
 from orders.models import Orders, CreateServiceWork
@@ -21,21 +22,22 @@ from orders.models import Orders, CreateServiceWork
 
 # Данный класс отвечает за показ существующих данных клиента (если они есть в БД)
 @method_decorator([login_required, never_cache], name="dispatch")
-class DiscountCalculation(View):
+class CountDsc(View):
 
     @transaction.atomic
-    def post(self, request, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
 
         try:
 
-            getted_value = request.POST.get("discount_value")
+            getted_value = request.GET.get("discount_value")
+
             # Получаю значение (число, рубли / число, проценты)
-            get_insert_count = int(getted_value) if getted_value != "" else 0
+            get_insert_count = int(float(getted_value)) if getted_value != "" else 0
 
             if get_insert_count < 0:
                 get_insert_count = 0
 
-            connected_id = request.POST.get("connected_id")
+            connected_id = request.GET.get("get_id_order")
 
             # Узнаю айди заказа (чтобы можно было соединить логику подсчета ремонта в рублях)
             get_order = Orders.objects.select_for_update().get(
@@ -49,7 +51,7 @@ class DiscountCalculation(View):
             total_price = get_sum_repair["total_sum"] or 0
 
             # Если значение "тумблера" - рубли
-            if request.POST.get("discount_type") == "rub":
+            if request.GET.get("discount_type") == "rub":
                 get_order.discount = get_insert_count
             else:
                 get_order.discount = (total_price * get_insert_count) // 100
@@ -60,9 +62,13 @@ class DiscountCalculation(View):
 
             get_order.save()
 
-            return HttpResponse(
-                f"<strong>Итого к оплате: {get_order.discount} руб.</strong>"
-            )
+            response_data = {
+                "discount": get_order.discount,
+                "total": total_price - get_order.discount,
+            }
+            response = JsonResponse(response_data)
+            response["HX-Trigger"] = "discountChanged"
+            return response
 
         except Orders.DoesNotExist:
             return HttpResponse("Заказ не найден", status=404)

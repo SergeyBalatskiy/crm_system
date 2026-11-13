@@ -1046,6 +1046,54 @@
     /* Эта карточка теперь всегда поверх соседей снизу */
 }
 
+/* Скрываем стрелочки для Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Стили для красивого селекта валюты/процентов */
+.discount-select {
+    background-color: #f3f6f9;
+    color: #3f4254;
+    border: 1px solid #ebedf2;
+    border-left: none; /* убираем двойную границу между инпутом и селектом */
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    /* Убираем стандартную стрелочку в некоторых браузеры и заменяем своей */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237e8299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    background-size: 14px;
+    padding-right: 20px;
+}
+
+.discount-select:hover {
+    background-color: #e4e6ef;
+    border-color: #d1d3de;
+}
+
+.discount-select:focus {
+    border-color: #8950fc;
+    box-shadow: 0 0 0 2px rgba(137, 80, 252, 0.15);
+    background-color: #fff;
+}
+
+/* Скрываем стрелочки для Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
 .crm-order-card:hover {
     border-color: #8950fc;
     box-shadow: 0 8px 20px #6e41c82d;

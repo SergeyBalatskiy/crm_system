@@ -10,9 +10,11 @@ from storage.models import StorageInfo, HistoryStorageInfo
 from orders.forms import WorkCreatingForm
 from django.shortcuts import render
 from django.db import transaction
+from orders.models import Orders
+
 
 # Данный класс отвечает за удаление определенной работы, которая привязана к самому заказу
-@method_decorator(login_required(), name='dispatch') 
+@method_decorator(login_required(), name="dispatch")
 class DeleteServicesInOrder(Select2QuerySetView):
 
     # Необходимо улавливать запрос с айдишником работы и удалять его
@@ -26,32 +28,44 @@ class DeleteServicesInOrder(Select2QuerySetView):
 
         # Получаю айди конкретного заказа показа всех работ именно у него
         try:
-            connected_id = request.POST.get('get_id_order')
+            connected_id = request.POST.get("get_id_order")
             # Получаю список оказанных услуг
-            get_created_works_later = CreateServiceWork.objects.filter(user=request.user, connected_id=connected_id).order_by('service_was_created')
+            get_created_works_later = CreateServiceWork.objects.filter(
+                user=request.user, connected_id=connected_id
+            ).order_by("service_was_created")
 
-            # Получаю уникальный айдишник нужной для удаления работы 
-            get_id_to_delete = request.POST.get('id_service_work')
+            # Получаю уникальный айдишник нужной для удаления работы
+            get_id_to_delete = request.POST.get("id_service_work")
 
             # Получаю сам обьект для дальнейшего его удаления
-            find_service_work = CreateServiceWork.objects.filter(user=request.user, id=get_id_to_delete)
+            find_service_work = CreateServiceWork.objects.filter(
+                user=request.user, id=get_id_to_delete
+            )
 
             # Если обьект есть:
             if find_service_work.exists():
-                
+
                 # Беру нужный обьект из бд после фильтрации
                 find_service_work = find_service_work.get()
 
                 if not find_service_work.detail_id:
                     # Идет удаление
                     find_service_work.delete()
-                    print('Удален обьект')
+                    print("Удален обьект")
                 else:
 
                     # Если у нас найдется действующий товар на складе, значит, к нему можно добавить количество списанного
-                    if StorageInfo.objects.filter(user=request.user, individual_code = find_service_work.detail_id).exists():
-                        get_to_update = StorageInfo.objects.select_for_update().get(user=request.user, individual_code = find_service_work.detail_id)
-                        get_to_update.remainder = get_to_update.remainder + find_service_work.quantity_was_used
+                    if StorageInfo.objects.filter(
+                        user=request.user, individual_code=find_service_work.detail_id
+                    ).exists():
+                        get_to_update = StorageInfo.objects.select_for_update().get(
+                            user=request.user,
+                            individual_code=find_service_work.detail_id,
+                        )
+                        get_to_update.remainder = (
+                            get_to_update.remainder
+                            + find_service_work.quantity_was_used
+                        )
                         get_to_update.save()
 
                         # Получаю актуальное количество товара после сохранения чтобы передать в историю операций склада
@@ -59,36 +73,66 @@ class DeleteServicesInOrder(Select2QuerySetView):
 
                     # Если товара нету, но айдишник есть:
                     else:
-                        
+
                         # Если обьекта нету, значит, нужно его создать...
-                        created_returned_detail = StorageInfo.objects.create(user=request.user, name_product = find_service_work.detail_name_was_used, quantity_at_the_purchase = find_service_work.detail_quantity_was_buyed,
-                            supplier = find_service_work.detail_supplier, buy_price = find_service_work.detail_buy_price, retail_price = find_service_work.detail_retail_price,
-                            minimum_items_for_notification = find_service_work.detail_minimum_items_for_not, remainder = find_service_work.quantity_was_used,
+                        created_returned_detail = StorageInfo.objects.create(
+                            user=request.user,
+                            name_product=find_service_work.detail_name_was_used,
+                            quantity_at_the_purchase=find_service_work.detail_quantity_was_buyed,
+                            supplier=find_service_work.detail_supplier,
+                            buy_price=find_service_work.detail_buy_price,
+                            retail_price=find_service_work.detail_retail_price,
+                            minimum_items_for_notification=find_service_work.detail_minimum_items_for_not,
+                            remainder=find_service_work.quantity_was_used,
                         )
                         # Записываем айдишник (individual_code) + сохраняем
-                        created_returned_detail.individual_code = created_returned_detail.id
+                        created_returned_detail.individual_code = (
+                            created_returned_detail.id
+                        )
                         created_returned_detail.save()
                         actual_remainder = created_returned_detail.remainder
 
-                    create_history = HistoryStorageInfo.objects.create(user=request.user, type_of_operation_history='Возврат с ремонта', 
-                    name_product_history=find_service_work.detail_name_was_used, individual_code_history=find_service_work.detail_id,
-                    supplier_history=find_service_work.detail_supplier, quantity_history=find_service_work.quantity_was_used,
-                    buy_price_history=find_service_work.detail_buy_price, remainder_history=actual_remainder)
+                    create_history = HistoryStorageInfo.objects.create(
+                        user=request.user,
+                        type_of_operation_history="Возврат с ремонта",
+                        name_product_history=find_service_work.detail_name_was_used,
+                        individual_code_history=find_service_work.detail_id,
+                        supplier_history=find_service_work.detail_supplier,
+                        quantity_history=find_service_work.quantity_was_used,
+                        buy_price_history=find_service_work.detail_buy_price,
+                        remainder_history=actual_remainder,
+                    )
 
                     # После всех манипуляций с товаром - удаляем окончательно нашу работу
                     find_service_work.delete()
 
+                # Получаю обьект
+                get_order = Orders.objects.get(user=request.user, id=connected_id)
+
                 # Получение итоговой суммы ремонта
-                get_sum_repair = CreateServiceWork.objects.filter(user=self.request.user, connected_id = connected_id).aggregate(total_sum=Sum('service_price'))
-                total_price = get_sum_repair['total_sum']
+                get_sum_repair = CreateServiceWork.objects.filter(
+                    user=self.request.user, connected_id=connected_id
+                ).aggregate(total_sum=Sum("service_price"))
+                total_price = get_sum_repair["total_sum"] - get_order.discount
 
-                msg = ''
+                print(total_price)
+
+                msg = ""
             else:
-                msg = 'Произошла ошибка. Повторите попытку позже!'
+                msg = "Произошла ошибка. Повторите попытку позже!"
 
-            return render(self.request, 'orders/show_work_success/show_work.html', {'create_work_form' : create_work_form, 
-            'get_created_works_later' : get_created_works_later, 'connected_id' : connected_id, 'total_price' : total_price, 'msg' : msg})
+            return render(
+                self.request,
+                "orders/show_work_success/show_work.html",
+                {
+                    "create_work_form": create_work_form,
+                    "get_created_works_later": get_created_works_later,
+                    "connected_id": connected_id,
+                    "total_price": total_price,
+                    "msg": msg,
+                },
+            )
 
         except Exception as e:
-            msg=f'Ошибка: {e}'               
+            msg = f"Ошибка: {e}"
             print(msg)

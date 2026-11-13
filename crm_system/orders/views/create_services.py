@@ -27,7 +27,7 @@ from storage.models import StorageInfo, HistoryStorageInfo
 class ServiceWorkCreate(View):
 
     # Здесь активируется функция, которая уже сохраняет оказываемую работу в базу данных CreateServiceWork
-    def form_valid(self, get_one_form, get_id_order):
+    def form_valid(self, get_one_form, get_id_order, discount):
 
         get_created_works_later = CreateServiceWork.objects.filter(
             user=self.request.user, connected_id=get_id_order
@@ -152,7 +152,7 @@ class ServiceWorkCreate(View):
                     get_sum_repair = CreateServiceWork.objects.filter(
                         user=self.request.user, connected_id=connected_id
                     ).aggregate(total_sum=Sum("service_price"))
-                    total_price = get_sum_repair["total_sum"]
+                    total_price = get_sum_repair["total_sum"] - discount
                     return render(
                         self.request,
                         "orders/show_work_success/show_work.html",
@@ -161,6 +161,7 @@ class ServiceWorkCreate(View):
                             "get_created_works_later": get_created_works_later,
                             "connected_id": connected_id,
                             "total_price": total_price,
+                            "get_dicount_later": discount,
                         },
                     )
 
@@ -175,7 +176,7 @@ class ServiceWorkCreate(View):
                     get_sum_repair = CreateServiceWork.objects.filter(
                         user=self.request.user, connected_id=connected_id
                     ).aggregate(total_sum=Sum("service_price"))
-                    total_price = get_sum_repair["total_sum"]
+                    total_price = get_sum_repair["total_sum"] - discount
 
                     print(
                         "Ничего не было выбрано, просто обычное создание текста без использования детали"
@@ -189,6 +190,7 @@ class ServiceWorkCreate(View):
                             "get_created_works_later": get_created_works_later,
                             "connected_id": connected_id,
                             "total_price": total_price,
+                            "get_dicount_later": discount,
                         },
                     )
 
@@ -221,7 +223,9 @@ class ServiceWorkCreate(View):
         get_sum_repair = CreateServiceWork.objects.filter(
             user=request.user, connected_id=connected_id
         ).aggregate(total_sum=Sum("service_price"))
-        total_price = get_sum_repair["total_sum"]
+        total_price = get_sum_repair["total_sum"] - get_dicount_later
+
+        print(total_price)
 
         # Плюс дополнительно если человек открывает разметку не в первый раз и там уже есть выполненные работы, то я иду в БД
         # и фильтрую по тому, что есть + с сортировкой по дате (от старого к новому)
@@ -251,6 +255,12 @@ class ServiceWorkCreate(View):
         # получаю специально код самого заказа
         connected_id = request.POST.get("get_id_order")
 
+        # Получаю скидку
+        get_dicount_order = Orders.objects.get(
+            user=request.user, id=connected_id
+        ).discount
+        print(get_dicount_order)
+
         # Получаю обьект
         get_service_work = CreateServiceWork.objects.filter(
             user=request.user, connected_id=connected_id
@@ -259,20 +269,21 @@ class ServiceWorkCreate(View):
 
         # Получаю итоговую сумму за все услуги
         get_sum_repair = get_service_work.aggregate(total_sum=Sum("service_price"))
-        total_price = get_sum_repair["total_sum"]
+        total_price = get_sum_repair["total_sum"] - get_dicount_order
 
         if get_one_form.is_valid():
             service_provided = get_one_form.cleaned_data["service_provided"]
             quantity_was_used = get_one_form.cleaned_data["quantity_was_used"]
 
-            return self.form_valid(get_one_form, connected_id)
-
+            return self.form_valid(get_one_form, connected_id, get_dicount_order)
+        print()
         context = {
             "connected_id": connected_id,
             "create_work_form": get_one_form,
             "get_created_works_later": get_created_works_later,
             "total_price": total_price,
-            "error_message": "Пожалуйста, заполните обязательные поля!",
+            "get_dicount_later": get_dicount_order,
+            "error_message": "Пожалуйста, заполните правильно поля!",
         }
 
         # Возврат контекста если форма не валидна

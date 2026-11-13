@@ -18,6 +18,8 @@ urlpatterns = [
         OrdersDetailsAutocomplete.as_view(),
         name="orders_autocomplete",
     ),
+    # Отвечает за подсчет скидки
+    path("get_dsc", CountDsc.as_view(), name="get_dsc"),
     # Указываю на путь к обращению за рабочими услугами, чтобы отображать авто ответы для подсказок из БД
     path(
         "services_autocomplete",
@@ -32,10 +34,6 @@ urlpatterns = [
     ),
     # Показывает и принимает выбранную оплату с внесением в кассу (основную)
     path("pay_process", ShowAndPayView.as_view(), name="pay_process"),
-    # Указываю на путь, чтобы можно было подсчитать скидку всех работ
-    path(
-        "discount_calculation",
-        DiscountCalculation.as_view(),
-        name="discount_calculation",
-    ),
+    # Подсчитывает итоговую сумму всех услуг
+    path("get_order_total", GetTotalCount.as_view(), name="get_order_total"),
 ]
