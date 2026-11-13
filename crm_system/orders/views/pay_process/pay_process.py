@@ -34,6 +34,8 @@ def format_initials(initials):
 
     if not initials:
         return ""
+    elif " " not in initials:
+        return initials
 
     index = initials.index(" ")
     format_int = initials[0 : index + 2]

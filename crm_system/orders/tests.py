@@ -1,1 +1,5 @@
-print((5000 * 75) // 100)
+initials = "иван г"
+if not initials:
+    print(1)
+elif " " not in initials:
+    print(0)
