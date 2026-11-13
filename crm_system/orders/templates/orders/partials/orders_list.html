@@ -7,68 +7,70 @@
             hx-target="#drawer-content-loader"
             hx-swap="innerHTML"
             onclick="openOrderDrawer()"
-            style="cursor: pointer;">
+            style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 220px; height: 100%; padding: 16px; box-sizing: border-box;">
                     
-            <!-- Шапка карточки: Название слева, бейджи справа -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                <div class="device-info-row" style="display: flex; align-items: center; gap: 8px; margin: 0;">
-                    <i class="fa-solid fa-laptop-code device-ico"></i>
-                    <h4 class="device-name" title="{{ i.name_of_device }}" style="margin: 0;">{{ i.name_of_device }}</h4>
+            <!-- Верхняя часть (Шапка + Тело) -->
+            <div>
+                <!-- Шапка карточки: Название слева, бейджи справа -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <div class="device-info-row" style="display: flex; align-items: center; gap: 8px; margin: 0;">
+                        <i class="fa-solid fa-laptop-code device-ico"></i>
+                        <h4 class="device-name" title="{{ i.name_of_device }}" style="margin: 0;">{{ i.name_of_device }}</h4>
+                    </div>
+
+                    <div class="crm-status-badges" style="position: relative; display: flex; align-items: center; gap: 6px;">
+                        {% if i.important %}
+                        <span class="badge-urgent" title="Срочный заказ"><i class="fa-solid fa-bolt"></i> Срочно</span>
+                        {% endif %}
+
+                        <!-- Кнопка статуса, которая вызывает поповер -->
+                        <button type="button" 
+                            hx-get="{% url 'change_status_order' %}?get_id_order={{ i.id }}" 
+                            hx-target="#status-popover-{{ i.id }}"  
+                            hx-swap="innerHTML"
+                            onclick="toggleStatusPopover(event, 'status-popover-{{ i.id }}')"
+                            style="background: {{ i.color_category|default:'#8950fc' }}; color: #fff; border: none; padding: 4.3px 12px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer;">
+                            {{ i.name_category }}
+                        </button>
+
+                        <!-- Компактное выпадающее окошко (поповер) -->
+                        <div id="status-popover-{{ i.id }}" class="status-popover-box" 
+                            style="display: none; position: absolute; right: 0; top: calc(100% + 6px); background: #ffffff; border: 1px solid #ebedf2; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 1000;"
+                            onclick="event.stopPropagation()">
+                        </div>
+                    </div>
                 </div>
 
-                <div class="crm-status-badges" style="position: relative; display: flex; align-items: center; gap: 6px;">
-                    {% if i.important %}
-                    <span class="badge-urgent" title="Срочный заказ"><i class="fa-solid fa-bolt"></i> Срочно</span>
-                    {% endif %}
-
-                    <!-- Кнопка статуса, которая вызывает поповер -->
-                    <button type="button" 
-                        hx-get="{% url 'change_status_order' %}?get_id_order={{ i.id }}" 
-                        hx-target="#status-popover-{{ i.id }}"  
-                        hx-swap="innerHTML"
-                        onclick="toggleStatusPopover(event, 'status-popover-{{ i.id }}')"
-                        style="background: {{ i.color_category|default:'#8950fc' }}; color: #fff; border: none; padding: 4.3px 12px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer;">
-                        {{ i.name_category }}
-                    </button>
-
-                    <!-- Компактное выпадающее окошко (поповер), спрятанное по умолчанию -->
-                    <div id="status-popover-{{ i.id }}" class="status-popover-box" 
-                        style="display: none; position: absolute; right: 0; top: calc(100% + 6px); background: #ffffff; border: 1px solid #ebedf2; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 1000;"
-                        onclick="event.stopPropagation()">
-                        <!-- Сюда подгрузится список статусов через HTMX -->
+                <!-- Основной контент -->
+                <div class="crm-card-body">
+                   <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: #3f4254; margin-bottom: 8px;">
+                        {% if i.device_type %}
+                            <div><span style="color: #7e8299;">Тип:</span> {{ i.device_type }}</div>
+                        {% endif %}
+                        {% if i.device_company %}
+                            <div><span style="color: #7e8299;">Марка:</span> {{ i.device_company }}</div>
+                        {% endif %}
+                        {% if i.name_of_device %}
+                            <div><span style="color: #7e8299;">Модель:</span> {{ i.name_of_device }}</div>
+                        {% endif %}
+                        {% if i.problem_with_device %}
+                            <div><span style="color: #7e8299;">Неисправность:</span> {{ i.problem_with_device }}</div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
 
-            <!-- Основной контент (Фиксированная высота) -->
-            <div class="crm-card-body">
-               <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: #3f4254; margin-bottom: 8px;">    {% if i.device_type %}
-                        <div><span style="color: #7e8299;">Тип:</span> {{ i.device_type }}</div>
-                    {% endif %}
-                    {% if i.device_company %}
-                        <div><span style="color: #7e8299;">Марка:</span> {{ i.device_company }}</div>
-                    {% endif %}
-                    {% if i.name_of_device %}
-                        <div><span style="color: #7e8299;">Модель:</span> {{ i.name_of_device }}</div>
-                    {% endif %}
-                    {% if i.problem_with_device %}
-                        <div><span style="color: #7e8299;">Неисправность:</span> {{ i.problem_with_device }}</div>
-                    {% endif %}
-                </div>
-            </div>
-
             <!-- Прижатый к низу Футер -->
-            <div class="crm-card-footer">    
-                <div class="footer-client-info">
-                    <i class="fa-regular fa-user"></i>
-                    <span class="client-name">{{ i.client.name }}</span>
+            <div class="crm-card-footer" style="border-top: 1px solid #ebedf2; padding-top: 10px; margin-top: auto;">    
+                <div class="footer-client-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                    <span class="client-name"><i class="fa-regular fa-user"></i> {{ i.client.name }}</span>
                     <span class="meta-price" style="font-weight: 700; color: #212529; font-size: 0.9rem;">
                         {{ i.total_services_sum }} ₽
                     </span>
-                    <span class="client-phone">{{ i.client.phone|format_phone }}</span>
                 </div>
 
-                <div class="footer-meta-info">
+                <div class="footer-meta-info" style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: #7e8299;">
+                    <span class="meta-phone">{{ i.client.phone|format_phone }}</span>
                     <span class="meta-manager"><i class="fa-solid fa-user-tie"></i> {{ i.manager|default:"Не назначен" }}</span>
                     <span class="meta-date"><i class="fa-regular fa-clock"></i> {{ i.created_at|date:"d.m H:i" }}</span>
                 </div>
