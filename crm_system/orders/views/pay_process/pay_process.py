@@ -117,7 +117,7 @@ DOCUMENT_VARIABLES = {
         str(sum(s.service_price for s in services)) if services else "0"
     ),
     "<Скидка>": lambda order, services=None, company_inf=None, **kwargs: str(
-        getattr(order, "discount", 0) or 0
+        getattr(order, "discount", 0)
     ),
     "<ИтогоЦена>": lambda order, services=None, company_inf=None, **kwargs: (
         str(

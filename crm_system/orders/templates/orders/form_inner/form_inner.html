@@ -1,4 +1,14 @@
-<form method="POST" hx-post="{% url 'show_form' %}" id="create-order-form" class="drawer-form-body" onsubmit="return validatePrepayForm(event)">
+<form method="POST" hx-post="{% url 'show_form' %}" id="create-order-form" class="drawer-form-body" onsubmit="return validatePrepayForm(event)"
+    hx-on::after-request="
+        // Проверяем, что запрос ушел именно от нашей формы создания заказа и завершился успешно
+        if (event.detail.successful && event.detail.target.id === 'create-order-form') {
+            if (typeof closeOrderDrawer === 'function') {
+                closeOrderDrawer();
+            } else if (typeof closeWideOrderDrawer === 'function') {
+                closeWideOrderDrawer();
+            }
+        }
+    ">
     {% csrf_token %}
     
     {% comment %} Передается в обработчик POST также и тип заказа {% endcomment %}
