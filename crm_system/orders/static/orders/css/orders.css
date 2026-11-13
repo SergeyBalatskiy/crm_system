@@ -1154,10 +1154,18 @@ input[type="number"] {
 }
 
 .crm-card-body {
-    flex: 1;
-    /* Занимает оставшееся пространство */
-    display: flex;
-    flex-direction: column;
+    /* Убираем жесткий flex: 1, который сжимает блок */
+    flex: 0 0 auto !important; 
+    
+    /* Разрешаем блоку расти по высоте в зависимости от содержимого */
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    
+    /* Гарантируем, что текст внутри не скрывается */
+    overflow: visible !important;
+    
+    margin-bottom: 12px;
 }
 
 .badge-urgent {

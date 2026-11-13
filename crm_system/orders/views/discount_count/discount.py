@@ -66,8 +66,9 @@ class CountDsc(View):
                 "discount": get_order.discount,
                 "total": total_price - get_order.discount,
             }
+
             response = JsonResponse(response_data)
-            response["HX-Trigger"] = "discountChanged"
+            response["HX-Trigger"] = "refreshOrders"
             return response
 
         except Orders.DoesNotExist:

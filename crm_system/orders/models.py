@@ -6,6 +6,7 @@ from django.utils import timezone
 from profile_user.models import WorkersInfo
 from storage.models import StorageInfo
 from auth_registration.models import Users
+from django.db.models import Sum
 
 User = get_user_model()
 
@@ -42,9 +43,8 @@ class Orders(models.Model):
     client = models.ForeignKey(Client, models.PROTECT, related_name="client_order")
 
     # Информация о девайсе (устройстве): Тип устройства / Цвет устройства / Название устройства / Проблема с устройством
-    device_type = models.CharField(
-        max_length=40, db_index=True
-    )  # Тип устройства: Телефон, Планшет, Ноутбук и т.д.
+    device_type = models.CharField(max_length=40, db_index=True)
+    # Тип устройства: Телефон, Планшет, Ноутбук и т.д.
     color_of_device = models.CharField(max_length=40, db_index=True)
 
     # Модель устройства
@@ -80,6 +80,20 @@ class Orders(models.Model):
 
     def __str__(self):
         return f"Статус: {self.name_category}, Менеджер: {self.manager}, ФИО клиента: {self.client.name}, Номер: {self.client.phone}, Название девайса: {self.name_of_device}, Проблема с девайсом: {self.problem_with_device}, Был создан: {self.created_at}, Поле c JSON-формами: {self.form_with_order_information}."
+
+    # Применяю декоратор проперти для получения подсчитанной суммы услуг
+    @property
+    def total_services_sum(self):
+
+        # Сумма всех работ
+        get_services_sum = CreateServiceWork.objects.filter(
+            user=self.user,
+            connected_id=self.id,
+        ).aggregate(total_sum=Sum("service_price"))
+
+        total_sum_val = get_services_sum["total_sum"] or 0
+        discount = self.discount or 0
+        return total_sum_val - discount
 
 
 # Данный класс отвечает за создание услуги, которая связана с опеределеной заявкой на ремонт

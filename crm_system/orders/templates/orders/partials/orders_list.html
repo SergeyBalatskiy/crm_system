@@ -42,18 +42,29 @@
 
             <!-- Основной контент (Фиксированная высота) -->
             <div class="crm-card-body">
-                <div class="device-issue-wrapper">
-                    <p class="device-issue" title="{{ i.problem_with_device }}">
-                        <span>Проблема:</span> {{ i.problem_with_device }}
-                    </p>
+               <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: #3f4254; margin-bottom: 8px;">    {% if i.device_type %}
+                        <div><span style="color: #7e8299;">Тип:</span> {{ i.device_type }}</div>
+                    {% endif %}
+                    {% if i.device_company %}
+                        <div><span style="color: #7e8299;">Марка:</span> {{ i.device_company }}</div>
+                    {% endif %}
+                    {% if i.name_of_device %}
+                        <div><span style="color: #7e8299;">Модель:</span> {{ i.name_of_device }}</div>
+                    {% endif %}
+                    {% if i.problem_with_device %}
+                        <div><span style="color: #7e8299;">Неисправность:</span> {{ i.problem_with_device }}</div>
+                    {% endif %}
                 </div>
             </div>
 
             <!-- Прижатый к низу Футер -->
-            <div class="crm-card-footer">
+            <div class="crm-card-footer">    
                 <div class="footer-client-info">
                     <i class="fa-regular fa-user"></i>
                     <span class="client-name">{{ i.client.name }}</span>
+                    <span class="meta-price" style="font-weight: 700; color: #212529; font-size: 0.9rem;">
+                        {{ i.total_services_sum }} ₽
+                    </span>
                     <span class="client-phone">{{ i.client.phone|format_phone }}</span>
                 </div>
 

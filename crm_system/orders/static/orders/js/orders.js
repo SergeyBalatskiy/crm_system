@@ -8,6 +8,9 @@ function closeOrderDrawer() {
     document.getElementById('order-drawer').classList.remove('active');
     document.getElementById('drawer-overlay').classList.remove('active');
     document.body.style.overflow = ''; // Возвращаем прокрутку
+
+    // Отправляем глобальный сигнал: обновить все карточки заказов на странице!
+    htmx.trigger(document.body, 'refreshOrders');
 }
 
 // Закрытие по нажатию клавиши ESC

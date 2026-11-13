@@ -98,10 +98,8 @@ class ChangeStatusOrder(View):
                 get_sum_repair = CreateServiceWork.objects.filter(
                     user=self.request.user, connected_id=get_id_order
                 ).aggregate(total_sum=Sum("service_price"))
-                total_price = (
-                    get_sum_repair["total_sum"]
-                    - get_order.get(id=get_id_order).discount
-                )
+                get_sum_repair = get_sum_repair["total_sum"] or 0
+                total_price = get_sum_repair - get_order.get(id=get_id_order).discount
 
                 # Получаю имя клиента для дальнейшей отправки
                 get_name_client = update_category.client.name
