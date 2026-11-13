@@ -152,7 +152,8 @@ class ServiceWorkCreate(View):
                     get_sum_repair = CreateServiceWork.objects.filter(
                         user=self.request.user, connected_id=connected_id
                     ).aggregate(total_sum=Sum("service_price"))
-                    total_price = get_sum_repair["total_sum"] - discount
+                    get_sum_repair = get_sum_repair["total_sum"] or 0
+                    total_price = get_sum_repair - discount
                     return render(
                         self.request,
                         "orders/show_work_success/show_work.html",
@@ -176,7 +177,8 @@ class ServiceWorkCreate(View):
                     get_sum_repair = CreateServiceWork.objects.filter(
                         user=self.request.user, connected_id=connected_id
                     ).aggregate(total_sum=Sum("service_price"))
-                    total_price = get_sum_repair["total_sum"] - discount
+                    get_sum_repair = get_sum_repair["total_sum"] or 0
+                    total_price = get_sum_repair - discount
 
                     print(
                         "Ничего не было выбрано, просто обычное создание текста без использования детали"
@@ -205,7 +207,7 @@ class ServiceWorkCreate(View):
                     "create_work_form": create_work_form,
                     "get_created_works_later": get_created_works_later,
                     "connected_id": connected_id,
-                    "error_message": msg,
+                    "msg": msg,
                 },
             )
 
@@ -223,7 +225,8 @@ class ServiceWorkCreate(View):
         get_sum_repair = CreateServiceWork.objects.filter(
             user=request.user, connected_id=connected_id
         ).aggregate(total_sum=Sum("service_price"))
-        total_price = get_sum_repair["total_sum"] - get_dicount_later
+        get_sum_repair = get_sum_repair["total_sum"] or 0
+        total_price = get_sum_repair - get_dicount_later
 
         print(total_price)
 
@@ -269,7 +272,8 @@ class ServiceWorkCreate(View):
 
         # Получаю итоговую сумму за все услуги
         get_sum_repair = get_service_work.aggregate(total_sum=Sum("service_price"))
-        total_price = get_sum_repair["total_sum"] - get_dicount_order
+        get_sum_repair = get_sum_repair["total_sum"] or 0
+        total_price = get_sum_repair - get_dicount_order
 
         if get_one_form.is_valid():
             service_provided = get_one_form.cleaned_data["service_provided"]
@@ -283,7 +287,7 @@ class ServiceWorkCreate(View):
             "get_created_works_later": get_created_works_later,
             "total_price": total_price,
             "get_dicount_later": get_dicount_order,
-            "error_message": "Пожалуйста, заполните правильно поля!",
+            "msg": "Пожалуйста, заполните правильно поля!",
         }
 
         # Возврат контекста если форма не валидна

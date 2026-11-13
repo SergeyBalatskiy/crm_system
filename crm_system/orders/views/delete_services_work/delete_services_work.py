@@ -34,6 +34,16 @@ class DeleteServicesInOrder(Select2QuerySetView):
                 user=request.user, connected_id=connected_id
             ).order_by("service_was_created")
 
+            # Получаю обьект
+            get_order = Orders.objects.get(user=request.user, id=connected_id)
+
+            # Получение итоговой суммы ремонта
+            get_sum_repair = CreateServiceWork.objects.filter(
+                user=self.request.user, connected_id=connected_id
+            ).aggregate(total_sum=Sum("service_price"))
+            get_sum_repair = get_sum_repair["total_sum"] or 0
+            total_price = get_sum_repair - get_order.discount
+
             # Получаю уникальный айдишник нужной для удаления работы
             get_id_to_delete = request.POST.get("id_service_work")
 
@@ -106,16 +116,23 @@ class DeleteServicesInOrder(Select2QuerySetView):
                     # После всех манипуляций с товаром - удаляем окончательно нашу работу
                     find_service_work.delete()
 
-                # Получаю обьект
-                get_order = Orders.objects.get(user=request.user, id=connected_id)
-
                 # Получение итоговой суммы ремонта
                 get_sum_repair = CreateServiceWork.objects.filter(
                     user=self.request.user, connected_id=connected_id
                 ).aggregate(total_sum=Sum("service_price"))
-                total_price = get_sum_repair["total_sum"] - get_order.discount
+                summary = get_sum_repair["total_sum"] or 0
 
-                print(total_price)
+                total_price = summary - get_order.discount
+                print("Получилось до проверки:", total_price)
+
+                # Если скидка больше чем наша сумма работы после удаления, нужно обнулять скидку и возвращать сумму текущую
+                if total_price < 0:
+                    total_price = summary
+                    get_order.discount = 0
+                    get_order.save()
+                    print(get_order.discount)
+
+                print("Получилось после проверки:", total_price)
 
                 msg = ""
             else:
@@ -129,10 +146,23 @@ class DeleteServicesInOrder(Select2QuerySetView):
                     "get_created_works_later": get_created_works_later,
                     "connected_id": connected_id,
                     "total_price": total_price,
+                    "get_dicount_later": get_order.discount,
                     "msg": msg,
                 },
             )
 
         except Exception as e:
             msg = f"Ошибка: {e}"
-            print(msg)
+
+            return render(
+                self.request,
+                "orders/show_work_success/show_work.html",
+                {
+                    "create_work_form": create_work_form,
+                    "get_created_works_later": get_created_works_later,
+                    "connected_id": connected_id,
+                    "total_price": total_price,
+                    "get_dicount_later": get_order.discount,
+                    "msg": msg,
+                },
+            )

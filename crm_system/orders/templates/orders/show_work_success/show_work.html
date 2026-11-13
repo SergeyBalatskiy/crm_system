@@ -9,13 +9,12 @@
     </div>
 
     <!-- Блок для системных ошибок или предупреждений -->
-    {% if msg or error_message %}
-    <div id="error-alert" style="flex-shrink: 0; margin: 15px 25px 0 25px; padding: 12px 15px; background: #ffe2e5; color: #f64e60; border-radius: 6px; font-size: 0.9rem; font-weight: 500; transition: opacity 0.5s ease;">
-        <i class="fa-solid fa-triangle-exclamation"></i> 
-        {{ msg|default:error_message|default:"Пожалуйста, заполните обязательные поля!" }}
-    </div>
+    {% if msg %}
+        <div id="error-alert" style="flex-shrink: 0; margin: 15px 25px 0 25px; padding: 12px 15px; background: #ffe2e5; color: #f64e60; border-radius: 6px; font-size: 0.9rem; font-weight: 500; transition: opacity 0.5s ease;">
+            <i class="fa-solid fa-triangle-exclamation"></i> 
+            {{ msg }}
+        </div>
     {% endif %}
-
     <!-- Форма -->
     <form hx-post="{% url 'create_service_work' %}" 
         hx-target="#drawer-content-loader" 
