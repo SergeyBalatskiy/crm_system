@@ -145,6 +145,11 @@ document.body.addEventListener('updateNewCounter', function (event) {
 
 // Глобальный клик: закрывает поповеры, если кликнули в любое другое место экрана
 document.addEventListener('click', function (e) {
+    // Если кликнули НА сам поповер или внутрь него — ничего не делаем, выходим
+    if (e.target.closest('.status-popover-box') || e.target.closest('button[hx-get*="change_status_order"]')) {
+        return;
+    }
+    
     document.querySelectorAll('.status-popover-box').forEach(function (box) {
         box.style.display = 'none';
     });
