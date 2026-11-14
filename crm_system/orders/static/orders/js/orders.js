@@ -14,9 +14,20 @@ function closeOrderDrawer() {
 }
 
 // Закрытие по нажатию клавиши ESC
+// Закрытие по нажатию клавиши ESC с приоритетом верхнего сайдбара (оплаты)
 document.addEventListener('keydown', function (event) {
     if (event.key === "Escape") {
-        closeOrderDrawer();
+        const paymentContainer = document.getElementById('payment-drawer-container');
+        
+        // Если сайдбар оплаты открыт (внутри контейнера что-то есть) — закрываем его первым
+        if (paymentContainer && paymentContainer.innerHTML.trim() !== '') {
+            paymentContainer.innerHTML = '';
+        } else {
+            // Иначе закрываем обычный сайдбар с данными клиента
+            if (typeof closeOrderDrawer === 'function') {
+                closeOrderDrawer();
+            }
+        }
     }
 });
 

@@ -13,6 +13,20 @@
     transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+/* МАГИЯ: Если в контейнере оплаты появился контент (открыта оплата), 
+   автоматически поднимаем оверлей ВЫШЕ шторки клиента (1000), 
+   но оставляем ниже оплаты (1050) */
+body:has(#payment-drawer-container:not(:empty)) .drawer-overlay.active {
+    z-index: 1045 !important;
+}
+
+#payment-drawer-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1050; /* Поверх всего */
+}
+
 .drawer-overlay.active {
     opacity: 1;
     visibility: visible;

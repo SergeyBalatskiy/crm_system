@@ -55,23 +55,23 @@
 
     <!-- Группа: Выданные -->
     {% if finished %}
-        <div style="font-size: 0.68rem; color: #3a393a; font-weight: 700; text-transform: uppercase; margin-top: 6px; padding-left: 4px; border-top: 1px solid #f1f1f2; padding-top: 6px;">Выданные</div>
-        <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
-            {% for cat in finished %}
-                <div hx-post="{% url 'change_status_order' %}"
-     hx-target="#payment-drawer-container"
-     hx-swap="innerHTML"
-     hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}"}'
-     hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-     style="background-color: {{ cat.color }}; color: #fff; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.08); transition: opacity 0.15s, transform 0.1s;"
-     onmouseover="this.style.opacity='0.85'; this.style.transform='translateY(-1px)';"
-     onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)';"
-     onclick="setTimeout(() => { 
-         // Если в контейнер загрузилась форма оплаты (проверяем по наличию разметки), 
-         // можно убедиться, что всё ок. Хотя HTMX сам всё вставит.
-     }, 100);">
-    {{ cat.name }}
-</div>
+                    <div style="font-size: 0.68rem; color: #3a393a; font-weight: 700; text-transform: uppercase; margin-top: 6px; padding-left: 4px; border-top: 1px solid #f1f1f2; padding-top: 6px;">Выданные</div>
+                    <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
+                        {% for cat in finished %}
+                            <div hx-post="{% url 'change_status_order' %}"
+                        hx-target="#payment-drawer-container"
+                        hx-swap="innerHTML"
+                        hx-vals='{"actual_id": "{{ cat.id }}", "get_id_order": "{{ get_id_order }}"}'
+                        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                        style="background-color: {{ cat.color }}; color: #fff; padding: 5px 12px; border-radius: 6px; cursor: pointer; font-size: 0.82rem; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.08); transition: opacity 0.15s, transform 0.1s;"
+                        onmouseover="this.style.opacity='0.85'; this.style.transform='translateY(-1px)';"
+                        onmouseout="this.style.opacity='1'; this.style.transform='translateY(0)';"
+                        onclick="setTimeout(() => { 
+                            // Если в контейнер загрузилась форма оплаты (проверяем по наличию разметки), 
+                            // можно убедиться, что всё ок. Хотя HTMX сам всё вставит.
+                        }, 100);">
+                        {{ cat.name }}
+                    </div>
             {% endfor %}
         </div>
     {% endif %}

@@ -90,11 +90,9 @@ class ChangeStatusOrder(View):
             # Счетчик для показа только новых заказов:
             new_counts = len(get_order.filter(user=request.user, category_eng="new"))
 
-            # Надо как-то сделать так чтобы обработчик реагировал на название категории, если она == "Выдан",
-            # то нужно выводить еще один шаблон страницы сбоку с карточкой об оплате...
-            print(get_selected_category.name == "Выдан")
+            # Если категория == ВЫДАН, то закрываем сайдбар + показываем предложение об оплате
             if get_selected_category.name == "Выдан":
-
+                print("ВЫБРАЛИ СТАТУС Выдан")
                 # Получение итоговой суммы ремонта:
                 get_sum_repair = CreateServiceWork.objects.filter(
                     user=self.request.user, connected_id=get_id_order
@@ -125,9 +123,10 @@ class ChangeStatusOrder(View):
                 print("Дошли до сюда")
                 return response
 
-            # Если есть тип заказа, то это означает что мы находимся внутри формы, и нужно просто выводить весь шаблон с формами
+            # Если категория другая, и если у нас есть тип заказа, значит что нужно отдавать шаблон с новым статусом
             if type_of_order:
                 print("Сработал этот блок!")
+                print("у нас есть тип заказа")
                 get_order = get_order.filter(id=get_id_order).first()
                 get_original_form = FormsForOrder.objects.filter(
                     user=request.user, type_of_order=type_of_order
