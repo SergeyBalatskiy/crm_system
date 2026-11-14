@@ -123,8 +123,8 @@ class ChangeStatusOrder(View):
                 )
                 return response
 
-            # Если есть тип заказа, то нужно просто выводить весь шаблон с формами
-            if type_of_order != None:
+            # Если есть тип заказа, то это означает что мы находимся внутри формы, и нужно просто выводить весь шаблон с формами
+            if type_of_order:
                 print("Сработал этот блок!")
                 get_order = get_order.filter(id=get_id_order).first()
                 get_original_form = FormsForOrder.objects.filter(

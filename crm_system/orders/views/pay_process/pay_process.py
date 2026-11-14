@@ -236,9 +236,7 @@ class ShowAndPayView(View):
                 str_of_services += (
                     f"{service.service_provided}, цена: {service.service_price} руб., "
                 )
-            str_of_services += (
-                f"Итого к оплате: {summary_price} руб., Оплата: {selected_type_pay}."
-            )
+            str_of_services += f"Скидка: {get_order.discount} руб., Итого к оплате: {summary_price} руб.,  Оплата: {selected_type_pay}."
             print(str_of_services)
 
             # Создание истории операции(финансовой) на внесение средств
