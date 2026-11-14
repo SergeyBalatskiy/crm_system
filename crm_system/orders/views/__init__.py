@@ -11,3 +11,4 @@ from .change_status_order.change_status_order import ChangeStatusOrder
 from .pay_process.pay_process import ShowAndPayView
 from .discount_count.discount import CountDsc
 from .get_total_num.total_num import GetTotalCount
+from .printing_documents.print_selected_document import PrintSelectedDocument

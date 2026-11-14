@@ -74,6 +74,21 @@ class ShowFormForOrder(View):
             # Получаю марку устройства (если оно есть)
             device_company = request.POST.get("device_company")
 
+            # Комплектация
+            complectation = request.POST.get("complectation")
+
+            # Внешний вид
+            visual = request.POST.get("visual")
+
+            # Ориентировочная цена
+            target_price = request.POST.get("target_price")
+
+            # Примерная дата окончания работ
+            day_of_the_end = request.POST.get("day_of_the_end")
+
+            # Комментарий приемщика
+            comment_of_order = request.POST.get("comment_of_order")
+
             # Если есть предоплата:
             prepay = "prepay" in request.POST
             if prepay:
@@ -168,6 +183,11 @@ class ShowFormForOrder(View):
                 problem_with_device=request.POST.get("destroyed", ""),
                 name_of_device=name_device,
                 device_company=device_company,
+                complectation=complectation,
+                visual=visual,
+                target_price=target_price,
+                day_of_the_end=day_of_the_end,
+                comment_of_order=comment_of_order,
                 deadline=request.POST.get("deadline", None),
                 form_with_order_information=order_dict,
                 important=is_urgently,

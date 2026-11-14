@@ -55,6 +55,28 @@ class Orders(models.Model):
         max_length=50, db_index=True, null=True, blank=True
     )
 
+    # Комплектация
+    complectation = models.CharField(
+        max_length=65, db_index=True, null=True, blank=True
+    )
+
+    # Внешний вид
+    visual = models.CharField(max_length=67, db_index=True, null=True, blank=True)
+
+    # Ориентировочная цена
+    target_price = models.CharField(max_length=50, db_index=True, null=True, blank=True)
+
+    # Примерная дата окончания работ
+    day_of_the_end = models.CharField(
+        max_length=50, db_index=True, null=True, blank=True
+    )
+
+    # Комментарий приемщика
+    comment_of_order = models.CharField(
+        max_length=100, db_index=True, null=True, blank=True
+    )
+
+    # Неисправность
     problem_with_device = models.CharField(max_length=150, db_index=True)
 
     # Скидка (в рублях)

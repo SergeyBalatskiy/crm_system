@@ -1,0 +1,62 @@
+<div class="drawer-header" style="display: flex; justify-content: space-between; align-items: center;">
+    <h3><i class="fa-solid fa-print" style="color: #8950fc;"></i> Выбор документа для печати</h3>
+    <button type="button" class="btn-close-drawer" onclick="closeOrderDrawer()">
+        <i class="fa-solid fa-xmark"></i>
+    </button>
+</div>
+
+<div class="drawer-sections-wrapper">
+    <form hx-post="{% url 'print_document' %}" 
+      hx-target="#document-modal-container" 
+      hx-swap="innerHTML"
+      id="print-doc-form"
+      class="form-section" style="display: flex; flex-direction: column; gap: 16px;">
+    {% csrf_token %}
+    
+    <!-- Передаем ID заказа дальше -->
+    <input type="hidden" name="get_id_order" value="{{ connected_id }}">
+
+    <div class="form-group">
+        <label class="form-label">Выберите тип документа:</label>
+        <select name="name_document" id="document-select" class="custom-select" onchange="handleDocumentChange(this)">
+            <option value="" disabled selected>-- Выберите документ --</option>
+            <option value="Акт о принятии">Акт о принятии</option>
+            <option value="Акт о отказе">Акт об отказе</option>
+            <option value="Акт о выполненных работах">Акт о выполненных работах</option>
+            <option value="Акт о гарантии">Акт о гарантии</option>
+        </select>
+    </div>
+
+    <!-- Поле для причины отказа -->
+    <div id="reason-container" style="display: none; flex-direction: column; gap: 6px;" class="prepay-amount-container">
+        <label class="form-label" style="color: #f64e60;">Введите причину отказа <span class="req-star">*</span></label>
+        <textarea name="reason_for_refusal" 
+                  id="reason-input" 
+                  class="custom-textarea" 
+                  rows="3" 
+                  placeholder="Например: Слишком дорогой ремонт / Отказ клиента..."></textarea>
+    </div>
+
+    <div style="margin-top: 10px; display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Закрыть</button>
+        <button type="submit" class="btn-submit-order">Сформировать и распечатать</button>
+    </div>
+</form>
+</div>
+
+<script>
+    // Функция для отслеживания выбора «Акт о отказе»
+    function handleDocumentChange(selectElement) {
+        const reasonContainer = document.getElementById('reason-container');
+        const reasonInput = document.getElementById('reason-input');
+
+        if (selectElement.value === 'Акт о отказе') {
+            reasonContainer.style.display = 'flex';
+            reasonInput.setAttribute('required', 'true');
+        } else {
+            reasonContainer.style.display = 'none';
+            reasonInput.removeAttribute('required');
+            reasonInput.value = ''; // Очищаем поле при смене выбора
+        }
+    }
+</script>

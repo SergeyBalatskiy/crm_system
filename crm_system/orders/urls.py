@@ -36,4 +36,6 @@ urlpatterns = [
     path("pay_process", ShowAndPayView.as_view(), name="pay_process"),
     # Подсчитывает итоговую сумму всех услуг
     path("get_order_total", GetTotalCount.as_view(), name="get_order_total"),
+    # Показывает документы на печать + берет выбранный документ и вставляет все требуемые данные в него
+    path("print_document", PrintSelectedDocument.as_view(), name="print_document"),
 ]
