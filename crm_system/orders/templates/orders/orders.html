@@ -90,4 +90,14 @@
     </div>
 </div>
 
+<script>
+    // Слушаем триггер от сервера и закрываем именно шторку редактирования/просмотра заказа
+    document.body.addEventListener('closeClientDrawer', function(evt) {
+        // Вызываем твою стандартную функцию закрытия шторки заказа
+        if (typeof closeOrderDrawer === 'function') {
+            closeOrderDrawer();
+        }
+    });
+</script>
+
 {% endblock %}

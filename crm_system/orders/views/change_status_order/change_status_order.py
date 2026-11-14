@@ -118,6 +118,7 @@ class ChangeStatusOrder(View):
                     {
                         "refreshOrders": True,
                         "updateNewCounter": new_counts,
+                        "closeClientDrawer": True,
                     }
                 )
                 print("Дошли до сюда")

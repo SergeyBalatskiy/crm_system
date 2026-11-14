@@ -31,6 +31,38 @@ document.addEventListener('keydown', function (event) {
     }
 });
 
+function changeOrderStatus(event, orderId, statusName, statusColor, updateUrl) {
+    event.stopPropagation(); // Предотвращаем всплытие клика
+
+    // 1. Мгновенно обновляем визуал кнопки в футере
+    const btn = document.getElementById('status-btn-' + orderId);
+    if (btn) {
+        btn.style.background = statusColor;
+        btn.innerHTML = statusName + ' <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 4px;"></i>';
+    }
+
+    // 2. Закрываем поповер со списком статусов
+    document.querySelectorAll('.status-popover-box').forEach(box => {
+        box.style.display = 'none';
+    });
+
+    // 3. Тихо сохраняем статус на сервере в фоне
+    fetch(updateUrl, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/json'
+        }
+    }).then(response => {
+        if (!response.ok) {
+            console.error('Ошибка сохранения статуса на сервере');
+        }
+    }).catch(error => {
+        console.error('Ошибка сети:', error);
+    });
+}
+
+
 // Показать подсказки при клике/фокусе
 function showHints(input) {
     // Закрываем все другие открытые подсказки
@@ -321,6 +353,28 @@ function togglePrepayInput(checkbox) {
         if (input) input.value = ''; // Очищаем сумму при выключении тумблера
     }
 }
+
+// Функция форматирования чисел при вводе (добавляет пробелы между тысячами)
+function formatMoneyInput(input) {
+    let value = input.value.replace(/\D/g, '');
+    if (value === '') {
+        input.value = '';
+        return;
+    }
+    input.value = Number(value).toLocaleString('ru-RU');
+}
+
+// Перехват отправки HTMX для автоматической очистки пробелов перед отправкой на бэкенд
+document.addEventListener('htmx:configRequest', function(evt) {
+    const form = document.getElementById('payment-form');
+    if (form && evt.detail.elt === form) {
+        const priceInput = document.getElementById('summary-price-field');
+        if (priceInput) {
+            // Убираем все пробелы, чтобы на сервер улетело чистое число (например: "305000")
+            evt.detail.parameters['summary_price'] = priceInput.value.replace(/\s/g, '');
+        }
+    }
+});
 
 function validatePrepayForm(event) {
     // Находим чекбокс (тумблер) предоплаты и инпут суммы

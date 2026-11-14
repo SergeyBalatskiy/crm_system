@@ -24,15 +24,19 @@
 </div>
 
 <script>
-    // Автоматически закрываем фоновую шторку заказа
-    if (typeof closeOrderDrawer === 'function') {
-        closeOrderDrawer();
-    }
-
-    // Функция закрытия окна и обновления списка заказов сзади
+    // Универсальная функция закрытия модального окна предпросмотра
     function closePrintModal() {
-        document.getElementById('payment-drawer-container').innerHTML = '';
-        location.reload(); // Перезагружаем страницу, чтобы обновить статусы и список заказов
+        // Очищаем контейнер документов, если он существует
+        const docModal = document.getElementById('document-modal-container');
+        if (docModal) {
+            docModal.innerHTML = '';
+        }
+
+        // Очищаем контейнер оплаты/платежей на всякий случай тоже
+        const paymentModal = document.getElementById('payment-drawer-container');
+        if (paymentModal) {
+            paymentModal.innerHTML = '';
+        }
     }
 </script>
 

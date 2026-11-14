@@ -1,6 +1,6 @@
 {% load phone_filters %}
 <form method="POST" hx-post="{% url 'client_order' %}?get_id_order={{ get_order.id }}&type_of_order={{ get_order.type_of_order }}" 
-    hx-target="#drawer-content-loader" 
+   hx-target="#drawer-content-loader" 
     hx-swap="innerHTML" 
     id="edit-order-form" 
     class="drawer-form-body">
@@ -12,7 +12,7 @@
     
     <!-- Шапка шторки -->
     <div class="drawer-header" style="display: flex; justify-content: space-between; align-items: center;">
-        <h3><i class="fa-solid fa-pen-to-square" style="color: #8950fc;"></i> Заявка #{{ get_order.id }}</h3>
+        <h3><i class="fa-solid fa-pen-to-square" style="color: #9d9d9e;"></i> Заявка #{{ get_order.id }}</h3>
         
         <!-- Правая часть шапки: сообщение + крестик -->
         <div style="display: flex; align-items: center; gap: 12px;">
@@ -171,43 +171,92 @@
 
     </div>
 
-    <!-- Зафиксированный футер -->
-    <div class="drawer-footer">
-        <button type="button" class="btn-cancel" onclick="closeOrderDrawer()">Закрыть</button>
-                
-       <div style="position: relative; display: inline-block;">
-            <button type="button" 
-                hx-get="{% url 'change_status_order' %}?get_id_order={{ get_id_order }}&type_of_order={{ get_order.type_of_order }}" 
-                hx-target="#status-popover-drawer-{{ get_id_order }}"  
-                hx-swap="innerHTML"
-                onclick="toggleStatusPopover(event, 'status-popover-drawer-{{ get_id_order }}')"
-                style="background: {{ get_order.color_category|default:'#8950fc' }}; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer;">
-                {{ get_order.name_category }}
+    <!-- Зафиксированный футер с красивыми и аккуратными кнопками -->
+    <div class="drawer-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 20px; background: #b866e8f8; border-top: 1px solid #ebedf2;">
+        
+        <!-- Левая группа: Закрыть + Статус -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn-cancel" onclick="closeOrderDrawer()" style="padding: 8px 14px; background: #e9ecef; color: #495057; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
+                Закрыть
             </button>
+                
+            <div style="position: relative; display: inline-block;">
+                <button type="button" 
+                    id="status-btn-{{ get_order.id }}"
+                    hx-get="{% url 'change_status_order' %}?get_id_order={{ get_id_order }}&type_of_order={{ get_order.type_of_order }}" 
+                    hx-target="#status-popover-drawer-{{ get_id_order }}"  
+                    hx-swap="innerHTML"
+                    onclick="toggleStatusPopover(event, 'status-popover-drawer-{{ get_id_order }}')"
+                    style="background: {{ get_order.color_category|default:'#8950fc' }}; color: #fff; border: none; padding: 8px 14px; border-radius: 6px; font-size: 0.9rem; font-weight: 600; cursor: pointer; white-space: nowrap;">
+                    {{ get_order.name_category }} <i class="fa-solid fa-chevron-down" style="font-size: 0.75rem; margin-left: 4px;"></i>
+                </button>
 
-            <!-- Уникальный ID для поповера в шторке, открывается вверх (bottom) -->
-            <div id="status-popover-drawer-{{ get_id_order }}" class="status-popover-box" 
-                style="display: none; position: absolute; right: 0; bottom: calc(100% + 8px); background: #ffffff; border: 1px solid #ebedf2; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 1000;"
-                onclick="event.stopPropagation()">
-                <!-- Сюда подгрузится список статусов через HTMX -->
+                <div id="status-popover-drawer-{{ get_id_order }}" class="status-popover-box" 
+                    style="display: none; position: absolute; left: 0; bottom: calc(100% + 8px); background: #ffffff; border: 1px solid #ebedf2; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 1000;"
+                    onclick="event.stopPropagation()">
+                </div>
             </div>
         </div>
 
-        {% comment %} Тут хочу сделать кнопку HX-GET которая показывает нам небольшое окошко которое выводит небольшой HTML НА ЮРЛ= print_document {% endcomment %}
-        <!-- Кнопка вызова окна печати документов -->
-        <button type="button" class="btn-secondary"
-            hx-get="{% url 'print_document' %}?get_id_order={{ get_order.id }}"
-            hx-target="#drawer-content-loader"
-            hx-swap="innerHTML">
-            <i class="fa-solid fa-print"></i> Печать документов
-        </button>
+        <!-- Правая группа: Печать, Ход работ и Сохранить -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+            
+            <!-- Кнопка печати с поповером -->
+            <div style="position: relative; display: inline-block;">
+                <button type="button" 
+                    hx-get="{% url 'print_document' %}?get_id_order={{ get_order.id }}" 
+                    hx-target="#print-popover-drawer-{{ get_order.id }}"  
+                    hx-swap="innerHTML"
+                    onclick="togglePrintPopover(event, 'print-popover-drawer-{{ get_order.id }}')"
+                    class="btn-secondary"
+                    style="padding: 8px 12px; background: #e9ecef; color: #3f4254; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; gap: 6px; white-space: nowrap;">
+                    <i class="fa-solid fa-print"></i> Печать
+                </button>
 
-        <button type="button" class="btn-secondary"
-            hx-get="{% url 'create_service_work' %}?get_id_order={{ get_order.id }}"
-            hx-target="#drawer-content-loader"
-            hx-swap="innerHTML">
-            Ход работ
-        </button>
-        <button type="submit" class="btn-submit-order">Сохранить изменения</button>
+                <div id="print-popover-drawer-{{ get_order.id }}" class="print-popover-box" 
+                    style="display: none; position: absolute; right: 0; bottom: calc(100% + 8px); width: 320px; background: #ffffff; border: 1px solid #ebedf2; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); z-index: 1000; padding: 16px; text-align: left;"
+                    onclick="event.stopPropagation()">
+                </div>
+            </div>
+
+            <!-- Ход работ -->
+            <button type="button" class="btn-secondary"
+                hx-get="{% url 'create_service_work' %}?get_id_order={{ get_order.id }}"
+                hx-target="#drawer-content-loader"
+                hx-swap="innerHTML"
+                style="padding: 8px 12px; background: #e9ecef; color: #3f4254; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; white-space: nowrap;">
+                Ход работ
+            </button>
+
+            <!-- Основная кнопка сохранения -->
+            <button type="submit" class="btn-submit-order"
+                style="padding: 8px 16px; background: #8950fc; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; white-space: nowrap; box-shadow: 0 4px 12px rgba(137,80,252,0.3);">
+                Сохранить
+            </button>
+        </div>
+
     </div>
 </form>
+
+<script>
+    function togglePrintPopover(event, popoverId) {
+        event.stopPropagation();
+        const popover = document.getElementById(popoverId);
+        
+        document.querySelectorAll('.print-popover-box, .status-popover-box').forEach(box => {
+            if (box.id !== popoverId) box.style.display = 'none';
+        });
+
+        if (popover.style.display === 'none' || !popover.style.display) {
+            popover.style.display = 'block';
+        } else {
+            popover.style.display = 'none';
+        }
+    }
+
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.print-popover-box, .status-popover-box').forEach(box => {
+            box.style.display = 'none';
+        });
+    });
+</script>

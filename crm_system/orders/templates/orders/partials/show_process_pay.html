@@ -27,13 +27,14 @@
             <div style="background: #f4f0ff; padding: 14px 16px; border-radius: 8px; display: flex; flex-direction: column; gap: 6px; border: 1px solid #e2d9fc;">
                 <label for="summary-price-field" style="font-size: 0.85rem; color: #7e8299; font-weight: 600; text-transform: uppercase;">Сумма к оплате (₽):</label>
                 <input type="text" 
-                       id="summary-price-field"
-                       name="summary_price" 
-                       value="{{ summary_price }}"
-                       class="custom-input" 
-                       style="font-size: 1.3rem; color: #8950fc; font-weight: 700; background: #ffffff; border: 1px solid #d1c4e9; padding: 8px 12px; border-radius: 6px; width: 100%; box-sizing: border-box; outline: none;"
-                       autocomplete="off"
-                       required>
+               id="summary-price-field"
+               name="summary_price" 
+               value="{{ summary_price }}"
+               class="custom-input" 
+               oninput="formatMoneyInput(this)"
+               style="font-size: 1.3rem; color: #8950fc; font-weight: 700; background: #ffffff; border: 1px solid #d1c4e9; padding: 8px 12px; border-radius: 6px; width: 100%; box-sizing: border-box; outline: none;"
+               autocomplete="off"
+               required>
             </div>
 
             <!-- Клиент -->
