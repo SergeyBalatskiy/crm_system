@@ -257,8 +257,10 @@ class PrintSelectedDocument(View):
         connected_id = request.POST.get("get_id_order")
         reason_for_refusal = request.POST.get("reason_for_refusal")
         get_name_document = request.POST.get("name_document")
-        print(connected_id)
-        print(get_name_document)
+
+        if not get_name_document:
+            return HttpResponse(status=204)
+
         try:
 
             # Получаю сначала "Шаблон выбранного документа":
