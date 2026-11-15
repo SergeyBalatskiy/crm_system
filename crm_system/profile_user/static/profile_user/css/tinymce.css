@@ -92,7 +92,7 @@
     font-size: 15px;
     font-weight: 600;
     border-radius: 12px;
-    background-color: #6f42c1;
+    background-color: #8950fc;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -101,7 +101,7 @@
 
 .document-show-box h1 {
     margin: 0;
-    color: #6235cb8;
+    color: #8950fc;
 }
 
 .selected-document {
@@ -201,14 +201,14 @@
 }
 
 .btn-save {
-    background-color: #6f42c1;
+    background-color: #8950fc;
     color: #ffffff;
     font-size: 17px;
     margin-top: 6.5px;
 }
 
 .btn-save:hover {
-    background-color: #59339d;
+    background-color: #673bb3;
 }
 
 /* Красная кнопка "По умолчанию" */
@@ -235,7 +235,7 @@
 }
 
 .btn-primary {
-    background-color: #6f42c1;
+    background-color: #8950fc;
     color: #ffffff;
     font-size: 19px;
     border-radius: 12px;
@@ -245,7 +245,7 @@
 }
 
 .btn-primary:hover {
-    background-color: #59329d;
+    background-color: #673bb3;
     transform: translateY(-1px);
     color: #ffffff;
 }

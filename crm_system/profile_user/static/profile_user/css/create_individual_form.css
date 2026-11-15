@@ -68,7 +68,7 @@
 }
 
 .individual_window input[type="text"]:focus {
-    border-color: #5c32be;
+    border-color: #8950fc;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
@@ -94,14 +94,14 @@
     width: 16px;
     height: 16px;
     cursor: pointer;
-    accent-color: #6235cb8;
+    accent-color: #8950fc;
 }
 
 /* 6. Кнопка отправки */
 .individual_window button[type="submit"] {
     width: 100%;
     padding: 11px 16px;
-    background-color: #734ad2;
+    background-color: #8950fc;
     color: #ffffff;
     border: none;
     border-radius: 8px;
@@ -113,7 +113,7 @@
 }
 
 .individual_window button[type="submit"]:hover {
-    background-color: #5936a8;
+    background-color: rgb(104, 63, 201);
 }
 
 /* 7. Блок ошибок Django messages */

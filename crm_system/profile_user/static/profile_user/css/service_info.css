@@ -28,7 +28,7 @@
 .main-page-title {
     font-size: 38px;
     font-weight: 700;
-    color: #6235cb8;
+    color: #8950fc;
     margin: 0 0 6px 0;
     text-align: left;
 }
@@ -152,7 +152,7 @@
 }
 
 .field-group input:focus {
-    border-color: #6f42c1;
+    border-color: #8950fc;
     box-shadow: 0 0 0 3px rgba(111, 66, 193, 0.15);
 }
 
@@ -188,7 +188,7 @@
     height: 50px;
     margin: 0 !important;
     padding: 0 !important;
-    background-color: #6f42c1 !important;
+    background-color: #8950fc !important;
     color: #ffffff !important;
     font-size: 20px;
     font-weight: 600;

@@ -8,7 +8,7 @@
 .main-page-title {
     font-size: 38px;
     font-weight: 700;
-    color: #6235cb8;
+    color: #8950fc;
     margin: 0 0 16px 0;
     text-align: left;
     align-self: flex-start;
@@ -94,7 +94,7 @@
 }
 
 .workers-form input:focus {
-    border-color: #6f42c1;
+    border-color: #8950fc;
 }
 
 .form-buttons {
@@ -107,7 +107,7 @@
 
 .form-buttons .btn-submit:hover,
 .form-buttons .btn-next:hover {
-    background-color: #59329d
+    background-color: rgb(119, 68, 206)
 }
 
 .form-buttons .btn-submit,
@@ -118,7 +118,7 @@
     width: 260px;
     height: 50px;
     margin: 0 !important;
-    background-color: #6f42c1;
+    background-color: #8950fc;
     color: #ffffff;
     font-size: 23px;
     font-weight: 600;
@@ -220,7 +220,7 @@
 }
 
 .btn-submit:hover {
-    background-color: #59329d;
+    background-color: #7244ce;
 }
 
 .dark-divider {
@@ -236,7 +236,7 @@
 .active-workers-title {
     font-size: 33px;
     font-weight: 600;
-    color: #6235cb8;
+    color: #8950fc;
     margin: 0 0 16px 0;
     text-align: left;
     padding-bottom: 7px;
@@ -283,7 +283,7 @@
     align-items: center;
     gap: 16px;
     background-color: #ffffff;
-    border: 2px solid #6235cb8;
+    border: 2px solid #8950fc;
     border-radius: 12px;
     padding: 14px 24px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
@@ -312,7 +312,7 @@
 }
 
 .btn-delete-worker {
-    background-color: #6f42c1;
+    background-color: #8950fc;
     color: #ffffff;
     transform: translateY(-12px);
     border: none;
@@ -327,7 +327,7 @@
 }
 
 .btn-delete-worker:hover {
-    background-color: #59329d;
+    background-color: #6d41c7;
 }
 
 .empty-workers-text {

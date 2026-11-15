@@ -64,7 +64,7 @@ body {
 .div-box button {
     margin-top: 25px;
     padding: 10px 30px;
-    background-color: #6235cb;
+    background-color: #8950fc;
     color: #fff;
     border: none;
     border-radius: 12px;
@@ -74,7 +74,7 @@ body {
 }
 
 .div-box button:hover {
-    background-color: #5029aa;
+    background-color: rgb(103, 58, 208);
 }
 
 .site-header .logo {
@@ -87,7 +87,7 @@ body {
 
 .site-header .logo a {
     text-decoration: none;
-    color: #6235cb;
+    color: #8950fc;
     font-weight: 700;
     letter-spacing: 2px;
     font-size: 26px;
@@ -108,7 +108,7 @@ body {
 }
 
 .site-nav:hover {
-    scrollbar-color: #6235cb transparent;
+    scrollbar-color: #8950fc transparent;
 }
 
 .site-nav::-webkit-scrollbar {
@@ -134,7 +134,7 @@ body {
 }
 
 .site-nav:hover::-webkit-scrollbar-thumb {
-    background-color: #6235cb;
+    background-color: #8950fc;
 }
 
 .site-nav li {
@@ -152,7 +152,7 @@ body {
     height: 100%;
     position: relative;
     text-decoration: none;
-    color: #6235cb;
+    color: #8950fc;
     font-weight: 600;
     z-index: 3;
     transition: color 0.3s ease;
@@ -180,7 +180,7 @@ body {
     height: 80%;
     width: 0;
     opacity: 0;
-    background: #6235cb;
+    background: #8950fc;
     border-radius: 30px 0 0 30px;
     transition: width 0.4s ease, opacity 0.15s ease;
     z-index: 1;
@@ -210,14 +210,14 @@ body {
     margin-top: 4px;
     top: -34px;
     border-radius: 0 0 30px 0;
-    box-shadow: 0 20px 0 0 #6235cb;
+    box-shadow: 0 20px 0 0 #8950fc;
 }
 
 .site-nav a::after {
     margin-bottom: 4px;
     bottom: -34px;
     border-radius: 0 30px 0 0;
-    box-shadow: 0 -20px 0 0 #6235cb;
+    box-shadow: 0 -20px 0 0 #8950fc;
 }
 
 .site-nav li:hover a::before,

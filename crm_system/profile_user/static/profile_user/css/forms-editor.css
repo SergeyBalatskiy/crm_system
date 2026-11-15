@@ -54,7 +54,7 @@
     justify-content: center;
     width: 150px;
     height: 50px;
-    background-color: #6f42c1 !important;
+    background-color: #8950fc !important;
     border-radius: 10px;
     border: none;
     cursor: pointer;
@@ -63,7 +63,7 @@
 }
 
 .footer-actions .btn-next:hover {
-    background-color: #47298d !important;
+    background-color: rgb(99, 58, 194) !important;
 }
 
 .form-editor-header {
@@ -77,7 +77,7 @@
 
 .sortable-swap-highlight {
     background-color: #e0e7ff !important;
-    border: 2px dashed #4f46e5 !important;
+    border: 2px dashed #8950fc !important;
     opacity: 0.8;
 }
 
@@ -132,7 +132,7 @@
 
 .section-number {
     background: #e0e7ff;
-    color: #4338ca;
+    color: #8950fc;
     padding: 2px 8px;
     border-radius: 6px;
     font-size: 0.9rem;
@@ -269,7 +269,7 @@
 }
 
 .btn-plus:hover {
-    color: #4f46e5;
+    color: #8950fc;
     transform: scale(1.3);
 }
 
@@ -365,12 +365,12 @@
 }
 
 .btn-primary {
-    background: #4f46e5;
+    background: #8950fc;
     color: white;
 }
 
 .btn-primary:hover {
-    background: #4338ca;
+    background: #6d42c3;
 }
 
 .btn-danger {
@@ -399,8 +399,8 @@
 }
 
 .placeholder-slot:hover {
-    border-color: #4f46e5;
-    color: #4f46e5;
+    border-color: #7d4be2;
+    color: #7142d0;
     background-color: #f0fdf4;
 }
 
@@ -416,7 +416,7 @@
     justify-content: center;
     gap: 8px;
     padding: 10px 16px;
-    background-color: rgb(106, 75, 216);
+    background-color: #8950fc;
     border-radius: 8px;
     color: #ffffff;
     font-size: 0.95rem;
@@ -426,7 +426,7 @@
 }
 
 .new_individual_form button:hover {
-    background-color: #45278b;
+    background-color: #7143cc;
 }
 
 .new_individual_form button svg {
@@ -552,7 +552,7 @@
 .editor-page-wrapper-box h1 {
     margin-bottom: 20px;
     margin: 0;
-    color: #6235cb;
+    color: #8950fc;
 }
 
 .navigation-form-select label {
@@ -598,7 +598,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
-    background-color: #7445e1;
+    background-color: #8950fc;
     color: #ffffff !important;
     border: none;
     border-radius: 12px;
@@ -610,7 +610,7 @@
 }
 
 .new_individual_form:hover {
-    background-color: #623bbd;
+    background-color: #7b4adf;
 }
 
 .new_individual_form svg {
