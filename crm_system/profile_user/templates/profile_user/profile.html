@@ -1,33 +1,134 @@
 {% extends "profile_user/base.html" %}
 
 {% block content %}
-<div class="div-place">
-    <div class="div-box">
-        <h1>Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</h1>
-        <p>Давайте настроим все так, как вам хочется!</p>
-        <p>Как называется ваш сервисный центр?</p>
-        <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Logout</button>
-        </form>
-        <div class="form-container div_service_name">
-            <form form method="post" action="#">
-                <div class="field_input_name">
-                    <p>*Тут ввод поля названия сервиса*</p>
-                </div>
-            </form>
-        </div>
-        <p>Пожалуйста, введите адрес вашего сервиса</p>
-        <div class="form-container div_service_adres">
-            <form form method="post" action="#">
-                <div class="field_input_adres">
-                    <p>*Тут ввод поля адреса сервиса*</p>
-                </div>
-            </form>
-        </div>
+<!-- Стили для мгновенного скрытия скроллбара прямо в HTML -->
+<style>
+    .div-box::-webkit-scrollbar {
+        display: none !important;
+        width: 0px !important;
+        background: transparent !important;
+    }
+    .div-box {
+        overflow: hidden !important;
+        -ms-overflow-style: none !important;
+    }
+</style>
 
-        <button>Далее</button>
+<div class="div-place">
+    <!-- Добавили overflow-y: auto прямо в style, чтобы скролл работал, но полосы не было -->
+    <div class="div-box workers-page-container" style="align-items: stretch; justify-content: flex-start; text-align: left; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+
+        <div class="crm-profile-wrapper" style="width: 100%; max-width: 100%;">
+            
+            <!-- Общий контейнер-сетка (2 колонки) -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start;">
+                
+                <!-- ЛЕВАЯ КОЛОНКА -->
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    
+                    <!-- Приветствие -->
+                    <div style="background: #ffffff; padding: 14px 16px; border-radius: 10px; border: 1px solid #ebedf2;">
+                        <h1 style="font-size: 1.2rem; font-weight: 700; color: #3f4254; margin: 0 0 2px 0;">
+                            Здравствуйте, {{ user.first_name|default:user.username }}! 👋
+                        </h1>
+                        <p style="color: #7e8299; font-size: 0.8rem; margin: 0;">Вот сводка по вашему сервисному центру.</p>
+                    </div>
+
+                    <!-- Метрики -->
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                        <div style="background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #ebedf2;">
+                            <div style="font-size: 0.65rem; color: #7e8299; font-weight: 600; text-transform: uppercase; margin-bottom: 2px;">Заказы</div>
+                            <div style="font-size: 1.2rem; font-weight: 700; color: #3f4254;">{{ summary_orders }}</div>
+                        </div>
+                        <div style="background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #ebedf2;">
+                            <div style="font-size: 0.65rem; color: #7e8299; font-weight: 600; text-transform: uppercase; margin-bottom: 2px;">В работе</div>
+                            <div style="font-size: 1.2rem; font-weight: 700; color: #8950fc;">{{ in_progress_orders }}</div>
+                        </div>
+                        <div style="background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #ebedf2;">
+                            <div style="font-size: 0.65rem; color: #7e8299; font-weight: 600; text-transform: uppercase; margin-bottom: 2px;">Касса</div>
+                            <div style="font-size: 1rem; font-weight: 700; color: #50cd89;">{{ balance_cash }} ₽</div>
+                        </div>
+                    </div>
+
+                    <!-- Навигация -->
+                    <div style="background: #ffffff; padding: 14px 16px; border-radius: 10px; border: 1px solid #ebedf2;">
+                        <h3 style="font-size: 0.9rem; font-weight: 700; color: #3f4254; margin: 0 0 8px 0;">Быстрые разделы</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            <a href="{% url 'service_info' %}" class="btn" style="background: #f3f6f9; color: #3f4254; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem; margin: 0;">🏢 Сервис</a>
+                            <a href="{% url 'workers' %}" class="btn" style="background: #f3f6f9; color: #3f4254; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem; margin: 0;">👥 Сотрудники</a>
+                            <a href="{% url 'categories' %}" class="btn" style="background: #f3f6f9; color: #3f4254; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem; margin: 0;">📂 Статусы</a>
+                            <a href="{% url 'tiny_mce' %}" class="btn" style="background: #f3f6f9; color: #3f4254; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem; margin: 0;">📝 Документы</a>
+                            <a href="{% url 'form-editor' %}" class="btn" style="background: #f3f6f9; color: #3f4254; padding: 5px 10px; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.75rem; margin: 0;">📄 Формы</a>
+                        </div>
+                    </div>
+
+                    <!-- Заказы -->
+                    <div style="background: #ffffff; padding: 14px 16px; border-radius: 10px; border: 1px solid #ebedf2;">
+                        <h3 style="font-size: 0.9rem; font-weight: 700; color: #3f4254; margin: 0 0 10px 0;">Последние заказы</h3>
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.8rem;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid #ebedf2; color: #7e8299;">
+                                    <th style="padding: 4px;">ID</th>
+                                    <th style="padding: 4px;">Устройство</th>
+                                    <th style="padding: 4px;">Клиент</th>
+                                    <th style="padding: 4px;">Статус</th>
+                                    <th style="padding: 4px;">Дата</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for order in latest_ten_orders %}
+                                <tr style="border-bottom: 1px solid #f8f9fa;">
+                                    <td style="padding: 6px 4px; font-weight: 600; color: #8950fc;">#{{ order.id }}</td>
+                                    <td style="padding: 6px 4px; color: #3f4254;"><strong>{{ order.device_type }}</strong></td>
+                                    <td style="padding: 6px 4px; color: #3f4254;">{{ order.client.name }}</td>
+                                    <td style="padding: 6px 4px;">
+                                        <span style="background-color: {{ order.color_category }}; color: #fff; padding: 2px 4px; border-radius: 4px; font-size: 0.6rem; font-weight: 600;">
+                                            {{ order.name_category }}
+                                        </span>
+                                    </td>
+                                    <td style="padding: 6px 4px; color: #7e8299; font-size: 0.7rem;">
+                                        {{ order.created_at|date:"d.m H:i" }}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" style="padding: 10px; text-align: center; color: #7e8299;">Нет заказов.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <!-- ПРАВАЯ КОЛОНКА -->
+                <div style="display: flex; flex-direction: column; gap: 14px;">
+                    
+                    <!-- Аналитика -->
+                    <div style="background: #ffffff; padding: 14px 16px; border-radius: 10px; border: 1px solid #ebedf2;">
+                        <h3 style="font-size: 0.9rem; font-weight: 700; color: #3f4254; margin: 0 0 10px 0;">Финансовая аналитика</h3>
+                        
+                    
+                        <div id="financial-results-container">
+                            {% include "profile_user/partials/finance_history_list.html" %}
+                        </div>
+                    </div>
+
+                    <!-- Кнопка выхода -->
+                    <div style="text-align: right;">
+                        <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" style="background: #ffe2e5; color: #f1416c; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; cursor: pointer; margin: 0;">
+                                <i class="fa-solid fa-right-from-bracket"></i> Выйти из аккаунта
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
     </div>
 </div>
-
 {% endblock %}

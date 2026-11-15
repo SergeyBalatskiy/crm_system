@@ -1,0 +1,120 @@
+<div id="financial-results-container">
+    
+    <!-- Форма фильтрации теперь прямо внутри партиала -->
+    <form method="GET" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;"
+        hx-get="{% url 'profile' %}" 
+        hx-target="#financial-results-container"
+        hx-trigger="change, input">
+        
+        <select name="type_of_operation" style="padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
+            <option value="">Все операции</option>
+            <option value="income" {% if request.GET.type_of_operation == 'income' %}selected{% endif %}>Поступление</option>
+            <option value="outcome" {% if request.GET.type_of_operation == 'outcome' %}selected{% endif %}>Исход</option>
+        </select>
+
+        <select name="category_of_operation" style="padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
+            <option value="">Все категории</option>
+            <option value="Продажа" {% if request.GET.category_of_operation == 'Продажа' %}selected{% endif %}>Продажа</option>
+            <option value="Покупка" {% if request.GET.category_of_operation == 'Покупка' %}selected{% endif %}>Покупка</option>
+            <option value="Гарантийный возврат" {% if request.GET.category_of_operation == 'Гарантийный возврат' %}selected{% endif %}>Возврат</option>
+            <option value="Оказание ремонтных услуг" {% if request.GET.category_of_operation == 'Оказание ремонтных услуг' %}selected{% endif %}>Ремонт</option>
+            <option value="Прочее" {% if request.GET.category_of_operation == 'Прочее' %}selected{% endif %}>Прочее</option>
+        </select>
+
+        <select name="fast_day_seleted" style="grid-column: span 2; padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
+            <option value="">За всё время</option>
+            <option value="date_today" {% if request.GET.fast_day_seleted == 'date_today' %}selected{% endif %}>Сегодня</option>
+            <option value="date_yesterday" {% if request.GET.fast_day_seleted == 'date_yesterday' %}selected{% endif %}>Вчера</option>
+            <option value="date_this_week" {% if request.GET.fast_day_seleted == 'date_this_week' %}selected{% endif %}>За неделю</option>
+            <option value="date_this_month" {% if request.GET.fast_day_seleted == 'date_this_month' %}selected{% endif %}>За месяц</option>
+        </select>
+    </form>
+
+    <!-- Блок с графиком -->
+    <div style="background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #ebedf2; margin-bottom: 20px; position: relative; height: 260px;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #3f4254; margin-bottom: 10px;">Динамика операций</h4>
+        <div style="position: relative; height: 210px; width: 100%;">
+            <canvas id="financeChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Таблица с историей операций -->
+    <div style="background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #ebedf2;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #3f4254; margin-bottom: 15px;">
+            История операций за выбранный период
+        </h4>
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+                <thead>
+                    <tr style="border-bottom: 1px solid #ebedf2; color: #7e8299;">
+                        <th style="padding: 8px;">Операция</th>
+                        <th style="padding: 8px;">Категория</th>
+                        <th style="padding: 8px;">Сумма</th>
+                        <th style="padding: 8px;">Дата</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in history_finance %}
+                    <tr style="border-bottom: 1px solid #f8f9fa;">
+                        <td style="padding: 10px; font-weight: 600;">{{ item.type_of_operation }}</td>
+                        <td style="padding: 10px;">{{ item.category_of_operation }}</td>
+                        <td style="padding: 10px; color: {% if item.type_of_operation == 'Поступление' %}#50cd89{% else %}#f1416c{% endif %}; font-weight: 700;">
+                            {{ item.amount }} ₽
+                        </td>
+                        <td style="padding: 10px; color: #7e8299; font-size: 0.85rem;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" style="padding: 15px; text-align: center; color: #7e8299;">Операций за выбранный период нет.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<!-- Инициализация графика с защитой от дублирования -->
+<!-- Инициализация графика в изолированной области видимости -->
+<script>
+    (function() {
+        if (window.myFinanceChart instanceof Chart) {
+            window.myFinanceChart.destroy();
+        }
+
+        const ctx = document.getElementById('financeChart').getContext('2d');
+        window.myFinanceChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+                datasets: [{
+                    label: 'Сумма (₽)',
+                    data: [12000, 19000, 30005, 5000, 20000, 35000, 42000],
+                    borderColor: '#8950fc',
+                    backgroundColor: 'rgba(137, 80, 252, 0.1)',
+                    borderWidth: 3,
+                    fill: true,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#ebedf2' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+    })();
+</script>
