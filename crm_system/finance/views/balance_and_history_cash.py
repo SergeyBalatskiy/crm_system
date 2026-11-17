@@ -17,7 +17,9 @@ class MainCashAndHistoryView(View):
     def get(self, request, *args, **kwargs):
 
         # Получаю / создаю баланс кассы
-        get_main_balance, created = CashAccount.objects.get_or_create(user=request.user)
+        get_main_balance, created = CashAccount.objects.get_or_create(
+            user=request.user, defaults={"user": request.user, "money_balance": 0}
+        )
         # Беру все данные пользователя
         qs = FinanceHistoryInfo.objects.filter(user=request.user).order_by(
             "-created_at"

@@ -11,97 +11,56 @@ from django.shortcuts import render
 from django.db.models import Sum
 from datetime import timedelta
 from datetime import datetime
+from django.http import JsonResponse
 from django.utils import timezone
 from django.db.models import Q, TextField, F
 from django.db.models.functions import TruncMonth
 
 
 # Функция, которая отвечает за фильтрацию "Финансовых данных" и дальнейшее отображение в HTML (В виде диаграммы)
-def show_graphical_diagram(
-    request,
-    header,
-    type_of_operation,
-    category_of_operation,
-    fast_day_seleted,
-    start_day,
-    finish_day,
-):
+def show_graphical_diagram(request):
 
-    # Получаю / создаю баланс кассы
-    get_main_balance, created = CashAccount.objects.get_or_create(user=request.user)
     # Беру все данные пользователя
-    qs = FinanceHistoryInfo.objects.filter(user=request.user).order_by("-created_at")
+    qs = FinanceHistoryInfo.objects.filter(user=request.user)
 
-    # Если у нас НЕ пришел запрос через AJAX (или HTMX) — отдаем ТОЛЬКО кусок со списком
-    if not header == "XMLHttpRequest":
-        result_func_context = {
-            "history_finance": qs,
-            "cash": get_main_balance,
-        }
-        return result_func_context
+    # Все остальное для функции
+    type_of_operation = request.GET.get("type_of_operation")
+    category_of_operation = request.GET.get("category_of_operation")
+    start_day = request.GET.get("start_day")
+    finish_day = request.GET.get("finish_day")
+    print(type_of_operation)
+    print(category_of_operation)
 
-    # В противном случае:
-    # Для удобного будущего суммарного поиска через Q (или)
-    main_q = Q()
-
-    # Поиск по типу операции
+    # Определяю стартовый день
+    if (
+        start_day
+    ):  # gte = означает, что вы берем все, что "выше", чем наш выбранный день
+        qs = qs.filter(created_at__date__gte=start_day)
+    if (
+        finish_day
+    ):  # lte = означает, что вы берем все, что "ниже", чем наш  второй выбранный день
+        qs = qs.filter(created_at__date__lte=finish_day)
     if type_of_operation:
-        operations_dict = {
-            "income": "Поступление",
-            "outcome": "Исход",
-        }
-        op_value = operations_dict.get(type_of_operation)
-        if op_value:
-            main_q &= Q(type_of_operation=op_value)
-
-    # Поиск по категории операции
+        qs = qs.filter(type_of_operation=type_of_operation)
     if category_of_operation:
-        category_dict = {
-            "Продажа": "Продажа",
-            "Покупка": "Покупка",
-            "Гарантийный возврат": "Гарантийный возврат",
-            "Оказание ремонтных услуг": "Оказание ремонтных услуг",
-            "Прочее": "Прочее",
-        }
-        cat_value = category_dict.get(category_of_operation)
-        if cat_value:
-            main_q &= Q(category_of_operation=cat_value)
+        qs = qs.filter(category_of_operation=category_of_operation)
 
-    # "Быстрый" поиск по предложенным из селекта дням:
-    if fast_day_seleted:
+    # Группировка всех обьектов, полученных в результате фильтрации
+    filtered_objects = (
+        qs.values("created_at")
+        .annotate(total_sum=Sum("number_in_the_operation"))
+        .order_by("created_at")
+    )
 
-        # Получение точного момента времени
-        now = timezone.now()
-        # Получение только даты (без времени)
-        today = now.date()
+    # Тут я по порядку получаю ТОЛЬКО ДЕНЬ
+    date_time = [
+        item["created_at"].strftime("%d.%m.%y, %H:%M") for item in filtered_objects
+    ]
 
-        # Словарь с датами в зависимости от выбранного дня
-        dates_dict = {
-            "date_today": (today, now),
-            "date_yesterday": (today - timedelta(days=1), today),
-            "date_this_week": (today - timedelta(days=7), now),
-            "date_this_month": (today - timedelta(days=30), now),
-        }
-        date_finded = dates_dict.get(fast_day_seleted)
-        if date_finded:
-            main_q &= Q(created_at__range=date_finded)
+    # Тут я по порядку получаю ТОЛЬКО СУММУ
+    everyb_object = [int(item["total_sum"]) for item in filtered_objects]
 
-    # Поиск по дате (состоит из СТАРТ и ФИНИШ)
-    # Если выбраны даты СТАРТ и ФИНИШ:
-    if start_day and finish_day:
-        # Получаю результат от СТАРТ до ФИНИШ
-        finish_day = datetime.strptime(finish_day, "%Y-%m-%d").date()
-        main_q &= Q(created_at__range=(start_day, finish_day + timedelta(days=1)))
-
-    # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
-    qs = qs.filter(main_q)
-
-    result_func_context = {
-        "history_finance": qs,
-        "cash": get_main_balance,
-    }
-
-    return result_func_context
+    return JsonResponse({"date_time": date_time, "everyb_object": everyb_object})
 
 
 # Отвечает за показ главной информации о клиенте (что-то типо профиля)
@@ -120,7 +79,9 @@ class UserProfileView(TemplateView):
         latest_ten_orders = get_orders.order_by("-created_at")[:10]
 
         # Получаю весь баланс кассы
-        get_balance = CashAccount.objects.get(user=request.user)
+        get_balance, created = CashAccount.objects.get_or_create(
+            user=request.user, defaults={"user": request.user, "money_balance": 0}
+        )
 
         context = {
             "user": get_user,  # Получаю данные "главного пользователя"
@@ -134,30 +95,5 @@ class UserProfileView(TemplateView):
             "balance_cash": get_balance.money_balance,  # Актуальный баланс кассы
             "latest_ten_orders": latest_ten_orders,  # Последние 10 актуальных заказов
         }
-
-        # Заголовок для проверки того, какой запрос мы получили?
-        header = request.headers.get(
-            "x-requested-with"
-        )  # request.headers.get("x-requested-with") в условии
-
-        # Все остальное для функции
-        type_of_operation = request.GET.get("type_of_operation")
-        category_of_operation = request.GET.get("category_of_operation")
-        fast_day_seleted = request.GET.get("fast_day_seleted")
-        start_day = request.GET.get("start_day")
-        finish_day = request.GET.get("finish_day")
-
-        # Вызываю функцию, которая отвечает за фильтрацию "Финансовых данных" и дальнейшее отображение в HTML (В виде диаграммы)
-        result_func_context = show_graphical_diagram(
-            request,
-            header,
-            type_of_operation,
-            category_of_operation,
-            fast_day_seleted,
-            start_day,
-            finish_day,
-        )
-
-        context.update(result_func_context)
 
         return render(request, self.template_name, context)

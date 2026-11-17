@@ -1,120 +1,149 @@
 <div id="financial-results-container">
     
-    <!-- Форма фильтрации теперь прямо внутри партиала -->
-    <form method="GET" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px;"
-        hx-get="{% url 'profile' %}" 
-        hx-target="#financial-results-container"
-        hx-trigger="change, input">
-        
-        <select name="type_of_operation" style="padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
-            <option value="">Все операции</option>
-            <option value="income" {% if request.GET.type_of_operation == 'income' %}selected{% endif %}>Поступление</option>
-            <option value="outcome" {% if request.GET.type_of_operation == 'outcome' %}selected{% endif %}>Исход</option>
-        </select>
+       <!-- Блок фильтров -->
+    <div id="filters">
+        <label>С даты: <input type="date" id="start_day"></label>
+        <label>По дату: <input type="date" id="finish_day"></label>
 
-        <select name="category_of_operation" style="padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
-            <option value="">Все категории</option>
-            <option value="Продажа" {% if request.GET.category_of_operation == 'Продажа' %}selected{% endif %}>Продажа</option>
-            <option value="Покупка" {% if request.GET.category_of_operation == 'Покупка' %}selected{% endif %}>Покупка</option>
-            <option value="Гарантийный возврат" {% if request.GET.category_of_operation == 'Гарантийный возврат' %}selected{% endif %}>Возврат</option>
-            <option value="Оказание ремонтных услуг" {% if request.GET.category_of_operation == 'Оказание ремонтных услуг' %}selected{% endif %}>Ремонт</option>
-            <option value="Прочее" {% if request.GET.category_of_operation == 'Прочее' %}selected{% endif %}>Прочее</option>
-        </select>
+        <label>Тип операции:
+            <select name="type_of_operation" id="type_of_operation" style="padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
+                <option value="">Все операции</option>
+                <option value="Поступление">Поступление</option>
+                <option value="Исход">Исход</option>
+            </select>
+        </label>
 
-        <select name="fast_day_seleted" style="grid-column: span 2; padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
-            <option value="">За всё время</option>
-            <option value="date_today" {% if request.GET.fast_day_seleted == 'date_today' %}selected{% endif %}>Сегодня</option>
-            <option value="date_yesterday" {% if request.GET.fast_day_seleted == 'date_yesterday' %}selected{% endif %}>Вчера</option>
-            <option value="date_this_week" {% if request.GET.fast_day_seleted == 'date_this_week' %}selected{% endif %}>За неделю</option>
-            <option value="date_this_month" {% if request.GET.fast_day_seleted == 'date_this_month' %}selected{% endif %}>За месяц</option>
-        </select>
-    </form>
+        <label>Категория:
+            <select name="category_of_operation" id="category_of_operation" style="padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
+                <option value="">Все категории</option>
+                <option value="Продажа">Продажа</option>
+                <option value="Покупка">Покупка</option>
+                <option value="Гарантийный возврат">Возврат</option>
+                <option value="Оказание ремонтных услуг">Ремонт</option>
+                <option value="Прочее">Прочее</option>
+            </select>
+        </label>
 
-    <!-- Блок с графиком -->
-    <div style="background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #ebedf2; margin-bottom: 20px; position: relative; height: 260px;">
-        <h4 style="font-size: 0.95rem; font-weight: 700; color: #3f4254; margin-bottom: 10px;">Динамика операций</h4>
-        <div style="position: relative; height: 210px; width: 100%;">
-            <canvas id="financeChart"></canvas>
-        </div>
+        <button onclick="updateChart()">Применить</button>
     </div>
 
-    <!-- Таблица с историей операций -->
-    <div style="background: #ffffff; padding: 20px; border-radius: 10px; border: 1px solid #ebedf2;">
-        <h4 style="font-size: 0.95rem; font-weight: 700; color: #3f4254; margin-bottom: 15px;">
-            История операций за выбранный период
-        </h4>
-        
-        <div style="overflow-x: auto;">
-            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
-                <thead>
-                    <tr style="border-bottom: 1px solid #ebedf2; color: #7e8299;">
-                        <th style="padding: 8px;">Операция</th>
-                        <th style="padding: 8px;">Категория</th>
-                        <th style="padding: 8px;">Сумма</th>
-                        <th style="padding: 8px;">Дата</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in history_finance %}
-                    <tr style="border-bottom: 1px solid #f8f9fa;">
-                        <td style="padding: 10px; font-weight: 600;">{{ item.type_of_operation }}</td>
-                        <td style="padding: 10px;">{{ item.category_of_operation }}</td>
-                        <td style="padding: 10px; color: {% if item.type_of_operation == 'Поступление' %}#50cd89{% else %}#f1416c{% endif %}; font-weight: 700;">
-                            {{ item.amount }} ₽
-                        </td>
-                        <td style="padding: 10px; color: #7e8299; font-size: 0.85rem;">{{ item.created_at|date:"d.m.Y H:i" }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="4" style="padding: 15px; text-align: center; color: #7e8299;">Операций за выбранный период нет.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <!-- Контейнер для графика -->
+    <div style="width: 80%; max-width: 800px; margin-top: 20px;">
+        <canvas id="financeChart"></canvas>
     </div>
-
 </div>
-
-<!-- Инициализация графика с защитой от дублирования -->
-<!-- Инициализация графика в изолированной области видимости -->
 <script>
-    (function() {
-        if (window.myFinanceChart instanceof Chart) {
-            window.myFinanceChart.destroy();
-        }
+    // Уничтожаем старый график, если он есть
+    if (window.financeChart instanceof Chart) {
+        window.financeChart.destroy();
+    }
 
+    function initChart() {
         const ctx = document.getElementById('financeChart').getContext('2d');
-        window.myFinanceChart = new Chart(ctx, {
-            type: 'line',
+        
+        // Градиент для столбцов (делает график современнее)
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(137, 80, 252, 0.8)'); // Фиолетовый (как кнопка)
+        gradient.addColorStop(1, 'rgba(137, 80, 252, 0.2)');
+
+        window.financeChart = new Chart(ctx, {
+            type: 'bar',
             data: {
-                labels: ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'],
+                labels: [],
                 datasets: [{
                     label: 'Сумма (₽)',
-                    data: [12000, 19000, 30005, 5000, 20000, 35000, 42000],
+                    data: [],
+                    backgroundColor: gradient,
                     borderColor: '#8950fc',
-                    backgroundColor: 'rgba(137, 80, 252, 0.1)',
-                    borderWidth: 3,
-                    fill: true,
-                    tension: 0.4
+                    borderWidth: 1,
+                    borderRadius: 4, // Скругление верхних углов столбцов
+                    barPercentage: 0.6, // Ширина столбика
                 }]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false,
+                maintainAspectRatio: false, // Позволяет графику тянуться
                 plugins: {
-                    legend: { display: false }
+                    legend: { display: false }, // Скрываем лишнюю легенду сверху
+                    tooltip: {
+                        backgroundColor: 'rgba(63, 66, 84, 0.9)',
+                        titleFont: { size: 13 },
+                        bodyFont: { size: 14, weight: 'bold' },
+                        padding: 10,
+                        cornerRadius: 6,
+                        callbacks: {
+                            // Форматируем подпись при наведении
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.y !== null) {
+                                    // Добавляем пробелы для тысяч (10 000) и значок рубля
+                                    label += new Intl.NumberFormat('ru-RU').format(context.parsed.y) + ' ₽';
+                                }
+                                return label;
+                            }
+                        }
+                    }
                 },
                 scales: {
+                    x: {
+                        grid: { display: false }, // Убираем вертикальные линии сетки
+                        ticks: {
+                            maxRotation: 45, // Наклоняем подписи, если их много
+                            minRotation: 45,
+                            color: '#7e8299',
+                            font: { size: 11 }
+                        }
+                    },
                     y: {
                         beginAtZero: true,
-                        grid: { color: '#ebedf2' }
-                    },
-                    x: {
-                        grid: { display: false }
+                        border: { display: false }, // Убираем линию оси Y
+                        grid: {
+                            color: '#ebedf2', // Светло-серые линии
+                            drawBorder: false,
+                            borderDash: [5, 5], // Делаем линии пунктирными
+                        },
+                        ticks: {
+                            color: '#7e8299',
+                            font: { size: 11 },
+                            callback: function(value) {
+                                // Форматируем ось Y (добавляем пробелы для тысяч)
+                                return new Intl.NumberFormat('ru-RU').format(value);
+                            }
+                        }
                     }
+                },
+                animation: {
+                    duration: 800, // Плавная анимация при обновлении
+                    easing: 'easeOutQuart'
                 }
             }
         });
-    })();
-</script>
+    }
+
+    // Функция загрузки данных (осталась без изменений)
+    async function updateChart() {
+        const params = new URLSearchParams({
+            start_day: document.getElementById('start_day').value,
+            finish_day: document.getElementById('finish_day').value,
+            category_of_operation: document.getElementById('category_of_operation').value,
+            type_of_operation: document.getElementById('type_of_operation').value,
+        });
+
+        const response = await fetch(`/profile/api/chart-histories/?${params.toString()}`);
+        const result = await response.json();
+
+        // Обновляем данные графика
+        window.financeChart.data.labels = result.date_time;
+        window.financeChart.data.datasets[0].data = result.everyb_object;
+        
+        // Перерисовываем
+        window.financeChart.update();
+    }
+
+    // Инициализация при загрузке
+    initChart();
+    updateChart();
+</script>   

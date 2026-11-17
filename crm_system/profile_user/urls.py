@@ -1,10 +1,17 @@
 from django.urls import path
 from .views import *
+from . import views
 from django.contrib.auth.views import LogoutView
 
 # Веселые маршруты... как я на них навернулся...
 urlpatterns = [
     path("", UserProfileView.as_view(), name="profile"),
+    # Созданный API для фильтра финансовых историй (Chart.js)
+    path(
+        "api/chart-histories/",
+        views.show_graphical_diagram,
+        name="chart_finances_diagr",
+    ),
     # Выход пользователя из авторизации
     path("logout", LogoutView.as_view(next_page="auth"), name="logout"),
     # Отображение сайта для настройки данных сервиса

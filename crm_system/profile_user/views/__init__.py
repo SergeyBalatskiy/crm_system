@@ -3,7 +3,7 @@ from .cancel import ShowCancellView
 from .categories_info import ShowCategoriesView
 from .complete import ShowCompleteView
 from .garanty import ShowGarantyView
-from .profile import UserProfileView
+from .profile import UserProfileView, show_graphical_diagram
 from .service_info import ServiceInfoView
 from .tinymce import ShowDocumentView
 from .workers import WorkersAddView
