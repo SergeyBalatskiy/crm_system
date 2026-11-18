@@ -3,11 +3,81 @@
 
 {% block content %}
 
+<style>
+    /* --- СЕТКА ДЛЯ РЕДАКТОРА И ПАНЕЛИ --- */
+    .editor-layout {
+        display: grid;
+        /* Жестко задаем колонки: редактор тянется, панель фиксирована 320px */
+        grid-template-columns: minmax(0, 1fr) 320px;
+        gap: 20px;
+        align-items: start;
+        margin-top: 20px;
+        width: 100%;
+    }
+
+    /* --- РЕДАКТОР (СЛЕВА) --- */
+        .editor-main {
+        width: 100%;
+        min-width: 0; 
+        background: #fff;
+        border: 1px solid #ebedf2;
+        border-radius: 8px;
+        padding: 15px;
+        box-sizing: border-box;
+        
+        /* ДОБАВЛЯЕМ ЖЕСТКУЮ ВЫСОТУ */
+        height: 600px; 
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Принудительно задаем ширину для TinyMCE */
+        .editor-main .tox-tinymce {
+        width: 100% !important;
+        height: 100% !important; /* Жестко задаем высоту 100% */
+        border: none !important;
+        flex-grow: 1;
+    }
+
+    /* --- ПАНЕЛЬ ПЕРЕМЕННЫХ (СПРАВА) --- */
+    .variables-panel {
+        width: 100%;
+        background: #f8f9fa;
+        border: 1px solid #ebedf2;
+        border-radius: 8px;
+        padding: 15px;
+        box-sizing: border-box;
+        max-height: 600px;
+        overflow-y: auto;
+    }
+
+    /* --- Стили для кнопок --- */
+    .variables-panel h3 { font-size: 1rem; color: #3f4254; margin-bottom: 10px; font-weight: 700; }
+    .var-group { margin-bottom: 20px; }
+    .var-group-title { font-size: 0.75rem; color: #7e8299; text-transform: uppercase; margin-bottom: 8px; font-weight: 600; letter-spacing: 0.5px; }
+    .var-btn {
+        display: block; width: 100%; text-align: left; background: #ffffff;
+        border: 1px solid #ebedf2; padding: 6px 10px; border-radius: 6px;
+        margin-bottom: 6px; font-size: 0.8rem; color: #3f4254; cursor: pointer; transition: all 0.2s;
+    }
+    .var-btn:hover { background: #8950fc; color: white; border-color: #8950fc; }
+
+    /* На мобильных панель прячется под редактор */
+    @media (max-width: 992px) {
+        .editor-layout {
+            grid-template-columns: 1fr;
+        }
+        .variables-panel {
+            max-height: 300px;
+        }
+    }
+</style>
+
 <div class="document-show-place">
     <div class="document-show-box">
         <div id="toast-container"></div>
 
-        <!-- Шапка: Заголовок, Выбор, Сохранить, По умолчанию -->
+        <!-- Шапка -->
         <div class="header-row">
             <h1>Настройка документов</h1>
 
@@ -37,17 +107,87 @@
 
         <div id="hidden-data-container" style="display: none;"></div>
 
-        <!-- Только редактор скрывается до выбора документа -->
-        <div id="editor-container" style="display: none;">
-            <form id="editor-form" hx-post="{% url 'tiny_mce' %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-                {% csrf_token %}
-                <input type="hidden" name="document" id="current-document-input" value="">
-                {{ tiny_mce.media }}
-                {{ tiny_mce.as_p }}
-            </form>
+        <!-- Блок редактора и панели -->
+        <div id="editor-container" class="editor-layout" style="display: none;">
+            
+            <!-- 1. РЕДАКТОР (Слева) -->
+            <div class="editor-main">
+                <form id="editor-form" hx-post="{% url 'tiny_mce' %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+                    {% csrf_token %}
+                    <input type="hidden" name="document" id="current-document-input" value="">
+                    {{ tiny_mce.media }}
+                    {{ tiny_mce.as_p }}
+                </form>
+            </div>
+
+            <!-- 2. ПАНЕЛЬ ПЕРЕМЕННЫХ (Справа) -->
+            <div class="variables-panel">
+                <h3>Доступные переменные</h3>
+                <p style="font-size: 0.75rem; color: #7e8299; margin-bottom: 15px;">
+                    Кликните на текст, чтобы вставить его в документ.
+                </p>
+
+                <div class="var-group">
+                    <div class="var-group-title">Заказ</div>
+                    <button type="button" class="var-btn insert-var" data-var="<НомерЗаказа>">Номер заказа</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ТипЗаказа>">Тип заказа</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ДатаВыдачи>">Дата выдачи</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ПричинаОтказа>">Причина отказа</button>
+                    <button type="button" class="var-btn insert-var" data-var="<Рекомендации>">Рекомендации</button>
+                </div>
+
+                <div class="var-group">
+                    <div class="var-group-title">Клиент</div>
+                    <button type="button" class="var-btn insert-var" data-var="<Контрагент>">ФИО клиента</button>
+                    <button type="button" class="var-btn insert-var" data-var="<КонтрагентСокр>">ФИО (сокращенно)</button>
+                    <button type="button" class="var-btn insert-var" data-var="<НомерКонтрагента>">Телефон клиента</button>
+                </div>
+
+                <div class="var-group">
+                    <div class="var-group-title">Устройство</div>
+                    <button type="button" class="var-btn insert-var" data-var="<Марка>">Марка</button>
+                    <button type="button" class="var-btn insert-var" data-var="<Модель>">Модель</button>
+                    <button type="button" class="var-btn insert-var" data-var="<Комплектация>">Комплектация</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ВнешнийВид>">Внешний вид</button>
+                    <button type="button" class="var-btn insert-var" data-var="<Неисправность>">Неисправность</button>
+                    <button type="button" class="var-btn insert-var" data-var="<Вердикт>">Вердикт</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ОриентировочнаяСтоимостьРемонта>">Ориент. стоимость</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ОриентировочнаяДатаГотовности>">Ориент. дата готовности</button>
+                    <button type="button" class="var-btn insert-var" data-var="<КомментарийПриемщика>">Комментарий приемщика</button>
+                </div>
+
+                <div class="var-group">
+                    <div class="var-group-title">Сервисный центр</div>
+                    <button type="button" class="var-btn insert-var" data-var="<Менеджер>">Менеджер</button>
+                    <button type="button" class="var-btn insert-var" data-var="<МенеджерСокр>">Менеджер (сокр.)</button>
+                    <button type="button" class="var-btn insert-var" data-var="<НазваниеОрганизации>">Название организации</button>
+                    <button type="button" class="var-btn insert-var" data-var="<АдресОрганизации>">Адрес организации</button>
+                </div>
+
+                <div class="var-group">
+                    <div class="var-group-title">Финансы</div>
+                    <button type="button" class="var-btn insert-var" data-var="<Предоплата>">Предоплата</button>
+                    <button type="button" class="var-btn insert-var" data-var="<СуммаЧека>">Сумма чека</button>
+                    <button type="button" class="var-btn insert-var" data-var="<Скидка>">Скидка</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ИтогоЦена>">Итого цена</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ИтогоПрописьюТекстом>">Итого прописью</button>
+                    <button type="button" class="var-btn insert-var" data-var="<ВсегоПозиций>">Всего позиций</button>
+                </div>
+
+                <div class="var-group">
+                    <div class="var-group-title">Позиции услуг (Таблица)</div>
+                    <button type="button" class="var-btn insert-var" data-var="<Номер>">Номер строки</button>
+                    <button type="button" class="var-btn insert-var" data-var="<КодДетали>">Код детали</button>
+                    <button type="button" class="var-btn insert-var" data-var="<НазваниеОказываемойУслуги>">Название услуги</button>
+                    <button type="button" class="var-btn insert-var" data-var="<Количество>">Количество</button>
+                    <button type="button" class="var-btn insert-var" data-var="<Гарантия>">Гарантия (дней)</button>
+                    <button type="button" class="var-btn insert-var" data-var="<СтоимостьУслуги>">Стоимость услуги</button>
+                    <button type="button" class="var-btn insert-var" data-var="<СуммаУслуг>">Сумма услуг (нарастающим)</button>
+                </div>
+            </div>
         </div>
 
-        <!-- Линия и кнопки вынесены наружу — они всегда видимы -->
+        <!-- Нижние кнопки -->
         <div class="bottom-section">
             <div class="custom-divider"></div>
 
@@ -55,14 +195,12 @@
                 <a href="{% url 'categories' %}" class="btn btn-primary btn-next">
                     <svg class="arrow-left-4" style="height: 25px; fill: white; transform: rotate(180deg);"
                         viewBox="0 0 100 85">
-                        <polygon
-                            points="58.263,0.056 100,41.85 58.263,83.641 30.662,83.641 62.438,51.866 0,51.866 0,31.611 62.213,31.611 30.605,0 58.263,0.056" />
+                        <polygon points="58.263,0.056 100,41.85 58.263,83.641 30.662,83.641 62.438,51.866 0,51.866 0,31.611 62.213,31.611 30.605,0 58.263,0.056" />
                     </svg>
                 </a>
                 <a href="{% url 'form-editor' %}" class="btn btn-primary btn-next">
                     <svg class="arrow-right-4" viewBox="0 0 100 85" style="height: 25px; fill: white;">
-                        <polygon
-                            points="58.263,0.056 100,41.85 58.263,83.641 30.662,83.641 62.438,51.866 0,51.866 0,31.611 62.213,31.611 30.605,0 58.263,0.056" />
+                        <polygon points="58.263,0.056 100,41.85 58.263,83.641 30.662,83.641 62.438,51.866 0,51.866 0,31.611 62.213,31.611 30.605,0 58.263,0.056" />
                     </svg>
                 </a>
             </div>
@@ -74,57 +212,73 @@
     document.addEventListener('DOMContentLoaded', function () {
         const selectElement = document.getElementById('page-select');
         const saveBtn = document.getElementById('save-doc-btn');
-        const editorContainer = document.getElementById('editor-container');
-
-        if (selectElement) selectElement.selectedIndex = 0;
-        if (editorContainer) editorContainer.style.display = 'none';
-        if (saveBtn) saveBtn.style.display = 'none';
 
         if (selectElement) {
+            selectElement.selectedIndex = 0;
             selectElement.addEventListener('change', function () {
-                if (!this.value) {
-                    saveBtn.style.display = 'none';
-                    editorContainer.style.display = 'none';
-                }
+                if (!this.value && saveBtn) saveBtn.style.display = 'none';
             });
         }
     });
 
+    // Обработчик загрузки HTMX
     document.body.addEventListener('htmx:afterSwap', function (event) {
         if (event.detail.target.id === 'hidden-data-container') {
             const fetchedContent = document.getElementById('fetched-content');
             const fetchedDocType = document.getElementById('fetched-doc-type');
+            const editorContainer = document.getElementById('editor-container');
+            const saveBtn = document.getElementById('save-doc-btn');
 
-            if (fetchedContent && tinymce.activeEditor) {
-                tinymce.activeEditor.setContent(fetchedContent.innerHTML);
+            // 1. Показываем контейнер (делаем grid)
+            if (editorContainer) editorContainer.style.display = 'grid';
+            if (saveBtn) saveBtn.style.display = 'block';
 
+            // 2. Ждем 150мс, чтобы Grid отрисовался, и TinyMCE понял свою ширину
+            setTimeout(() => {
+                if (typeof tinymce !== 'undefined' && tinymce.activeEditor) {
+                    // Магия: пересчитываем размеры
+                    tinymce.activeEditor.execCommand('mceAutoResize');
+                    
+                    if (fetchedContent) {
+                        tinymce.activeEditor.setContent(fetchedContent.innerHTML);
+                    }
+                }
+                
                 const inputDoc = document.getElementById('current-document-input');
                 if (inputDoc && fetchedDocType) {
                     inputDoc.value = fetchedDocType.value;
                 }
+            }, 150);
+        }
+    });
 
-                document.getElementById('editor-container').style.display = 'block';
-                document.getElementById('save-doc-btn').style.display = 'block';
+    // Вставка переменных по клику
+    document.body.addEventListener('click', function (e) {
+        const btn = e.target.closest('.insert-var');
+        if (btn) {
+            e.preventDefault(); 
+            const varText = btn.getAttribute('data-var');
+
+            if (typeof tinymce !== 'undefined' && tinymce.activeEditor) {
+                tinymce.activeEditor.insertContent(varText);
+                tinymce.activeEditor.focus();
             }
         }
     });
 
+    // Функция тостов
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container');
+        if (!container) return;
+        
         const alertDiv = document.createElement('div');
         alertDiv.className = `alert alert-${type} fade-in`;
-
         const icon = type === 'success'
-            ? `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z"/>
-           </svg>`
-            : `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-           </svg>`;
+            ? `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l4.992-5.99a.75.75 0 0 0-.018-1.042z"/></svg>`
+            : `<svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/></svg>`;
 
         alertDiv.innerHTML = `${icon}<span>${message}</span>`;
         container.appendChild(alertDiv);
-
         setTimeout(() => {
             alertDiv.style.opacity = '0';
             alertDiv.style.transition = 'opacity 0.4s ease';
@@ -132,17 +286,9 @@
         }, 3500);
     }
 
-    document.body.addEventListener('success_save_doc', function () {
-        showToast('Изменения успешно сохранены!', 'success');
-    });
-
-    document.body.addEventListener('no_changes_doc', function () {
-        showToast('Изменения не обнаружены.', 'danger');
-    });
-
-    document.body.addEventListener('backup_success', function () {
-        showToast('Документ восстановлен!', 'success');
-    });
+    document.body.addEventListener('success_save_doc', () => showToast('Изменения успешно сохранены!', 'success'));
+    document.body.addEventListener('no_changes_doc', () => showToast('Изменения не обнаружены.', 'danger'));
+    document.body.addEventListener('backup_success', () => showToast('Документ восстановлен!', 'success'));
 
     document.body.addEventListener('htmx:configRequest', function (event) {
         event.detail.headers['X-CSRFToken'] = '{{ csrf_token }}';

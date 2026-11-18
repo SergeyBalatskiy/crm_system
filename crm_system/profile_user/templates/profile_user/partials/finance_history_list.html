@@ -1,70 +1,204 @@
 <div id="financial-results-container">
     
-       <!-- Блок фильтров -->
+    <!-- Стили для фильтров -->
+    <style>
+        #filters {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+            font-family: inherit;
+        }
+
+        /* Контейнер для инпутов (выстраиваем их в ряд) */
+        .filters-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: flex-end;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1; /* Поля будут растягиваться равномерно */
+            min-width: 140px; /* Чтобы не сжимались слишком сильно */
+        }
+
+        .filter-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #7e8299;
+            margin-left: 2px;
+        }
+
+        /* Общие стили для инпутов и селектов */
+        .filter-control {
+            padding: 8px 12px;
+            border: 1px solid #ebedf2;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: #3f4254;
+            background-color: #ffffff;
+            outline: none;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            height: 38px;
+            width: 100%; /* Занимаем всю ширину контейнера */
+        }
+
+        .filter-control:focus {
+            border-color: #8950fc;
+            box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.15);
+        }
+
+        select.filter-control {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%237e8299%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px top 50%;
+            background-size: 10px auto;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+
+        /* Кнопка "Применить" */
+        .btn-apply {
+            padding: 0 32px;
+            height: 38px;
+            background-color: #8950fc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-apply:hover {
+            background-color: #7337e5;
+        }
+
+        /* Контейнер для центрирования кнопки */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 5px;
+        }
+
+        /* Адаптивность для мобильных */
+        @media (max-width: 768px) {
+            .filters-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-group {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <!-- Блок фильтров -->
     <div id="filters">
-        <label>С даты: <input type="date" id="start_day"></label>
-        <label>По дату: <input type="date" id="finish_day"></label>
+        <!-- Ряд с полями -->
+        <div class="filters-row">
+            <div class="filter-group">
+                <label class="filter-label">С даты</label>
+                <input type="date" id="start_day" class="filter-control">
+            </div>
 
-        <label>Тип операции:
-            <select name="type_of_operation" id="type_of_operation" style="padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
-                <option value="">Все операции</option>
-                <option value="Поступление">Поступление</option>
-                <option value="Исход">Исход</option>
-            </select>
-        </label>
+            <div class="filter-group">
+                <label class="filter-label">По дату</label>
+                <input type="date" id="finish_day" class="filter-control">
+            </div>
 
-        <label>Категория:
-            <select name="category_of_operation" id="category_of_operation" style="padding: 5px 8px; border: 1px solid #ebedf2; border-radius: 6px; font-size: 0.75rem;">
-                <option value="">Все категории</option>
-                <option value="Продажа">Продажа</option>
-                <option value="Покупка">Покупка</option>
-                <option value="Гарантийный возврат">Возврат</option>
-                <option value="Оказание ремонтных услуг">Ремонт</option>
-                <option value="Прочее">Прочее</option>
-            </select>
-        </label>
+            <div class="filter-group">
+                <label class="filter-label">Тип операции</label>
+                <select name="type_of_operation" id="type_of_operation" class="filter-control">
+                    <option value="">Все операции</option>
+                    <option value="Поступление">Поступление</option>
+                    <option value="Исход">Исход</option>
+                </select>
+            </div>
 
-        <button onclick="updateChart()">Применить</button>
+            <div class="filter-group">
+                <label class="filter-label">Категория</label>
+                <select name="category_of_operation" id="category_of_operation" class="filter-control">
+                    <option value="">Все категории</option>
+                    <option value="Продажа">Продажа</option>
+                    <option value="Покупка">Покупка</option>
+                    <option value="Гарантийный возврат">Возврат</option>
+                    <option value="Оказание ремонтных услуг">Ремонт</option>
+                    <option value="Прочее">Прочее</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Кнопка по центру -->
+        <div class="btn-container">
+            <button type="button" class="btn-apply" onclick="updateChart()">Применить</button>
+        </div>
     </div>
 
     <!-- Контейнер для графика -->
-    <div style="width: 80%; max-width: 800px; margin-top: 20px;">
+    <div style="width: 100%; max-width: 800px; margin-top: 20px; height: 400px; position: relative;">
         <canvas id="financeChart"></canvas>
     </div>
-</div>
-<script>
-    // Уничтожаем старый график, если он есть
+
+</div><script>
     if (window.financeChart instanceof Chart) {
         window.financeChart.destroy();
     }
 
     function initChart() {
         const ctx = document.getElementById('financeChart').getContext('2d');
-        
-        // Градиент для столбцов (делает график современнее)
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(137, 80, 252, 0.8)'); // Фиолетовый (как кнопка)
-        gradient.addColorStop(1, 'rgba(137, 80, 252, 0.2)');
+
+        const gradientGreen = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientGreen.addColorStop(0, 'rgba(80, 205, 137, 0.9)');
+        gradientGreen.addColorStop(1, 'rgba(80, 205, 137, 0.2)');
+
+        const gradientRed = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientRed.addColorStop(0, 'rgba(241, 65, 108, 0.9)');
+        gradientRed.addColorStop(1, 'rgba(241, 65, 108, 0.2)');
 
         window.financeChart = new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: [],
-                datasets: [{
-                    label: 'Сумма (₽)',
-                    data: [],
-                    backgroundColor: gradient,
-                    borderColor: '#8950fc',
-                    borderWidth: 1,
-                    borderRadius: 4, // Скругление верхних углов столбцов
-                    barPercentage: 0.6, // Ширина столбика
-                }]
+                datasets: [
+                    {
+                        label: 'Прибыль (₽)',
+                        data: [],
+                        backgroundColor: gradientGreen,
+                        borderColor: '#50cd89',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                        minBarLength: 5 // <--- Важно: минимальная высота столбика в пикселях
+                    },
+                    {
+                        label: 'Убыток (₽)',
+                        data: [],
+                        backgroundColor: gradientRed,
+                        borderColor: '#f1416c',
+                        borderWidth: 1,
+                        borderRadius: 4,
+                        barPercentage: 0.6,
+                        minBarLength: 5 // <--- Важно: минимальная высота столбика в пикселях
+                    }
+                ]
             },
             options: {
                 responsive: true,
-                maintainAspectRatio: false, // Позволяет графику тянуться
+                maintainAspectRatio: false, 
                 plugins: {
-                    legend: { display: false }, // Скрываем лишнюю легенду сверху
+                    legend: { display: true, position: 'top' },
                     tooltip: {
                         backgroundColor: 'rgba(63, 66, 84, 0.9)',
                         titleFont: { size: 13 },
@@ -72,26 +206,21 @@
                         padding: 10,
                         cornerRadius: 6,
                         callbacks: {
-                            // Форматируем подпись при наведении
                             label: function(context) {
-                                let label = context.dataset.label || '';
-                                if (label) {
-                                    label += ': ';
-                                }
-                                if (context.parsed.y !== null) {
-                                    // Добавляем пробелы для тысяч (10 000) и значок рубля
-                                    label += new Intl.NumberFormat('ru-RU').format(context.parsed.y) + ' ₽';
-                                }
-                                return label;
+                                let value = context.parsed.y;
+                                let displayValue = context.dataset.label.includes('Убыток') ? -value : value;
+                                let prefix = displayValue > 0 ? '+' : ''; 
+                                return context.dataset.label + ': ' + prefix + new Intl.NumberFormat('ru-RU').format(displayValue) + ' ₽';
                             }
                         }
                     }
                 },
                 scales: {
                     x: {
-                        grid: { display: false }, // Убираем вертикальные линии сетки
+                        stacked: true,
+                        grid: { display: false },
                         ticks: {
-                            maxRotation: 45, // Наклоняем подписи, если их много
+                            maxRotation: 45,
                             minRotation: 45,
                             color: '#7e8299',
                             font: { size: 11 }
@@ -99,51 +228,79 @@
                     },
                     y: {
                         beginAtZero: true,
-                        border: { display: false }, // Убираем линию оси Y
+                        border: { display: false },
                         grid: {
-                            color: '#ebedf2', // Светло-серые линии
+                            color: '#ebedf2',
                             drawBorder: false,
-                            borderDash: [5, 5], // Делаем линии пунктирными
+                            borderDash: [5, 5],
                         },
                         ticks: {
                             color: '#7e8299',
                             font: { size: 11 },
                             callback: function(value) {
-                                // Форматируем ось Y (добавляем пробелы для тысяч)
                                 return new Intl.NumberFormat('ru-RU').format(value);
                             }
                         }
                     }
                 },
                 animation: {
-                    duration: 800, // Плавная анимация при обновлении
+                    duration: 800,
                     easing: 'easeOutQuart'
                 }
             }
         });
     }
 
-    // Функция загрузки данных (осталась без изменений)
     async function updateChart() {
+        const typeFilter = document.getElementById('type_of_operation').value;
+        
         const params = new URLSearchParams({
             start_day: document.getElementById('start_day').value,
             finish_day: document.getElementById('finish_day').value,
             category_of_operation: document.getElementById('category_of_operation').value,
-            type_of_operation: document.getElementById('type_of_operation').value,
+            type_of_operation: typeFilter,
         });
 
         const response = await fetch(`/profile/api/chart-histories/?${params.toString()}`);
         const result = await response.json();
 
-        // Обновляем данные графика
         window.financeChart.data.labels = result.date_time;
-        window.financeChart.data.datasets[0].data = result.everyb_object;
+
+        // --- ЛОГИКА ПОДРЕЗКИ СЛИШКОМ БОЛЬШИХ ЧИСЕЛ ---
+        // Находим максимальное значение среди всех данных, чтобы не масштабировать график под выбросы
+        const allValues = [...result.income_data, ...result.outcome_data.map(v => -v)];
+        const maxAbs = Math.max(...allValues.map(Math.abs), 100); // Минимум 100, чтобы не было деления на 0
         
-        // Перерисовываем
+        // Ставим ограничение оси Y в 1.5 раза больше самого большого столбика
+        // Это заставит мелкие столбики выглядеть больше
+        const yLimit = maxAbs * 1.5; 
+
+        if (typeFilter === 'Поступление') {
+            window.financeChart.data.datasets[0].data = result.income_data;
+            window.financeChart.data.datasets[1].data = [];
+            window.financeChart.options.scales.x.stacked = false;
+            window.financeChart.options.scales.y.suggestedMax = yLimit;
+            window.financeChart.options.scales.y.suggestedMin = 0;
+        } 
+        else if (typeFilter === 'Исход') {
+            window.financeChart.data.datasets[0].data = [];
+            window.financeChart.data.datasets[1].data = result.outcome_data.map(val => -val);
+            window.financeChart.options.scales.x.stacked = false;
+            // Для исходов ось Y должна идти вниз (минус), поэтому ставим suggestedMin
+            window.financeChart.options.scales.y.suggestedMin = -yLimit;
+            window.financeChart.options.scales.y.suggestedMax = 0;
+        } 
+        else {
+            window.financeChart.data.datasets[0].data = result.income_data;
+            window.financeChart.data.datasets[1].data = result.outcome_data.map(val => -val);
+            window.financeChart.options.scales.x.stacked = true;
+            window.financeChart.options.scales.y.suggestedMax = yLimit;
+            window.financeChart.options.scales.y.suggestedMin = -yLimit;
+        }
+
         window.financeChart.update();
     }
 
-    // Инициализация при загрузке
     initChart();
     updateChart();
-</script>   
+</script>

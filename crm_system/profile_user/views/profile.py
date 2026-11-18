@@ -48,19 +48,38 @@ def show_graphical_diagram(request):
     # Группировка всех обьектов, полученных в результате фильтрации
     filtered_objects = (
         qs.values("created_at")
-        .annotate(total_sum=Sum("number_in_the_operation"))
+        .annotate(
+            total_income=Sum(
+                "number_in_the_operation", filter=Q(type_of_operation="Поступление")
+            ),
+            total_outcome=Sum(
+                "number_in_the_operation", filter=Q(type_of_operation="Исход")
+            ),
+        )
         .order_by("created_at")
     )
 
     # Тут я по порядку получаю ТОЛЬКО ДЕНЬ
-    date_time = [
-        item["created_at"].strftime("%d.%m.%y, %H:%M") for item in filtered_objects
-    ]
+    date_time = []
 
-    # Тут я по порядку получаю ТОЛЬКО СУММУ
-    everyb_object = [int(item["total_sum"]) for item in filtered_objects]
+    # Получаю положительные суммы
+    income_data = []
 
-    return JsonResponse({"date_time": date_time, "everyb_object": everyb_object})
+    # Получаю отрицательные суммы
+    outcome_data = []
+
+    for item in filtered_objects:
+        date_time.append(item["created_at"].strftime("%d.%m.%y, %H:%M"))
+        income_data.append(int(item["total_income"] or 0))
+        outcome_data.append(int(item["total_outcome"] or 0))
+
+    return JsonResponse(
+        {
+            "date_time": date_time,
+            "income_data": income_data,
+            "outcome_data": outcome_data,
+        }
+    )
 
 
 # Отвечает за показ главной информации о клиенте (что-то типо профиля)
