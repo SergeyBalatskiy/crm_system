@@ -1,8 +1,13 @@
 from django.shortcuts import redirect
 from django.views.generic.edit import CreateView
-from auth_registration.forms import CustomUserCreationForm
+from auth_registration.forms import CustomUserCreationForm, LoginForm
 from django.contrib.auth import login
-from profile_user.models import StatusCategory, DocumentInformation, FormsForOrder
+from profile_user.models import (
+    StatusCategory,
+    DocumentInformation,
+    FormsForOrder,
+    ServiceInfo,
+)
 from finance.models import CashAccount
 from pathlib import Path
 
@@ -76,7 +81,7 @@ class RegisterView(CreateView):
                 write_content = file.read()
 
                 # Здесь достаточно забавная механика, о которой я раньше не слышал, не знал, и при этом
-                # эта механика весьма удобна и проста! можно не создавать отлельных N запроса, а всего лишь
+                # эта механика весьма удобна и проста! можно н  е создавать отлельных N запроса, а всего лишь
                 # создать словарь docs_waiting_to_create = [], потом добавлять туда каждый раз ссылку на саму БД с
                 # аргументами на то что записывается внутри, и потом используя ссылку на саму БД.objects.bulk_create(docs_waiting_to_create)
                 # можно таким образом за 1 действие записать 4 обьекта! Ну разве не сказка, а?
@@ -101,21 +106,28 @@ class RegisterView(CreateView):
         return None
 
     # Вызываю функцию которая создает основной дефолтный баланс сервисного центра
-    def create_main_balance(user):
+    def create_main_balance(self, user):
         create_main_balance = CashAccount(user=user)
         create_main_balance.save()
 
+    # Вызываю функцию которая создает обьект для сервисного центра
+    def create_service_info(self, user):
+        create_service_inf = ServiceInfo(user=user)
+        print("Сервис инфо создан")
+        create_service_inf.save()
+
     # Непосредственно отвечает за валидацию и принятие формы и ее сохранение
     def form_valid(self, form):
-        user = form.save(commit=False)
-        user.username = user.email
-        user.save()
+        user = form.save()
 
         # После сохранения я вызываю функцию которая задает дефолт статусы заказов
         self.create_default_categories(user)
 
         # После сохранения статусов заказов я вызываю функцию которая задает дефолт документы
         self.create_default_documents(user)
+
+        # Создаю информацию о сервисном центре
+        self.create_service_info(user)
 
         # После сохранения 4 документов я вызываю функцию которая делает мне дефолт
         # форму для заполнения информациизаказов
@@ -127,3 +139,16 @@ class RegisterView(CreateView):
         login(self.request, user)
 
         return redirect("profile")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if "registration_form" not in context:
+            context["registration_form"] = self.get_form()
+
+        if "login_form" not in context:
+            context["login_form"] = LoginForm()
+
+        return context
+
+    def form_invalid(self, form):
+        return self.render_to_response(self.get_context_data(registration_form=form))

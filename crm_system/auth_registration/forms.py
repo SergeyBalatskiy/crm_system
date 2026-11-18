@@ -65,14 +65,18 @@ class CustomUserCreationForm(forms.ModelForm):
     # Функции клин всегда как правило предоставляют предобработку перед сохранением
     def clean_email(self):
         email = self.cleaned_data.get("email").strip().lower()
-        print(self.current_user.email)
         print(email)
         if self.current_user and self.current_user.email == email:
-            print("Тот же емаил")
+            print("Тот же емаил того же пользователя на замену")
             return email
+        print("ПОЧТА", email)
+        print(User.objects.filter(username=email).exists())
+        if User.objects.filter(username=email).exists():
+            print("Такая почта уже существует!")
+            raise forms.ValidationError("Пользователь с таким email уже существует")
 
         if User.objects.filter(email=email).exists():
-            print("Тот же емаил")
+            print("Такая почта уже существует!")
             raise forms.ValidationError("Пользователь с таким email уже существует")
         return email
 
@@ -110,16 +114,14 @@ class CustomUserCreationForm(forms.ModelForm):
     def clean_phone_number(self):
 
         phone_number = self.cleaned_data.get("phone_number")
-
-        print(self.current_user.phone_number)
-        print(phone_number)
         """
         Форматирует номер телефона в стандартный вид: +7 (XXX) XXX-XX-XX
         Принимает различные форматы ввода.
         """
         # Удаляем все нецифровые символы
         digits = "".join(c for c in phone_number if c.isdigit())
-
+        if not digits:
+            raise forms.ValidationError("В номере телефона отсутствуют цифры!")
         # Проверка длины номера
         if len(digits) < 10 or len(digits) > 11:
             raise forms.ValidationError("Некорректная длина номера!")
@@ -138,12 +140,12 @@ class CustomUserCreationForm(forms.ModelForm):
         )
 
         if self.current_user and self.current_user.phone_number == phone_number:
-            print("Тот же телефон у пользователя")
+            print("Тот же телефон у пользователя на замену")
             return formatted_number
 
         if User.objects.filter(phone_number=formatted_number).exists():
-            print("Тот же номер!")
-            raise forms.ValidationError("Пользователь с номером уже существует!")
+            print("Такой номер телефона уже существует!")
+            raise forms.ValidationError("Пользователь с таким номером уже существует!")
 
         return formatted_number
 

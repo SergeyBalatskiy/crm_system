@@ -47,7 +47,7 @@ body {
 }
 
 .container button {
-    background-color: #6235cb8;
+    background-color: #6235cb;
     color: #fff;
     font-size: 12px;
     padding: 10px 45px;
@@ -78,7 +78,7 @@ body {
 .container input {
     background-color: #eee;
     border: none;
-    margin: 8px 0;
+    margin: 4px 0;
     padding: 10px 15px;
     font-size: 13px;
     border-radius: 8px;
@@ -159,15 +159,22 @@ body {
     z-index: 1000;
 }
 
+/* Центрируем заголовок внутри формы */
+.container form h1 {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 20px; /* Отступ снизу до полей */
+}
+
 .container.active .toggle-container {
     transform: translateX(-100%);
     border-radius: 0 150px 100px 0;
 }
 
 .toggle {
-    background-color: #6235cb8;
+    background-color: #6235cb;
     height: 100%;
-    background: linear-gradient(to right, #5c6bc0, #6235cb8);
+    background: linear-gradient(to right, #5c6bc0, #6235cb);
     color: #fff;
     position: relative;
     left: -100%;

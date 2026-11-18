@@ -1,6 +1,3 @@
-def diction(arg):
-    x = {"arg": arg}
-    return x
+digits = "".join(c for c in "usdjkfhkdsfhkjds" if c.isdigit())
 
-
-print(diction("TEST"))
+print(digits)

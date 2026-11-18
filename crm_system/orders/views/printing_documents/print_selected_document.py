@@ -292,7 +292,10 @@ class PrintSelectedDocument(View):
             )
 
             # Получаю данные о сервисном центре:
-            company_inf = ServiceInfo.objects.get(user=request.user)
+            try:
+                company_inf = ServiceInfo.objects.get(user=request.user)
+            except Exception as e:
+                print("Инфо о сервисном центре: Его блять нету")
 
             rendered_document = PrintSelectedDocument.replace_fields_for_document(
                 document_html.content,

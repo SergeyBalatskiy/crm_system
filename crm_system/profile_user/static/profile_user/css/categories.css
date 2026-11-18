@@ -145,6 +145,7 @@
     background: rgba(15, 23, 42, 0.45);
     backdrop-filter: blur(4px);
     z-index: 9999;
+    display: none;
     align-items: center;
     justify-content: center;
     padding: 20px;
@@ -280,6 +281,7 @@
 .btn-delete {
     background-color: #ef4444;
     color: #ffffff;
+    padding: 30px, 1000px;
 }
 
 .btn-delete:hover {
@@ -289,8 +291,12 @@
 .btn-cancel {
     background-color: #f1f5f9;
     color: #475569;
+    padding: 6px 7px;      /* Уменьшили верхний и нижний отступ */
+    font-size: 16px;       /* Сделали текст меньше */
+    line-height: 1;        /* Убрали лишнюю высоту строки */
+    min-height: 0;         /* Сбросили возможные ограничения фреймворков */
+    height: auto;          /* Позволили кнопке сжаться под контент */
 }
-
 .btn-cancel:hover {
     background-color: #e2e8f0;
 }

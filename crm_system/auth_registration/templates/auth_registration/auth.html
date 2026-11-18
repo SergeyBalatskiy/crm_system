@@ -4,51 +4,86 @@
 {% block content %}
 
 <div class="container" id="container">
+    
+    <!-- ФОРМА РЕГИСТРАЦИИ -->
     <div class="form-container sign-up">
         <form method="post" action="{% url 'registration' %}">
             <h1>Создание аккаунта</h1>
-            <div class="social-icons">
-                {% csrf_token %}
-                {{ registration_form }}
-                {{ registration_form.errors }}
-                <button>Создать аккаунт</button>
+            {% csrf_token %}
+            
+            <!-- ПОЛЯ ВВОДА (вне social-icons) -->
+            <div class="form-fields">
+                {% for field in registration_form %}
+                    <div class="form-group">
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="error-message" style="color: red; font-size: 12px; margin-top: 4px;">
+                                {{ field.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
             </div>
-        </form>
-    </div>
-    <div class="form-container sign-in">
-        <form form method="post" action="{% url 'login' %}">
-            <h1>Вход в аккаунт</h1>
-            <div class="social-icons">
-                {% csrf_token %}
-                {{ login_form }}
-                <a href="#">Забыли пароль?</a>
-                <button>Войти</button>
-            </div>
+
+            <!-- Общие ошибки формы -->
+            {% if registration_form.non_field_errors %}
+                <div class="error-message" style="color: red; font-size: 12px; margin-top: 4px;">
+                    {{ registration_form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
+            <button type="submit">Создать аккаунт</button>
         </form>
     </div>
 
+    <!-- ФОРМА ВХОДА -->
+    <div class="form-container sign-in">
+        <form method="post" action="{% url 'login' %}">
+            <h1>Вход в аккаунт</h1>
+            {% csrf_token %}
+            
+            <div class="form-fields">
+                {% for field in login_form %}
+                    <div class="form-group">
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="error-message" style="color: red; font-size: 12px; margin-top: 4px;">
+                                {{ field.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Общие ошибки формы (например, "Неверный логин или пароль") -->
+            {% if login_form.non_field_errors %}
+                <div class="error-message" style="color: red; font-size: 12px; margin-top: 4px;">
+                    {{ login_form.non_field_errors.0 }}
+                </div>
+            {% endif %}
+
+            <a href="#">Забыли пароль?</a>
+            <button type="submit">Войти</button>
+        </form>
+    </div>
+
+    <!-- ПЕРЕКЛЮЧАТЕЛЬ (СЛАЙДЕР) -->
     <div class="toggle-container">
         <div class="toggle">
-            <div class="toggle-panel
-            toggle-left">
+            <div class="toggle-panel toggle-left">
                 <h1>Добро пожаловать!</h1>
-                <p>Введите пожалуйста все требуемые данные чтобы использовать
-                    механики сайта по максимуму!</p>
+                <p>Введите пожалуйста все требуемые данные чтобы использовать механики сайта по максимуму!</p>
                 <button class="hidden" id="login">Вход</button>
             </div>
-            <div class="toggle-panel
-            toggle-right">
+            <div class="toggle-panel toggle-right">
                 <h1>Здравствуйте!</h1>
                 <p>Зарегистрируйтесь чтобы начать пользоваться нашим сайтом!</p>
                 <button class="hidden" id="register">Создать аккаунт</button>
             </div>
         </div>
     </div>
+    
 </div>
 
-<!-- <form method="post">
-
-    <button type="submit">Зарегистрироваться</button>
-</form> -->
 <script src="{% static 'auth_registration/script/script.js'%}"></script>
 {% endblock %}

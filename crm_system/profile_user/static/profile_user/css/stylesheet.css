@@ -196,21 +196,21 @@ body {
     backdrop-filter: blur(10px);
 }
 
-.site-header {
-    overflow: visible; /* Это важно */
-    position: fixed;
-    left: 40px;
-    top: 40px;
-    width: 240px;
-    height: calc(100vh - 117px);
-    border-radius: 30px;
-    background-color: #fff;
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0 20px 20px;
-    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
-    z-index: 1000; /* Чтобы сайдбар был поверх контента */
-}
+    .site-header {
+        overflow: visible; /* Это важно */
+        position: fixed;
+        left: 40px;
+        top: 40px;
+        width: 240px;
+        height: calc(100vh - 117px);
+        border-radius: 30px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        padding: 20px 0 20px 20px;
+        box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+        z-index: 1; /* Чтобы сайдбар был поверх контента */
+    }
 
 .div-box {
     position: fixed;
