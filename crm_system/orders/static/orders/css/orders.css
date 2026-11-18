@@ -794,24 +794,22 @@ body:has(#payment-drawer-container:not(:empty)) .drawer-overlay.active {
 .crm-orders-wrapper {
     width: 100%;
     height: 100%;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .crm-orders-container {
-    position: fixed;
+  position: fixed;
     left: 320px;
     top: 40px;
     right: 40px;
     height: calc(100vh - 80px);
-
-    background-color: #fff;
-    border-radius: 30px;
-    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.228);
-    padding: 40px;
-
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 /* Верхняя панель */
@@ -863,18 +861,7 @@ body:has(#payment-drawer-container:not(:empty)) .drawer-overlay.active {
     background: #7345d1;
 }
 
-/* Фильтры */
-.crm-filter-bar {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 12px;
-    margin-bottom: 20px;
-}
 
-.crm-search-box {
-    position: relative;
-    width: 100%;
-}
 
 .crm-search-box .search-icon {
     position: absolute;
@@ -885,23 +872,22 @@ body:has(#payment-drawer-container:not(:empty)) .drawer-overlay.active {
     font-size: 0.9rem;
 }
 
-.crm-search-box input {
-    width: 100%;
-    padding: 10px 14px 10px 40px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    font-size: 0.9rem;
-    outline: none;
-    transition: border-color 0.2s;
-}
-
 .crm-search-box input:focus {
     border-color: #2563eb;
     box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
 
-.crm-select {
+
+.crm-select:focus {
+    border-color: #2563eb;
+}
+
+/* 5. Селект ВНУТРИ блока дат (чтобы он занимал 100% своей обертки) */
+.crm-date-wrapper select.crm-select {
+    width: 100%;
+}
+
+select.crm-select {
     width: 100%;
     padding: 10px 14px;
     background: #fff;
@@ -911,30 +897,24 @@ body:has(#payment-drawer-container:not(:empty)) .drawer-overlay.active {
     color: #374151;
     outline: none;
     cursor: pointer;
-}
-
-.crm-select:focus {
-    border-color: #2563eb;
-}
-
-/* Блок дат */
-.crm-date-wrapper {
-    position: relative;
+    box-sizing: border-box; /* Важно, чтобы padding не увеличивал ширину */
 }
 
 .crm-custom-dates {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: calc(100% + 4px); /* Отступ от селекта */
+    right: 0; /* Прижимаем к правому краю, чтобы не вылезал за экран */
+    width: 260px; /* Фиксируем ширину, чтобы поля не были гигантскими */
     background: #fff;
-    border: 1px solid #2563eb;
+    border: 1px solid #8950fc; /* Фиолетовая рамка */
     border-radius: 10px;
-    padding: 6px;
+    padding: 10px;
     display: flex;
-    gap: 6px;
-    z-index: 10;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1050;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
 }
 
 .crm-custom-dates.hidden {
@@ -942,20 +922,40 @@ body:has(#payment-drawer-container:not(:empty)) .drawer-overlay.active {
 }
 
 .crm-date-input {
-    width: 100%;
+        width: 100%;
     border: 1px solid #e5e7eb;
     border-radius: 6px;
-    padding: 4px 6px;
-    font-size: 0.75rem;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    color: #374151;
+    background: #f9fafb; /* Легкий серый фон, чтобы выделить поле */
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.crm-date-input:focus {
+    border-color: #8950fc;
+    background: #ffffff;
 }
 
 .crm-date-reset {
+    width: 100%;
     background: #fee2e2;
     border: none;
     color: #dc2626;
     border-radius: 6px;
-    width: 28px;
+    padding: 8px;
     cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.crm-date-reset:hover {
+    background: #fecaca;
 }
 
 /* Скролл и сетка карточек */
@@ -1376,4 +1376,59 @@ input[type="number"] {
 
 .crm-empty-state i {
     font-size: 2.5rem;
+}
+
+/* --- ПАНЕЛЬ ФИЛЬТРОВ (Grid) --- */
+.crm-filter-bar {
+        display: grid;
+    /* Теперь поиск максимум 400px, а селекты растягиваются */
+    grid-template-columns: minmax(200px, 400px) 1fr 1fr 1fr; 
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+    position: relative;
+    overflow: visible !important;
+    z-index: 20;
+}
+
+/* --- ПОИСК (занимает свою колонку) --- */
+.crm-search-box {
+    position: relative;
+    width: 100%;
+}
+
+.crm-search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* --- СЕЛЕКТЫ (Тип и Статус) --- */
+.crm-select {
+    width: 100%; /* Занимает ровно свою колонку */
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* --- БЛОК ДАТ --- */
+.crm-date-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Селект внутри блока дат (чтобы не ломал сетку) */
+.crm-date-wrapper .crm-select {
+    width: 100%;
 }

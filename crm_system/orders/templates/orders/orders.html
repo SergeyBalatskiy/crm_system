@@ -64,22 +64,25 @@
             </select>
 
             <!-- Даты -->
-            <div class="crm-date-wrapper">
-                <select class="crm-select" id="history_date_select" name="search_date_operation" autocomplete="new-password" onchange="toggleDateRange(this)">
-                    <option value="">За всё время</option>
-                    <option value="date_today" {% if request.GET.search_date_operation == 'date_today' %}selected{% endif %}>Сегодня</option>
-                    <option value="date_yesterday" {% if request.GET.search_date_operation == 'date_yesterday' %}selected{% endif %}>Вчера</option>
-                    <option value="date_this_week" {% if request.GET.search_date_operation == 'date_this_week' %}selected{% endif %}>За неделю</option>
-                    <option value="date_this_week" {% if request.GET.search_date_operation == 'date_this_month' %}selected{% endif %}>За месяц</option>
-                    <option value="custom" {% if request.GET.search_date_operation == 'custom' %}selected{% endif %}>📅 Период...</option>
-                </select>
+            <!-- Даты -->
+<div class="crm-date-wrapper">
+    <!-- Основной селект для быстрого выбора -->
+    <select class="crm-select" id="history_date_select" name="search_date_operation" autocomplete="new-password" onchange="toggleDateRange(this)" style="width: 100%;">
+        <option value="">За всё время</option>
+        <option value="date_today" {% if request.GET.search_date_operation == 'date_today' %}selected{% endif %}>Сегодня</option>
+        <option value="date_yesterday" {% if request.GET.search_date_operation == 'date_yesterday' %}selected{% endif %}>Вчера</option>
+        <option value="date_this_week" {% if request.GET.search_date_operation == 'date_this_week' %}selected{% endif %}>За неделю</option>
+        <option value="date_this_month" {% if request.GET.search_date_operation == 'date_this_month' %}selected{% endif %}>За месяц</option>
+        <option value="custom" {% if request.GET.search_date_operation == 'custom' %}selected{% endif %}>📅 Период...</option>
+    </select>
 
-                <div class="crm-custom-dates {% if not request.GET.date_start_input and request.GET.search_date_operation != 'custom' %}hidden{% endif %}" id="custom-date-range">
-                    <input type="date" name="date_start_input" value="{{ request.GET.date_start_input }}" class="crm-date-input" autocomplete="new-password">
-                    <input type="date" name="date_end_input" value="{{ request.GET.date_end_input }}" class="crm-date-input" autocomplete="new-password">
-                    <button type="button" class="crm-date-reset" onclick="resetDateRange()"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-            </div>
+    <!-- Выпадающий блок с датами (скрыт по умолчанию, если не выбран custom) -->
+    <div class="crm-custom-dates {% if request.GET.search_date_operation != 'custom' %}hidden{% endif %}" id="custom-date-range">
+        <input type="date" name="date_start_input" value="{{ request.GET.date_start_input }}" class="crm-date-input" autocomplete="new-password">
+        <input type="date" name="date_end_input" value="{{ request.GET.date_end_input }}" class="crm-date-input" autocomplete="new-password">
+        <button type="button" class="crm-date-reset" onclick="resetDateRange()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+</div>
         </form>
 
         <!-- Сетка карточек заказов (сюда HTMX подгружает только список) -->

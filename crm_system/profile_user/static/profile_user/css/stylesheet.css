@@ -34,6 +34,30 @@ body {
     box-sizing: border-box;
 }
 
+  
+/* Основной контейнер */
+.div-place {
+    width: 100%;
+    height: 100%;
+}
+
+.div-workers-page-containervices {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+
 
 .main-content {
     margin-left: 200px;
