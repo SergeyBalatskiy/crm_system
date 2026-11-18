@@ -12,15 +12,14 @@
     top: 40px;
     right: 40px;
     height: calc(100vh - 80px);
-
-    background-color: #fff;
-    border-radius: 30px;
-    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
-    padding: 40px;
-
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 a .django-form input[type=number]::-webkit-outer-spin-button,
@@ -55,7 +54,7 @@ a .django-form input[type=number]::-webkit-outer-spin-button,
     margin: 0;
     font-size: 24px;
     font-weight: 700;
-    color: #7444e4
+    color: #8153ec
 }
 
 /* Стилизация выпадающего списка */
@@ -95,7 +94,7 @@ a .django-form input[type=number]::-webkit-outer-spin-button,
 .storage-card-header h2 {
     font-size: 20px;
     font-weight: 600;
-    color: #5432a3;
+    color: #8153ec;
     margin-bottom: 20px;
 }
 

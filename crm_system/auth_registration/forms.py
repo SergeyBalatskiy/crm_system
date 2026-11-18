@@ -58,6 +58,10 @@ class CustomUserCreationForm(forms.ModelForm):
         self.current_user = kwargs.pop("current_user", None)
         super().__init__(*args, **kwargs)
 
+        if self.current_user:
+            self.fields["password1"].required = False
+            self.fields["password2"].required = False
+
     # Функции клин всегда как правило предоставляют предобработку перед сохранением
     def clean_email(self):
         email = self.cleaned_data.get("email").strip().lower()
@@ -151,8 +155,8 @@ class CustomUserCreationForm(forms.ModelForm):
         user.first_name = self.cleaned_data["first_name"]
         user.last_name = self.cleaned_data["last_name"]
         raw_password = self.cleaned_data["password1"]
-        hashed_password = make_password(raw_password)
-        user.password = hashed_password
+        if raw_password:
+            user.password = make_password(raw_password)
         user.phone_number = self.cleaned_data["phone_number"]
         if commit:
             user.save()

@@ -11,6 +11,135 @@ body {
     margin: 0;
 }
 
+/* --- ВЫЕЗЖАЮЩИЕ ПОДМЕНЮ В САЙДБАРЕ --- */
+
+/* Делаем родительский пункт относительным, чтобы подменю позиционировалось от него */
+.site-nav li.has-submenu {
+    position: relative;
+}
+
+/* 3. Стили самого выпадающего блока (скрыт по умолчанию) */
+.site-nav .submenu {
+    position: absolute;
+    left: 100%; /* Выезжает ровно за правый край */
+    top: 0;
+    width: 220px; /* Чуть шире, чтобы текст влезал */
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.15); /* Тень чуть темнее для объема */
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+    z-index: 9999;
+    
+    /* Скрываем по умолчанию */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Стили самого выпадающего блока */
+.submenu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 200px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+    z-index: 9999; /* Высокий приоритет */
+    
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Появление при наведении на родительский li */
+.site-nav li.has-submenu:hover .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.site-nav li.has-submenu {
+    position: relative;
+}
+
+/* 5. Стилизация пунктов внутри выпадающего меню */
+.site-nav .submenu li a {
+    display: block !important;
+    width: auto !important; /* Убираем жесткую ширину 100%, чтобы padding не ломал размер */
+    box-sizing: border-box !important; /* Гарантируем, что padding не увеличит ширину */
+    padding: 10px 20px !important;
+    color: #3f4254 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+}
+
+/* Убираем "хвосты" (псевдоэлементы) у ссылок внутри подменю */
+.site-nav .submenu li a::before,
+.site-nav .submenu li a::after {
+    display: none !important;
+}
+
+.site-nav .submenu li a::before,
+.site-nav .submenu li a::after,
+.site-nav .submenu li::before {
+    display: none !important;
+}
+
+.site-nav .submenu li a:hover {
+    background-color: #f4f0ff !important; /* Нежный фиолетовый фон */
+    color: #8950fc !important;            /* Фиолетовый текст */
+    padding-left: 24px !important;        /* Легкий сдвиг текста вправо для эффекта */
+}
+
+.site-nav .submenu li {
+    margin-top: 0 !important; /* Убираем отступ сверху */
+    height: auto !important;
+}
+
+.site-nav li.has-submenu a::before,
+.site-nav li.has-submenu a::after {
+    display: none !important;
+    content: none !important;
+}
+
+.site-nav li.has-submenu::before {
+    border-radius: 30px 0 0 30px !important;
+}
+
+.site-nav .submenu li::before {
+    display: none !important; /* Убираем фиолетовую полоску */
+}
+
+
+/* Стили для ссылок внутри подменю */
+.submenu li a {
+    display: block;
+    padding: 10px 20px;
+    color: #475569;
+    font-size: 15px;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.submenu li a:hover {
+    background-color: #f4f0ff; /* Светло-фиолетовый фон при наведении */
+    color: #8950fc; /* Твой фиолетовый цвет */
+}
+
 /* Основной контейнер */
 .div-place-services {
     width: 100%;
@@ -68,7 +197,7 @@ body {
 }
 
 .site-header {
-    overflow: hidden;
+    overflow: visible; /* Это важно */
     position: fixed;
     left: 40px;
     top: 40px;
@@ -79,7 +208,8 @@ body {
     display: flex;
     flex-direction: column;
     padding: 20px 0 20px 20px;
-    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276)
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    z-index: 1000; /* Чтобы сайдбар был поверх контента */
 }
 
 .div-box {
@@ -138,7 +268,6 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
     scrollbar-width: none;
     -ms-overflow-style: none;
 }
@@ -229,41 +358,6 @@ body {
 .site-nav li:hover::before {
     width: 100%;
     opacity: 1;
-}
-
-.site-nav a::before,
-.site-nav a::after {
-    content: '';
-    position: absolute;
-    right: -2px;
-    width: 25px;
-    height: 36px;
-    background: transparent;
-    opacity: 0;
-    transition: opacity 1.0s ease;
-    z-index: 2;
-    pointer-events: none;
-    transition: opacity 0.03s ease-in;
-}
-
-.site-nav a::before {
-    margin-top: 4px;
-    top: -34px;
-    border-radius: 0 0 30px 0;
-    box-shadow: 0 20px 0 0 #8950fc;
-}
-
-.site-nav a::after {
-    margin-bottom: 4px;
-    bottom: -34px;
-    border-radius: 0 30px 0 0;
-    box-shadow: 0 -20px 0 0 #8950fc;
-}
-
-.site-nav li:hover a::before,
-.site-nav li:hover a::after {
-    opacity: 1;
-    transition: opacity 0.17s ease-in;
 }
 
 .site-nav .bottom-nav {

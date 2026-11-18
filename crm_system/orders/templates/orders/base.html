@@ -40,12 +40,29 @@
                 <li><a href="{% url 'profile' %}"><i class="fa-solid fa-house"></i>Главная</a></li>
                 <li><a href="{% url 'orders' %}"><i class="fa-regular fa-address-card"></i>Заказы</a></li>
                 <li><a href="{% url 'services_work' %}"><i class="fa-solid fa-hand-holding-dollar"></i>Услуги</a></li>
-                <li><a href="{% url 'main-storage' %}"><i class="fa-solid fa-store"></i>Склад</a></li>
-                <li><a href="{% url 'main_cash' %}"><i class="fa-solid fa-money-bill"></i>Финансы</a></li>
+
+                <!-- Склад с подменю -->
+                <li class="has-submenu">
+                    <a href="{% url 'main-storage' %}"><i class="fa-solid fa-store"></i>Склад</a>
+                    <ul class="submenu">
+                        <li><a href="{% url 'acceptance-storage' %}">Приемка</a></li>
+                        <li><a href="{% url 'removal-form-storage' %}">Списание</a></li>
+                        <li><a href="{% url 'filter_and_history_storage' %}">История</a></li>
+                    </ul>
+                </li>
+
+                <!-- Финансы с подменю -->
+                <li class="has-submenu">
+                    <a href="{% url 'main_cash' %}"><i class="fa-solid fa-money-bill"></i>Финансы</a>
+                    <ul class="submenu">
+                        <li><a href="{% url 'insert_cash' %}">Продажа товара</a></li>
+                        <li><a href="{% url 'other_transaction' %}">Прочие транзакции</a></li>
+                    </ul>
+                </li>
             </ul>
 
             <ul class="bottom-nav">
-                <li><a href="#"><i class="fa-solid fa-list"></i>Настройки</a></li>
+                <li><a href="{% url 'change_personal_info' %}"><i class="fa-solid fa-list"></i>Настройки</a></li>
                 <li><a href="#"><i class="fa-solid fa-user"></i>{{ user.first_name }} {{ user.last_name.0 }}.</a></li>
             </ul>
         </nav>

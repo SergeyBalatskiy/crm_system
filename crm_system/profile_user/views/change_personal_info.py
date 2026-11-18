@@ -32,9 +32,7 @@ class ChangePersonalInformationView(UpdateView):
             request.POST, instance=request.user, current_user=request.user
         )
         if form.is_valid():
-            user = form.save(commit=False)
-            user.username = user.email
-            user.save()
+            form.save()
             super().form_valid(form)
             return redirect("profile")
 
