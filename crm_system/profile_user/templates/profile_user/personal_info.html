@@ -1,0 +1,126 @@
+{% extends "profile_user/base.html" %}
+
+{% block content %}
+
+<style>
+    /* Стилизуем контейнер формы */
+    .settings-form-container {
+        max-width: 500px;
+        margin: 40px auto;
+        padding: 40px;
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: 1px solid #ebedf2;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .settings-form-container h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 30px;
+        text-align: center;
+        letter-spacing: -0.5px;
+    }
+
+    /* Убираем стандартный параграф и делаем отступы для полей */
+    .form-field-group {
+        margin-bottom: 20px;
+    }
+
+    /* Стилизуем сами инпуты (поля ввода) */
+    .settings-form-container input[type="text"],
+    .settings-form-container input[type="email"],
+    .settings-form-container input[type="password"] {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        color: #1f2937;
+        background-color: #f9fafb;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+
+    /* Эффект при наведении/фокусе */
+    .settings-form-container input:focus {
+        outline: none;
+        border-color: #8950fc;
+        background-color: #ffffff;
+        box-shadow: 0 0 0 4px rgba(137, 80, 252, 0.15);
+    }
+
+    /* Стилизуем кнопку */
+    .settings-form-container button[type="submit"] {
+        width: 100%;
+        padding: 14px;
+        background-color: #8950fc;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.1s ease;
+        margin-top: 10px;
+    }
+
+    .settings-form-container button[type="submit"]:hover {
+        background-color: #7337e5;
+    }
+
+    .settings-form-container button[type="submit"]:active {
+        transform: scale(0.98);
+    }
+
+    /* Красивые ошибки */
+    .error-msg {
+        color: #ef4444;
+        font-size: 0.85rem;
+        margin-top: 5px;
+        display: block;
+    }
+</style>
+
+<div class="div-place">
+    <div class="div-box workers-page-container" style="align-items: stretch; justify-content: flex-start; text-align: left; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; display: flex; justify-content: center; padding: 20px;">
+        
+        <div class="settings-form-container">
+            <h2>Изменение личных данных</h2>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                {% for field in get_personal_info %}
+                    <div class="form-field-group">
+                        <!-- ХИТРОСТЬ: Проверяем, если label не False, тогда выводим -->
+                        {% if field.label != False %}
+                            <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 6px;">
+                                {{ field.label }}
+                            </label>
+                        {% endif %}
+                        
+                        {{ field }}
+                        
+                        {% if field.help_text %}
+                            <small style="color: #6b7280; font-size: 0.75rem; display: block; margin-top: 4px;">
+                                {{ field.help_text }}
+                            </small>
+                        {% endif %}
+                        
+                        {% for error in field.errors %}
+                            <span class="error-msg">{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                
+                <button type="submit">Сохранить изменения</button>
+            </form>
+        </div>
+
+    </div>
+</div>    
+
+{% endblock %}

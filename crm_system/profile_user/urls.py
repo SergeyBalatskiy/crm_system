@@ -6,6 +6,12 @@ from django.contrib.auth.views import LogoutView
 # Веселые маршруты... как я на них навернулся...
 urlpatterns = [
     path("", UserProfileView.as_view(), name="profile"),
+    # Новый путь для изменения данных аккаунта (логин, пароль, инициалы, телефон)
+    path(
+        "personal-settings",
+        ChangePersonalInformationView.as_view(),
+        name="change_personal_info",
+    ),
     # Созданный API для фильтра финансовых историй (Chart.js)
     path(
         "api/chart-histories/",

@@ -145,8 +145,20 @@ class ShowAndPayView(View):
     # Информация о сервисе
     def replace_fields_for_document(template_html, order, services, company_inf):
 
+        if "<textarea" in template_html:
+            match = re.search(
+                r"<textarea[^>]*>(.*?)</textarea>", template_html, re.DOTALL
+            )
+            if match:
+                template_html = match.group(1)
+
         # Заменяю символы от tinyMCE на "<>"
         template_html = template_html.replace("&lt;", "<").replace("&gt;", ">")
+        template_html = (
+            template_html.replace("&amp;lt;", "<")
+            .replace("&amp;gt;", ">")
+            .replace("&nbsp;", " ")
+        )
 
         # Нахожу то самое место с названием оказываемой услуги и говорим что после написания нужно переносить
         # на новую строку

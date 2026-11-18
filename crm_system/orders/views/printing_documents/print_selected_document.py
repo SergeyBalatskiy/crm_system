@@ -51,7 +51,9 @@ DOCUMENT_VARIABLES = {
     # Прочее
     "<ПричинаОтказа>": lambda order=None, services=None, company_inf=None, **kwargs: kwargs.get(
         "reason_for_refusal", ""
-    ),
+    )
+    .replace("&amp;nbsp;", " ")
+    .replace("&nbsp;", " "),
     "<Рекомендации>": lambda order, services=None, company_inf=None, **kwargs: str(
         getattr(order, "problem_with_device", "")
     ),
@@ -159,9 +161,22 @@ class PrintSelectedDocument(View):
         template_html, order, services, company_inf, reason_for_refusal
     ):
 
-        # Заменяю символы от tinyMCE на "<>"
-        template_html = template_html.replace("&lt;", "<").replace("&gt;", ">")
+        if "<textarea" in template_html:
+            match = re.search(
+                r"<textarea[^>]*>(.*?)</textarea>", template_html, re.DOTALL
+            )
+            if match:
+                template_html = match.group(1)
 
+        # Заменяю символы от tinyMCE на "<>"
+        template_html = (
+            template_html.replace("&amp;lt;", "<")
+            .replace("&amp;gt;", ">")
+            .replace("&amp;nbsp;", " ")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+            .replace("&nbsp;", " ")
+        )
         # Нахожу то самое место с названием оказываемой услуги и говорим что после написания нужно переносить
         # на новую строку
         row_pattern = r"(<tr[^>]*>(?:(?!<\/tr>).)*?<НазваниеОказываемойУслуги>(?:(?!<\/tr>).)*?<\/tr>)"

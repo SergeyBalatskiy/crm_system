@@ -222,25 +222,26 @@
     });
 
     // Обработчик загрузки HTMX
-    document.body.addEventListener('htmx:afterSwap', function (event) {
+        document.body.addEventListener('htmx:afterSwap', function (event) {
         if (event.detail.target.id === 'hidden-data-container') {
             const fetchedContent = document.getElementById('fetched-content');
             const fetchedDocType = document.getElementById('fetched-doc-type');
             const editorContainer = document.getElementById('editor-container');
             const saveBtn = document.getElementById('save-doc-btn');
 
-            // 1. Показываем контейнер (делаем grid)
             if (editorContainer) editorContainer.style.display = 'grid';
             if (saveBtn) saveBtn.style.display = 'block';
 
-            // 2. Ждем 150мс, чтобы Grid отрисовался, и TinyMCE понял свою ширину
             setTimeout(() => {
                 if (typeof tinymce !== 'undefined' && tinymce.activeEditor) {
-                    // Магия: пересчитываем размеры
                     tinymce.activeEditor.execCommand('mceAutoResize');
                     
                     if (fetchedContent) {
-                        tinymce.activeEditor.setContent(fetchedContent.innerHTML);
+                        const textarea = fetchedContent.querySelector('textarea');
+                        if (textarea) {
+                            // Берем чистый HTML из value и вставляем
+                            tinymce.activeEditor.setContent(textarea.value);
+                        }
                     }
                 }
                 

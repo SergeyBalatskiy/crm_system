@@ -1,146 +1,99 @@
-<h3 style="line-height: 1;" data-pm-slice="0 0 []">Гарантийный талон № &lt;НомерДокумента&gt; от &lt;ДатаВыдачи&gt;</h3>
-<hr>
-<table class="MsoTableGrid" style="border-collapse: collapse; width: 97.5482%; border-image: initial; height: 205px; border: medium none currentcolor;" border="1" cellspacing="0" cellpadding="0">
-<tbody>
-<tr style="height: 41px;">
-<td style="width: 16.17%; border: 1pt solid rgb(255, 255, 255); padding: 0cm 5.4pt; height: 41px;" width="132">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><strong><span style="font-size: 14pt;">Исполнитель:</span></strong></p>
-</td>
-<td style="width: 83.83%; border-width: 1pt 1pt 1pt medium; border-style: solid solid solid none; border-color: rgb(255, 255, 255); border-image: initial; padding: 0cm 5.4pt; height: 41px;" width="491">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><span style="font-size: 14pt;">&lt;НазваниеЛокации&gt;</span></p>
-</td>
-</tr>
-<tr style="height: 41px;">
-<td style="width: 16.17%; border-width: medium 1pt 1pt; border-style: none solid solid; border-color: rgb(255, 255, 255); border-image: initial; padding: 0cm 5.4pt; height: 41px;" width="132">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><strong><span style="font-size: 14pt;">Адрес:</span></strong></p>
-</td>
-<td style="width: 83.83%; border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: rgb(255, 255, 255); padding: 0cm 5.4pt; height: 41px;" width="491">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><span style="font-size: 14pt;">&lt;АдресЛокации&gt;</span></p>
-</td>
-</tr>
-<tr style="height: 41px;">
-<td style="width: 16.17%; border-width: medium 1pt 1pt; border-style: none solid solid; border-color: rgb(255, 255, 255); border-image: initial; padding: 0cm 5.4pt; height: 41px;" width="132">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><strong><span style="font-size: 14pt;">Телефон:</span></strong></p>
-</td>
-<td style="width: 83.83%; border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: rgb(255, 255, 255); padding: 0cm 5.4pt; height: 41px;" width="491">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><span style="font-size: 14pt;">&lt;ТелефонЛокации&gt;</span></p>
-</td>
-</tr>
-<tr>
-<td style="width: 16.17%; border-width: medium 1pt 1pt; border-style: none solid solid; border-color: rgb(255, 255, 255); border-image: initial; padding: 0cm 5.4pt;">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><strong><span style="font-size: 14pt;">&nbsp;</span></strong></p>
-</td>
-<td style="width: 83.83%; border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: rgb(255, 255, 255); padding: 0cm 5.4pt;">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><span style="font-size: 14pt;">&nbsp;</span></p>
-</td>
-</tr>
-<tr style="height: 41px;">
-<td style="width: 16.17%; border-width: medium 1pt 1pt; border-style: none solid solid; border-color: rgb(255, 255, 255); border-image: initial; padding: 0cm 5.4pt; height: 41px;" width="132">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><strong><span style="font-size: 14pt;">Заказчик:</span></strong></p>
-</td>
-<td style="width: 83.83%; border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: rgb(255, 255, 255); padding: 0cm 5.4pt; height: 41px;" width="491">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><span style="font-size: 14pt;">&lt;Контрагент&gt;</span></p>
-</td>
-</tr>
-<tr style="height: 41px;">
-<td style="width: 16.17%; border-width: medium 1pt 1pt; border-style: none solid solid; border-color: rgb(255, 255, 255); border-image: initial; padding: 0cm 5.4pt; height: 41px;" width="132">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><strong><span style="font-size: 14pt;">Марка/Модель:</span></strong></p>
-</td>
-<td style="width: 83.83%; border-width: medium 1pt 1pt medium; border-style: none solid solid none; border-color: rgb(255, 255, 255); padding: 0cm 5.4pt; height: 41px;" width="491">
-<p class="MsoNormal" style="margin-bottom: 0cm; line-height: normal;"><span style="font-size: 14pt;">&lt;Марка&gt; &lt;Модель&gt;&nbsp;</span></p>
-</td>
-</tr>
-</tbody>
-</table>
-<hr>
-<table style="border-collapse: collapse; width: 98.0736%; height: 247px; border-width: 1px; border-color: rgb(0, 0, 0);" border="1"><colgroup><col style="width: 3.93208%;"><col style="width: 4.64701%;"><col style="width: 45.2189%;"><col style="width: 9.02592%;"><col style="width: 10.992%;"><col style="width: 12.7793%;"><col style="width: 13.3155%;"></colgroup>
-<tbody>
-<tr style="height: 49px;">
-<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>№</strong></span></td>
-<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Код</strong></span></td>
-<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Наименование товаров и услуг</strong></span></td>
-<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Гар-тия</strong></span></td>
-<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Кол-во</strong></span></td>
-<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Цена</strong></span></td>
-<td style="text-align: center; height: 22.3906px; border-color: rgb(0, 0, 0);"><span style="font-size: 14pt;"><strong>Сумма</strong></span></td>
-</tr>
-<tr style="height: 37px;">
-<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-<td style="height: 22.3906px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-</tr>
-<tr style="height: 52.5px;">
-<td style="height: 78.6562px; border-color: rgb(0, 0, 0);" colspan="4" rowspan="3">&nbsp;</td>
-<td style="height: 26.375px; border-color: rgb(0, 0, 0); text-align: right;" colspan="2"><span style="font-size: 14pt;"><strong>Сумма чека:</strong></span></td>
-<td style="height: 26.375px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-</tr>
-<tr style="height: 56px;">
-<td style="height: 26.1406px; border-color: rgb(0, 0, 0); text-align: right;" colspan="2"><span style="font-size: 14pt;"><strong>Скидка:</strong></span></td>
-<td style="height: 26.1406px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-</tr>
-<tr style="height: 52.5px;">
-<td style="height: 26.1406px; border-color: rgb(0, 0, 0); text-align: right;" colspan="2"><span style="font-size: 14pt;"><strong>Итого:</strong></span></td>
-<td style="height: 26.1406px; border-color: rgb(0, 0, 0);">&nbsp;</td>
-</tr>
-</tbody>
-</table>
-<ol>
-<li>
-<p style="line-height: 1;"><span style="font-size: 14pt;">Гарантийный ремонт распространяется только на неисправности, возникшие в результате произведённого ремонта.</span></p>
-</li>
-<li style="line-height: 1; font-size: 14pt;">
-<p><span style="font-size: 14pt;">Гарантия устанавливается на каждый товар или услугу отдельно.</span></p>
-</li>
-<li style="line-height: 1; font-size: 14pt;">
-<p><span style="font-size: 14pt;">Гарантийный ремонт не распространяется на аксессуары поставляемые с оборудованием.</span></p>
-</li>
-<li style="line-height: 1; font-size: 14pt;">
-<p><span style="font-size: 14pt;">Сервисный центр может отказать в гарантийном ремонте в следующих случаях:</span></p>
-<ul class="tiptap-bullet-list">
-<li style="font-size: 14pt;">
-<p><span style="font-size: 14pt;">неправильно заполненных документов;</span></p>
-</li>
-<li style="font-size: 14pt;">
-<p><span style="font-size: 14pt;">нарушения сохранности гарантийных пломб;</span></p>
-</li>
-<li style="font-size: 14pt;">
-<p><span style="font-size: 14pt;">использования оборудования вместе с аксессуарами, не одобренных предприятием изготовителя;</span></p>
-</li>
-<li style="font-size: 14pt;">
-<p><span style="font-size: 14pt;">повреждений вызванных нарушением условий эксплуатации и хранения;</span></p>
-</li>
-<li style="font-size: 14pt;">
-<p><span style="font-size: 14pt;">несанкционированного вмешательства;</span></p>
-</li>
-<li style="font-size: 14pt;">
-<p><span style="font-size: 14pt;">наличия механических, химических или тепловых воздействий;</span></p>
-</li>
-<li style="font-size: 14pt;">
-<p><span style="font-size: 14pt;">стихийными бедствиями, водой;</span></p>
-</li>
-</ul>
-</li>
-<li style="line-height: 1; font-size: 14pt;">
-<p><span style="font-size: 14pt;">Данные услуги по желанию клиента могут быть выполнены за отдельную плату.</span></p>
-</li>
-<li style="font-size: 14pt;">
-<p style="line-height: 1;"><span style="font-size: 14pt;">Устройство (изделия) проверено во всех режимах.</span></p>
-</li>
-</ol>
-<hr>
-<table style="width: 99.9124%;"><colgroup><col style="width: 57.7402%;"><col style="width: 42.2598%;"></colgroup>
-<tbody>
-<tr>
-<td style="border-color: rgb(255, 255, 255);" colspan="1" rowspan="1">
-<p>Исполнитель: _______________ / &lt;ФИОТекущегоПользователя&gt;/</p>
-</td>
-<td style="border-color: rgb(255, 255, 255);" colspan="1" rowspan="1">
-<p>________________ / &lt;Контрагент&gt;/<br>с условием гарантии ознакомлен и согласен</p>
-</td>
-</tr>
-</tbody>
-</table>
+<div>
+    <textarea class="tinymce" cols="80" data-mce-conf="{&quot;theme&quot;: &quot;silver&quot;, &quot;height&quot;: 600, &quot;menubar&quot;: &quot;file edit view insert format tools table help&quot;, &quot;plugins&quot;: &quot;\n        advlist autolink lists link image charmap preview anchor\n        searchreplace visualblocks code fullscreen insertdatetime media table\n        code help wordcount\n    &quot;, &quot;toolbar&quot;: &quot;\n        undo redo | formatselect | bold italic underline strikethrough |\n        forecolor backcolor | alignleft aligncenter alignright alignjustify |\n        bullist numlist outdent indent | removeformat |\n        link image media | table | code visualblocks fullscreen | help\n    &quot;, &quot;contextmenu&quot;: &quot;link image table&quot;, &quot;branding&quot;: false, &quot;promotion&quot;: false, &quot;language_url&quot;: &quot;/static/langs/ru.js&quot;, &quot;language&quot;: &quot;ru&quot;, &quot;directionality&quot;: &quot;ltr&quot;, &quot;strict_loading_mode&quot;: 1, &quot;selector&quot;: &quot;#id_content&quot;}" id="id_content" name="content" rows="30">&lt;div style=&quot;font-family: Arial, sans-serif; font-size: 11pt; color: #000; line-height: 1.3; padding: 10px; box-sizing: border-box; width: 100%; max-width: 100%; overflow-x: hidden;&quot;&gt;&lt;!-- Шапка документа --&gt;
+&lt;p style=&quot;font-size: 16pt; font-weight: bold; margin: 0 0 5px 0;&quot;&gt;Гарантийный талон № &amp;lt;НомерЗаказа&amp;gt; от &amp;lt;ДатаВыдачи&amp;gt;&lt;/p&gt;
+&lt;hr style=&quot;border: none; border-top: 1px solid #000; margin: 5px 0 12px 0;&quot;&gt;
+&lt;table style=&quot;width: 100%; border-collapse: collapse; margin-bottom: 15px; table-layout: fixed;&quot; border=&quot;0&quot;&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&quot;width: 18%; padding: 3px 0; font-weight: bold;&quot;&gt;Исполнитель:&lt;/td&gt;
+&lt;td style=&quot;width: 82%; padding: 3px 0; word-break: break-word;&quot;&gt;&amp;lt;НазваниеОрганизации&amp;gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding: 3px 0; font-weight: bold;&quot;&gt;Адрес:&lt;/td&gt;
+&lt;td style=&quot;padding: 3px 0; word-break: break-word;&quot;&gt;&amp;lt;АдресОрганизации&amp;gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding: 3px 0; font-weight: bold;&quot;&gt;Телефон:&lt;/td&gt;
+&lt;td style=&quot;padding: 3px 0;&quot;&gt;+7 (900) 636 72-55&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding: 3px 0; font-weight: bold;&quot;&gt;Заказчик:&lt;/td&gt;
+&lt;td style=&quot;padding: 3px 0; word-break: break-word;&quot;&gt;&amp;lt;Контрагент&amp;gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&quot;padding: 3px 0; font-weight: bold;&quot;&gt;Марка/Модель:&lt;/td&gt;
+&lt;td style=&quot;padding: 3px 0; word-break: break-word;&quot;&gt;&amp;lt;Марка&amp;gt; &amp;lt;Модель&amp;gt;&amp;nbsp;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;!-- Таблица товаров и услуг --&gt;
+&lt;table style=&quot;width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 9.5pt; table-layout: fixed;&quot; border=&quot;1&quot;&gt;
+&lt;thead&gt;
+&lt;tr style=&quot;background-color: #f3f4f6;&quot;&gt;
+&lt;th style=&quot;text-align: center; padding: 5px; width: 6%;&quot;&gt;№&lt;/th&gt;
+&lt;th style=&quot;text-align: center; padding: 5px; width: 12%;&quot;&gt;Код&lt;/th&gt;
+&lt;th style=&quot;text-align: left; padding: 5px; width: 34%;&quot;&gt;Наименование&lt;/th&gt;
+&lt;th style=&quot;text-align: center; padding: 5px; width: 11%;&quot;&gt;Гар-тия&lt;/th&gt;
+&lt;th style=&quot;text-align: center; padding: 5px; width: 10%;&quot;&gt;Кол-во&lt;/th&gt;
+&lt;th style=&quot;text-align: center; padding: 5px; width: 13%;&quot;&gt;Цена&lt;/th&gt;
+&lt;th style=&quot;text-align: center; padding: 5px; width: 14%;&quot;&gt;Сумма&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&quot;text-align: center; padding: 4px; word-break: break-word;&quot;&gt;&amp;lt;Номер&amp;gt;&lt;/td&gt;
+&lt;td style=&quot;text-align: center; padding: 4px; word-break: break-word;&quot;&gt;&amp;lt;КодДетали&amp;gt;&lt;/td&gt;
+&lt;td style=&quot;padding: 4px; word-break: break-word;&quot;&gt;&amp;lt;НазваниеОказываемойУслуги&amp;gt;&lt;/td&gt;
+&lt;td style=&quot;text-align: center; padding: 4px; word-break: break-word;&quot;&gt;&amp;lt;Гарантия&amp;gt;&lt;/td&gt;
+&lt;td style=&quot;text-align: center; padding: 4px; word-break: break-word;&quot;&gt;&amp;lt;Количество&amp;gt;&lt;/td&gt;
+&lt;td style=&quot;text-align: right; padding: 4px; word-break: break-word;&quot;&gt;&amp;lt;СтоимостьУслуги&amp;gt;&lt;/td&gt;
+&lt;td style=&quot;text-align: right; padding: 4px; word-break: break-word;&quot;&gt;&amp;lt;СуммаУслуг&amp;gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&quot;border: none;&quot; colspan=&quot;4&quot; rowspan=&quot;3&quot;&gt;&amp;nbsp;&lt;/td&gt;
+&lt;td style=&quot;text-align: right; padding: 5px; font-weight: bold;&quot; colspan=&quot;2&quot;&gt;Сумма чека:&lt;/td&gt;
+&lt;td style=&quot;text-align: right; padding: 5px; word-break: break-word;&quot;&gt;&amp;lt;СуммаЧека&amp;gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&quot;text-align: right; padding: 5px; font-weight: bold;&quot; colspan=&quot;2&quot;&gt;Скидка:&lt;/td&gt;
+&lt;td style=&quot;text-align: right; padding: 5px; word-break: break-word;&quot;&gt;&amp;lt;Скидка&amp;gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style=&quot;text-align: right; padding: 5px; font-weight: bold;&quot; colspan=&quot;2&quot;&gt;Итого:&lt;/td&gt;
+&lt;td style=&quot;text-align: right; padding: 5px; font-weight: bold; word-break: break-word;&quot;&gt;&amp;lt;ИтогоЦена&amp;gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;!-- Условия гарантии --&gt;
+&lt;ol style=&quot;font-size: 9pt; margin: 0 0 20px 0; padding-left: 20px; line-height: 1.3;&quot;&gt;
+&lt;li style=&quot;margin-bottom: 3px;&quot;&gt;Гарантийный ремонт распространяется только на неисправности, возникшие в результате произведённого ремонта.&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 3px;&quot;&gt;Гарантия устанавливается на каждый товар или услугу отдельно.&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 3px;&quot;&gt;Гарантийный ремонт не распространяется на аксессуары, поставляемые с оборудованием.&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 3px;&quot;&gt;Сервисный центр может отказать в гарантийном ремонте в следующих случаях:
+&lt;ul style=&quot;margin: 2px 0; padding-left: 15px; list-style-type: disc;&quot;&gt;
+&lt;li style=&quot;margin-bottom: 2px;&quot;&gt;неправильно заполненных документов;&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 2px;&quot;&gt;нарушения сохранности гарантийных пломб;&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 2px;&quot;&gt;использования оборудования вместе с аксессуарами, не одобренными предприятием-изготовителем;&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 2px;&quot;&gt;повреждений, вызванных нарушением условий эксплуатации и хранения;&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 2px;&quot;&gt;несанкционированного вмешательства;&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 2px;&quot;&gt;наличия механических, химических или тепловых воздействий;&lt;/li&gt;
+&lt;li&gt;стихийными бедствиями, попаданием воды/жидкости.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li style=&quot;margin-bottom: 3px;&quot;&gt;Данные услуги по желанию клиента могут быть выполнены за отдельную плату.&lt;/li&gt;
+&lt;li&gt;Устройство (изделие) проверено во всех режимах.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;hr style=&quot;border: none; border-top: 1px solid #000; margin: 15px 0;&quot;&gt;&lt;!-- Блок подписей --&gt;
+&lt;table style=&quot;width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 10pt;&quot; border=&quot;0&quot;&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style=&quot;width: 50%; padding-bottom: 10px; word-break: break-word; vertical-align: top;&quot;&gt;Исполнитель: _______________________ / &lt;strong&gt;&amp;lt;МенеджерСокр&amp;gt;&lt;/strong&gt;&lt;/td&gt;
+&lt;td style=&quot;width: 50%; text-align: right; padding-bottom: 10px; word-break: break-word; vertical-align: top;&quot;&gt;Заказчик: _______________________ / &lt;strong&gt;&amp;lt;КонтрагентСокр&amp;gt;&lt;/strong&gt;&lt;br&gt;&lt;span style=&quot;font-size: 8.5pt; color: #4a5568;&quot;&gt;с условием гарантии ознакомлен и согласен&lt;/span&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/div&gt;</textarea>
+    
+      
+    
+</div>

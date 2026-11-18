@@ -1,18 +1,39 @@
-* {
-    font-family: 'Montserrat', sans-serif;
-    box-sizing: border-box;
-}
 
 body {
     background-color: #c9d6ff;
     background: linear-gradient(to right, #e2e2e2, #c9d6ff);
     display: flex;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     align-items: center;
     justify-content: center;
     flex-direction: column;
     height: 100vh;
     margin: 0;
 }
+
+/* Основной контейнер */
+.div-place-services {
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.div-box-services {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
 
 .main-content {
     margin-left: 200px;
@@ -28,18 +49,13 @@ body {
     left: 40px;
     top: 40px;
     width: 240px;
-    height: calc(100vh - 80px);
+    height: calc(100vh - 117px);
     border-radius: 30px;
     background-color: #fff;
     display: flex;
     flex-direction: column;
     padding: 20px 0 20px 20px;
     box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276)
-}
-
-.div-place {
-    width: 100%;
-    height: 100%;
 }
 
 .div-box {

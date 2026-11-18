@@ -7,36 +7,80 @@ from django.contrib.auth.forms import AuthenticationForm
 # текущего пользователя
 User = get_user_model()
 
+
 class CustomUserCreationForm(forms.ModelForm):
     """Форма для регистрации пользователей"""
-    first_name = forms.CharField(label=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Имя'}))
-    last_name = forms.CharField(label=False, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Фамилия'}))
-    phone_number = forms.CharField(label=False, max_length=30, widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Номер телефона'}))
-    email = forms.EmailField(label=False, max_length=255, widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Почта'}))
-    password1 = forms.CharField(label=False, widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Пароль'}))
-    password2 = forms.CharField(label=False, widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Подтверждение пароля'}))
-    
+
+    first_name = forms.CharField(
+        label=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Имя"}),
+    )
+    last_name = forms.CharField(
+        label=False,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Фамилия"}
+        ),
+    )
+    phone_number = forms.CharField(
+        label=False,
+        max_length=30,
+        widget=forms.TextInput(
+            attrs={"class": "form-control", "placeholder": "Номер телефона"}
+        ),
+    )
+    email = forms.EmailField(
+        label=False,
+        max_length=255,
+        widget=forms.EmailInput(
+            attrs={"class": "form-control", "placeholder": "Почта"}
+        ),
+    )
+    password1 = forms.CharField(
+        label=False,
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control", "placeholder": "Пароль"}
+        ),
+    )
+    password2 = forms.CharField(
+        label=False,
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control", "placeholder": "Подтверждение пароля"}
+        ),
+    )
+
     # Как правило класс мета задает настройки для формы
     class Meta:
         model = User
-        fields = ('first_name', 'last_name', 'phone_number', 'email')
+        fields = ("first_name", "last_name", "phone_number", "email")
+
+    def __init__(self, *args, **kwargs):
+        # Извлекаем переданный объект до вызова родительского __init__
+        self.current_user = kwargs.pop("current_user", None)
+        super().__init__(*args, **kwargs)
 
     # Функции клин всегда как правило предоставляют предобработку перед сохранением
     def clean_email(self):
-        email = self.cleaned_data.get('email').strip().lower()
+        email = self.cleaned_data.get("email").strip().lower()
+        print(self.current_user.email)
+        print(email)
+        if self.current_user and self.current_user.email == email:
+            print("Тот же емаил")
+            return email
+
         if User.objects.filter(email=email).exists():
+            print("Тот же емаил")
             raise forms.ValidationError("Пользователь с таким email уже существует")
         return email
 
     def clean_password2(self):
-        password1 = self.cleaned_data.get('password1')
-        password2 = self.cleaned_data.get('password2')
+        password1 = self.cleaned_data.get("password1")
+        password2 = self.cleaned_data.get("password2")
         if password1 and password2 and password1 != password2:
             raise forms.ValidationError("Пароли не совпадают")
         return password2
-    
+
     def clean_first_name(self):
-        name = self.cleaned_data.get('first_name')
+        name = self.cleaned_data.get("first_name")
         # Проверка на пустоту
         if not name.strip():
             raise forms.ValidationError("Имя не может быть пустым!")
@@ -48,7 +92,7 @@ class CustomUserCreationForm(forms.ModelForm):
         return formatted_name
 
     def clean_last_name(self):
-        lst_name = self.cleaned_data.get('last_name')
+        lst_name = self.cleaned_data.get("last_name")
         # Проверка на пустоту
         if not lst_name.strip():
             raise forms.ValidationError("Фамилия не может быть пустой!")
@@ -60,14 +104,17 @@ class CustomUserCreationForm(forms.ModelForm):
         return formatted_name
 
     def clean_phone_number(self):
-        phone = self.cleaned_data.get('phone_number')
 
+        phone_number = self.cleaned_data.get("phone_number")
+
+        print(self.current_user.phone_number)
+        print(phone_number)
         """
         Форматирует номер телефона в стандартный вид: +7 (XXX) XXX-XX-XX
         Принимает различные форматы ввода.
         """
         # Удаляем все нецифровые символы
-        digits = ''.join(c for c in phone if c.isdigit())
+        digits = "".join(c for c in phone_number if c.isdigit())
 
         # Проверка длины номера
         if len(digits) < 10 or len(digits) > 11:
@@ -75,35 +122,56 @@ class CustomUserCreationForm(forms.ModelForm):
 
         # Обработка номера без кода страны
         if len(digits) == 10:
-            digits = '7' + digits
+            digits = "7" + digits
 
         # Проверка кода страны
-        if digits[0] not in ['7', '8']:
+        if digits[0] not in ["7", "8"]:
             raise forms.ValidationError("Номер должен начинаться с 7 или 8!")
 
         # Форматирование номера
-        formatted_number = '+7 {} {}-{}-{}'.format(
-        digits[1:4], digits[4:7], digits[7:9], digits[9:11]
+        formatted_number = "+7 {} {}-{}-{}".format(
+            digits[1:4], digits[4:7], digits[7:9], digits[9:11]
         )
+
+        if self.current_user and self.current_user.phone_number == phone_number:
+            print("Тот же телефон у пользователя")
+            return formatted_number
+
+        if User.objects.filter(phone_number=formatted_number).exists():
+            print("Тот же номер!")
+            raise forms.ValidationError("Пользователь с номером уже существует!")
 
         return formatted_number
 
     # Функция сейв непосредственно соханяет данные из формы
     def save(self, commit=True):
         user = super().save(commit=False)
-        user.email = self.cleaned_data['email']
-        user.first_name = self.cleaned_data['first_name']
-        user.last_name = self.cleaned_data['last_name']
-        raw_password = self.cleaned_data['password1']
+        user.email = self.cleaned_data["email"]
+        user.username = user.email
+        user.first_name = self.cleaned_data["first_name"]
+        user.last_name = self.cleaned_data["last_name"]
+        raw_password = self.cleaned_data["password1"]
         hashed_password = make_password(raw_password)
         user.password = hashed_password
-        user.phone_number = self.cleaned_data['phone_number']
+        user.phone_number = self.cleaned_data["phone_number"]
         if commit:
             user.save()
         return user
 
+
 class LoginForm(AuthenticationForm):
     """Форма для аутентификации пользователей"""
-    username = forms.EmailField(label=False, max_length=255,widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Почта'}))
-    password = forms.CharField(label=False, widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Пароль'}))
-    
+
+    username = forms.EmailField(
+        label=False,
+        max_length=255,
+        widget=forms.EmailInput(
+            attrs={"class": "form-control", "placeholder": "Почта"}
+        ),
+    )
+    password = forms.CharField(
+        label=False,
+        widget=forms.PasswordInput(
+            attrs={"class": "form-control", "placeholder": "Пароль"}
+        ),
+    )

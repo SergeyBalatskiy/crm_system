@@ -7,33 +7,41 @@
         display: none !important;
         width: 0px !important;
         background: transparent !important;
-    }
+    }   
     .div-box {
         overflow: hidden !important;
         -ms-overflow-style: none !important;
     }
 </style>
+    <div class='div-place-services'>
 
-<div class="div-place">
-    <!-- Добавили overflow-y: auto прямо в style, чтобы скролл работал, но полосы не было -->
-    <div class="div-box workers-page-container" style="align-items: stretch; justify-content: flex-start; text-align: left; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
-
-        <div class="crm-profile-wrapper" style="width: 100%; max-width: 100%;">
+        <div class="div-box-services">
             
             <!-- Общий контейнер-сетка (2 колонки) -->
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start;">
                 
                 <!-- ЛЕВАЯ КОЛОНКА -->
                 <div style="display: flex; flex-direction: column; gap: 14px;">
-                    
-                    <!-- Приветствие -->
-                    <div style="background: #ffffff; padding: 14px 16px; border-radius: 10px; border: 1px solid #ebedf2;">
-                        <h1 style="font-size: 1.2rem; font-weight: 700; color: #3f4254; margin: 0 0 2px 0;">
-                            Здравствуйте, {{ user.first_name|default:user.username }}! 👋
-                        </h1>
-                        <p style="color: #7e8299; font-size: 0.8rem; margin: 0;">Вот сводка по вашему сервисному центру.</p>
-                    </div>
+                   <!-- Приветствие -->
+<div style="background: #ffffff; padding: 14px 16px; border-radius: 10px; border: 1px solid #ebedf2; display: flex; justify-content: space-between; align-items: center;">
+    
+    <!-- Текст слева -->
+    <div>
+        <h1 style="font-size: 1.2rem; font-weight: 700; color: #3f4254; margin: 0 0 2px 0;">
+            Здравствуйте, {{ user.first_name|default:user.username }}! 👋
+        </h1>
+        <p style="color: #7e8299; font-size: 0.8rem; margin: 0;">Вот сводка по вашему сервисному центру.</p>
+    </div>
 
+    <!-- Кнопка справа -->
+    <form method="post" action="{% url 'logout' %}" style="margin: 0;">
+        {% csrf_token %}
+        <button type="submit" style="background: #ffe2e5; color: #f1416c; border: none; padding: 8px 14px; border-radius: 6px; font-weight: 600; font-size: 0.89rem; cursor: pointer;">
+            <i class="fa-solid fa-right-from-bracket"></i> Выйти из аккаунта
+        </button>
+    </form>
+    
+</div>
                     <!-- Метрики -->
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
                         <div style="background: #ffffff; padding: 10px; border-radius: 10px; border: 1px solid #ebedf2;">
@@ -112,16 +120,6 @@
                         <div id="financial-results-container">
                             {% include "profile_user/partials/finance_history_list.html" %}
                         </div>
-                    </div>
-
-                    <!-- Кнопка выхода -->
-                    <div style="text-align: right;">
-                        <form method="post" action="{% url 'logout' %}" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" style="background: #ffe2e5; color: #f1416c; border: none; padding: 6px 12px; border-radius: 6px; font-weight: 600; font-size: 0.75rem; cursor: pointer; margin: 0;">
-                                <i class="fa-solid fa-right-from-bracket"></i> Выйти из аккаунта
-                            </button>
-                        </form>
                     </div>
 
                 </div>
