@@ -19,6 +19,11 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -29,8 +34,14 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ryb-crm.ru", "www.ryb-crm.ru"]
 
+CSRF_TRUSTED_ORIGINS = [
+    "http://127.0.0.1:8000"
+    "http://localhost:8000"
+    "http://ryb-crm.ru"
+    "http://www.ryb-crm.ru"
+]
 
 # Application definition
 # Применение новых приложений
@@ -193,3 +204,7 @@ TINYMCE_DEFAULT_CONFIG = {
 }
 
 TINYMCE_JS_URL = "https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.min.js"
+
+SESSION_COOKIE_AGE = 86400
+
+SESSION_SAVE_EVERY_REQUEST = True
