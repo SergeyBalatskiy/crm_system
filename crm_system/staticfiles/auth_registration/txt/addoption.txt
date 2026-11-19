@@ -1,0 +1,110 @@
+<div>
+    <textarea class="tinymce" cols="80" data-mce-conf="{"theme": "silver", "height": 600, "menubar": "file edit view insert format tools table help", "plugins": "\n        advlist autolink lists link image charmap preview anchor\n        searchreplace visualblocks code fullscreen insertdatetime media table\n        code help wordcount\n    ", "toolbar": "\n        undo redo | formatselect | bold italic underline strikethrough |\n        forecolor backcolor | alignleft aligncenter alignright alignjustify |\n        bullist numlist outdent indent | removeformat |\n        link image media | table | code visualblocks fullscreen | help\n    ", "contextmenu": "link image table", "branding": false, "promotion": false, "language_url": "/static/langs/ru.js", "language": "ru", "directionality": "ltr", "strict_loading_mode": 1, "selector": "#id_content"}" id="id_content" name="content" rows="30"><div style="font-family: Arial, sans-serif; font-size: 11pt; color: #000; line-height: 1.2;"><!-- КВИТАНЦИЯ 1 -->
+<p style="font-size: 16pt; font-weight: bold; margin: 0 0 5px 0;">Квитанция № &amp;lt;НомерЗаказа&amp;gt; от &amp;lt;ДатаВыдачи&amp;gt;</p>
+<hr style="border: none; border-top: 1px solid #000; margin: 5px 0 10px 0;">
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;" border="0">
+<tbody>
+<tr>
+<td style="width: 15%; padding: 2px 0; font-weight: bold;">Исполнитель:</td>
+<td style="padding: 2px 0;">&amp;lt;НазваниеОрганизации&amp;gt;</td>
+</tr>
+<tr>
+<td style="padding: 2px 0; font-weight: bold;">Адрес:</td>
+<td style="padding: 2px 0;">&amp;lt;АдресОрганизации&amp;gt;</td>
+</tr>
+<tr>
+<td style="padding: 2px 0; font-weight: bold;">Телефон:</td>
+<td style="padding: 2px 0;">+7 (900) 636 72-55</td>
+</tr>
+<tr>
+<td style="padding: 2px 0; font-weight: bold;">Заказчик:</td>
+<td style="padding: 2px 0;">&amp;lt;Контрагент&amp;gt;</td>
+</tr>
+<tr>
+<td style="padding: 2px 0; font-weight: bold;">Телефон:</td>
+<td style="padding: 2px 0;">&amp;lt;НомерКонтрагента&amp;gt;&amp;nbsp;</td>
+</tr>
+</tbody>
+</table>
+<p style="margin: 4px 0;"><strong>Марка/Модель:</strong> &amp;lt;Марка&amp;gt; &amp;lt;Модель&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Комплектация:</strong> &amp;lt;Комплектация&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Внешний вид:</strong> &amp;lt;ВнешнийВид&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Причина ремонта со слов заказчика:</strong> &amp;lt;Неисправность&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Предоплата:</strong> &amp;lt;Предоплата&amp;gt; руб.</p>
+<p style="margin: 4px 0;"><strong>Ориентировочная стоимость ремонта:</strong> &amp;lt;ОриентировочнаяСтоимостьРемонта&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Ориентировочная дата готовности:</strong> &amp;lt;ОриентировочнаяДатаГотовности&amp;gt;</p>
+<p style="margin: 4px 0 8px 0;"><strong>Примечание:</strong> &amp;lt;КомментарийПриемщика&amp;gt;</p>
+<ol style="font-size: 9.5pt; margin: 0 0 10px 0; padding-left: 20px; line-height: 1.15;">
+<li style="margin-bottom: 2px;">Технический центр не несет ответственности за возможную потерю данных в памяти устройства, связанную с заменой плат, установкой программного обеспечения, заменой носителя информации.</li>
+<li style="margin-bottom: 2px;">Заказчик принимает на себя риск возможной полной или частичной утраты работоспособности устройства в процессе ремонта (тепловой обработки), в случае грубых нарушений пользователем условий эксплуатации, наличия следа попадания токопроводящей жидкости (коррозии), либо механических повреждений.</li>
+<li style="margin-bottom: 2px;">На восстановленные после попадания жидкости на устройство гарантия не распространяется и не продлевается.</li>
+<li style="margin-bottom: 2px;">Срок бесплатного хранения устройства составляет 30 дней с момента приема его в ремонт. В случае, если по истечении указанного срока клиентом не заявлено требование о выдаче устройства, оно принимается на ответственное хранение. Стоимость услуг по ответственному хранению составляет ____ руб. в сутки. Максимальный срок ответственного хранения составляет 30 дней. В случае, если в течение указанного срока Клиент не потребует возврата устройства, устройство утилизируется без компенсации его стоимости клиенту.</li>
+<li style="margin-bottom: 2px;">В случае отказа заказчика от ремонта устройства стоимость диагностики неисправности платная.</li>
+<li>В случае утери квитанции, устройство выдается по предъявлению паспорта на имя заказчика.</li>
+</ol>
+<table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10pt;">
+<tbody>
+<tr>
+<td style="width: 50%;">Исполнитель: _____________________ / <strong>&amp;lt;МенеджерСокр&amp;gt;</strong></td>
+<td style="width: 50%; text-align: right;">_______________________ / <strong>&amp;lt;КонтрагентСокр&amp;gt;</strong></td>
+</tr>
+</tbody>
+</table>
+<p style="text-align: right; font-size: 9pt; margin: 2px 0 15px 0;">с условием гарантии ознакомлен и согласен</p>
+<hr style="border: none; border-top: 2px dashed #000; margin: 20px 0;"><!-- КВИТАНЦИЯ 2 (Корешок) -->
+<p style="font-size: 16pt; font-weight: bold; margin: 0 0 5px 0;">Квитанция № &amp;lt;НомерЗаказа&amp;gt; от &amp;lt;ДатаВыдачи&amp;gt;</p>
+<hr style="border: none; border-top: 1px solid #000; margin: 5px 0 10px 0;">
+<table style="width: 100%; border-collapse: collapse; margin-bottom: 8px;" border="0">
+<tbody>
+<tr>
+<td style="width: 15%; padding: 2px 0; font-weight: bold;">Исполнитель:</td>
+<td style="padding: 2px 0;">&amp;lt;НазваниеОрганизации&amp;gt;</td>
+</tr>
+<tr>
+<td style="padding: 2px 0; font-weight: bold;">Адрес:</td>
+<td style="padding: 2px 0;">&amp;lt;АдресОрганизации&amp;gt;</td>
+</tr>
+<tr>
+<td style="padding: 2px 0; font-weight: bold;">Телефон:</td>
+<td style="padding: 2px 0;">&amp;lt;Телефон сервиса&amp;gt;</td>
+</tr>
+<tr>
+<td style="padding: 2px 0; font-weight: bold;">Заказчик:</td>
+<td style="padding: 2px 0;">&amp;lt;Контрагент&amp;gt;</td>
+</tr>
+<tr>
+<td style="padding: 2px 0; font-weight: bold;">Телефон:</td>
+<td style="padding: 2px 0;">&amp;lt;НомерКонтрагента&amp;gt;</td>
+</tr>
+</tbody>
+</table>
+<p style="margin: 4px 0;"><strong>Марка/Модель:</strong> &amp;lt;Марка&amp;gt; &amp;lt;Модель&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Комплектация:</strong> &amp;lt;Комплектация&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Внешний вид:</strong> &amp;lt;ВнешнийВид&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Причина ремонта со слов заказчика:</strong> &amp;lt;Неисправность&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Предоплата:</strong> &amp;lt;Предоплата&amp;gt; руб.</p>
+<p style="margin: 4px 0;"><strong>Ориентировочная стоимость ремонта:</strong> &amp;lt;ОриентировочнаяСтоимостьРемонта&amp;gt;</p>
+<p style="margin: 4px 0;"><strong>Ориентировочная дата готовности:</strong> &amp;lt;ОриентировочнаяДатаГотовности&amp;gt;</p>
+<p style="margin: 4px 0 8px 0;"><strong>Примечание:</strong> &amp;lt;КомментарийПриемщика&amp;gt;</p>
+<ol style="font-size: 9.5pt; margin: 0 0 10px 0; padding-left: 20px; line-height: 1.15;">
+<li style="margin-bottom: 2px;">Технический центр не несет ответственности за возможную потерю данных в памяти устройства, связанную с заменой плат, установкой программного обеспечения, заменой носителя информации.</li>
+<li style="margin-bottom: 2px;">Заказчик принимает на себя риск возможной полной или частичной утраты работоспособности устройства в процессе ремонта (тепловой обработки), в случае грубых нарушений пользователем условий эксплуатации, наличия следа попадания токопроводящей жидкости (коррозии), либо механических повреждений.</li>
+<li style="margin-bottom: 2px;">На восстановленные после попадания жидкости на устройство гарантия не распространяется и не продлевается.</li>
+<li style="margin-bottom: 2px;">Срок бесплатного хранения устройства составляет 30 дней с момента приема его в ремонт. В случае, если по истечении указанного срока клиентом не заявлено требование о выдаче устройства, оно принимается на ответственное хранение. Стоимость услуг по ответственному хранению составляет ____ руб. в сутки. Максимальный срок ответственного хранения составляет 30 дней. В случае, если в течение указанного срока Клиент не потребует возврата устройства, устройство утилизируется без компенсации его стоимости клиенту.</li>
+<li style="margin-bottom: 2px;">В случае отказа заказчика от ремонта устройства стоимость диагностики неисправности платная.</li>
+<li>В случае утери квитанции, устройство выдается по предъявлению паспорта на имя заказчика.</li>
+</ol>
+<table style="width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 10pt;">
+<tbody>
+<tr>
+<td style="width: 50%;">Исполнитель: _____________________ / <strong>&amp;lt;МенеджерСокр&amp;gt;</strong></td>
+<td style="width: 50%; text-align: right;">_______________________ / <strong>&amp;lt;КонтрагентСокр&amp;gt;</strong></td>
+</tr>
+</tbody>
+</table>
+<p style="text-align: right; font-size: 9pt; margin: 2px 0 0 0;">с условием гарантии ознакомлен и согласен</p>
+</div></textarea>
+    
+      
+    
+</div>

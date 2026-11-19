@@ -1,0 +1,98 @@
+.div-place-form-removal {
+    width: 100%;
+    height: 100%;
+}
+
+.div-box-form-removal {
+     position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+
+/* Основной контейнер */
+.div-place-services {
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.div-box-services {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+
+a .django-form input[type=number]::-webkit-outer-spin-button,
+.django-form input[type=number]::-webkit-inner-spin-button {
+    -webkit-appearance: none !important;
+    margin: 0;
+}
+
+.django-form input[type=number] {
+    -moz-appearance: textfield !important;
+}
+
+.django-form input {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+/* Выравниваем заголовок и селект в один ряд */
+.page-header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+
+.navigation-form-select {
+    margin-top: 3px;
+}
+
+.page-title {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #8759f3;
+}
+
+/* Стилизация выпадающего списка */
+.custom-select {
+    padding: 8px 12px;
+    font-size: 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    min-width: 320px;
+}
+
+.custom-select:focus {
+    border-color: #7444e4;
+    box-shadow: 0 0 0 2px rgba(70, 24, 117, 0.1);
+}

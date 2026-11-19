@@ -1,0 +1,371 @@
+
+body {
+    background-color: #c9d6ff;
+    background: linear-gradient(to right, #e2e2e2, #c9d6ff);
+    display: flex;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 100vh;
+    margin: 0;
+}
+
+/* --- ВЫЕЗЖАЮЩИЕ ПОДМЕНЮ В САЙДБАРЕ --- */
+
+/* Делаем родительский пункт относительным, чтобы подменю позиционировалось от него */
+.site-nav li.has-submenu {
+    position: relative;
+}
+
+/* 3. Стили самого выпадающего блока (скрыт по умолчанию) */
+.site-nav .submenu {
+    position: absolute;
+    left: 100%; /* Выезжает ровно за правый край */
+    top: 0;
+    width: 220px; /* Чуть шире, чтобы текст влезал */
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.15); /* Тень чуть темнее для объема */
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+    z-index: 9999;
+    
+    /* Скрываем по умолчанию */
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Стили самого выпадающего блока */
+.submenu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    width: 200px;
+    background-color: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 4px 4px 15px rgba(0, 0, 0, 0.1);
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+    z-index: 9999; /* Высокий приоритет */
+    
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(-10px);
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Появление при наведении на родительский li */
+.site-nav li.has-submenu:hover .submenu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(0);
+}
+
+.site-nav li.has-submenu {
+    position: relative;
+}
+
+/* 5. Стилизация пунктов внутри выпадающего меню */
+.site-nav .submenu li a {
+    display: block !important;
+    width: auto !important; /* Убираем жесткую ширину 100%, чтобы padding не ломал размер */
+    box-sizing: border-box !important; /* Гарантируем, что padding не увеличит ширину */
+    padding: 10px 20px !important;
+    color: #3f4254 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    background: transparent !important;
+    border-radius: 0 !important;
+    transition: background-color 0.2s ease, color 0.2s ease !important;
+}
+
+/* Убираем "хвосты" (псевдоэлементы) у ссылок внутри подменю */
+.site-nav .submenu li a::before,
+.site-nav .submenu li a::after {
+    display: none !important;
+}
+
+.site-nav .submenu li a::before,
+.site-nav .submenu li a::after,
+.site-nav .submenu li::before {
+    display: none !important;
+}
+
+.site-nav .submenu li a:hover {
+    background-color: #f4f0ff !important; /* Нежный фиолетовый фон */
+    color: #8950fc !important;            /* Фиолетовый текст */
+    padding-left: 24px !important;        /* Легкий сдвиг текста вправо для эффекта */
+}
+
+.site-nav .submenu li {
+    margin-top: 0 !important; /* Убираем отступ сверху */
+    height: auto !important;
+}
+
+.site-nav li.has-submenu a::before,
+.site-nav li.has-submenu a::after {
+    display: none !important;
+    content: none !important;
+}
+
+.site-nav li.has-submenu::before {
+    border-radius: 30px 0 0 30px !important;
+}
+
+.site-nav .submenu li::before {
+    display: none !important; /* Убираем фиолетовую полоску */
+}
+
+
+/* Стили для ссылок внутри подменю */
+.submenu li a {
+    display: block;
+    padding: 10px 20px;
+    color: #475569;
+    font-size: 15px;
+    text-decoration: none;
+    transition: background-color 0.2s, color 0.2s;
+}
+
+.submenu li a:hover {
+    background-color: #f4f0ff; /* Светло-фиолетовый фон при наведении */
+    color: #8950fc; /* Твой фиолетовый цвет */
+}
+
+/* Основной контейнер */
+.div-place-services {
+    width: 100%;
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.div-box-services {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+  
+/* Основной контейнер */
+.div-place {
+    width: 100%;
+    height: 100%;
+}
+
+.div-workers-page-containervices {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+
+
+.main-content {
+    margin-left: 200px;
+    padding: 40px;
+    min-height: 100vh;
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(10px);
+}
+
+    .site-header {
+        overflow: visible; /* Это важно */
+        position: fixed;
+        left: 40px;
+        top: 40px;
+        width: 240px;
+        height: calc(100vh - 117px);
+        border-radius: 30px;
+        background-color: #fff;
+        display: flex;
+        flex-direction: column;
+        padding: 20px 0 20px 20px;
+        box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+        z-index: 1; /* Чтобы сайдбар был поверх контента */
+    }
+
+.div-box {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+
+    background-color: #fff;
+    border-radius: 30px;
+    box-shadow: 13px 13px 13px rgba(0, 0, 0, 0.364);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow-y: auto;
+}
+
+.div-box button {
+    margin-top: 25px;
+    padding: 10px 30px;
+    background-color: #8950fc;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.div-box button:hover {
+    background-color: rgb(103, 58, 208);
+}
+
+.site-header .logo {
+    text-align: center;
+    width: 100%;
+    margin-top: 20px;
+    margin-bottom: 30px;
+    padding-right: 20px;
+}
+
+.site-header .logo a {
+    text-decoration: none;
+    color: #8950fc;
+    font-weight: 700;
+    letter-spacing: 2px;
+    font-size: 26px;
+}
+
+.site-nav {
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.site-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.site-nav:hover {
+    scrollbar-color: #8950fc transparent;
+}
+
+.site-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.site-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.site-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.site-nav::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 10px;
+    transition: background-color 0.2s ease;
+}
+
+.site-nav:hover::-webkit-scrollbar-thumb {
+    background-color: #8950fc;
+}
+
+.site-nav li {
+    margin-top: 15px;
+    position: relative;
+    height: 54px;
+}
+
+.site-nav a {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    text-decoration: none;
+    color: #8950fc;
+    font-weight: 600;
+    z-index: 3;
+    transition: color 0.3s ease;
+    padding: 0 20px;
+}
+
+.site-nav li:hover a {
+    color: #fff;
+}
+
+.site-nav a i {
+    color: rgb(30, 48, 80);
+    transition: color 0.3s ease;
+}
+
+.site-nav li:hover a i {
+    color: #fff;
+}
+
+.site-nav li::before {
+    content: '';
+    position: absolute;
+    top: 5px;
+    right: 0;
+    height: 80%;
+    width: 0;
+    opacity: 0;
+    background: #8950fc;
+    border-radius: 30px 0 0 30px;
+    transition: width 0.4s ease, opacity 0.15s ease;
+    z-index: 1;
+}
+
+.site-nav li:hover::before {
+    width: 100%;
+    opacity: 1;
+}
+
+.site-nav .bottom-nav {
+    margin-top: auto;
+    padding-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.site-nav a i {
+    margin-right: 10px;
+}

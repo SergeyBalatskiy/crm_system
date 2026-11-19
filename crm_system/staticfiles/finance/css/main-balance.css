@@ -1,0 +1,340 @@
+.div-place-form-balance {
+    width: 100%;
+    height: 100%;
+}
+
+.div-box-form-balance {
+    position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #ffffff;
+    border-radius: 24px;
+    box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    /* Было overflow-y: auto — теперь фиксируем */
+    box-sizing: border-box;
+}
+
+/* Шапка */
+.finance-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.header-title-box {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    /* Расстояние между кнопками (можно уменьшить до 8px или увеличить по вкусу) */
+}
+
+.header-title-box h2 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: #8950fc
+}
+
+/* Баланс кассы */
+.cash-card-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #f1f5f9;
+    padding: 8px 16px;
+    border-radius: 14px;
+    font-size: 18px;
+    color: #334155;
+}
+
+.cash-card-badge i {
+    color: #8950fc;
+    font-size: 18px;
+}
+
+.cash-card-badge strong {
+    color: #0f172a;
+    font-size: 17px;
+}
+
+/* Кнопка редиректа */
+.btn-action-insert {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #8950fc;
+    color: #ffffff;
+    padding: 10px 20px;
+    border-radius: 14px;
+    font-weight: 600;
+    font-size: 16px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.btn-action-insert:hover {
+    background-color: #7444e4;
+    transform: translateY(-1px);
+}
+
+/* Фильтры */
+.filter-toolbar {
+    display: grid;
+    /* 4 колонки: поиск (растягивается), тип (140px), категория (160px), даты (180px) */
+    grid-template-columns: minmax(250px, 1fr) 270px 280px 270px;
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+    position: relative;
+    overflow: visible !important;
+    z-index: 20;
+}
+
+.search-input-wrapper {
+        position: relative;
+    width: 100%;
+}
+
+.search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+}
+
+.search-input-wrapper input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.search-input-wrapper input:focus {
+    border-color: #7444e4;
+    background-color: #fff;
+}
+
+.custom-select {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background-color: #f8fafc;
+    font-size: 14px;
+    color: #334155;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* Блок дат */
+.date-filter-container {
+    position: relative;
+    width: 100%;    
+}
+
+.date-range-wrapper {
+     position: absolute;
+    top: calc(100% + 4px);
+    right: 0;
+    width: 260px;
+    background-color: #fff;
+    border: 1px solid #7444e4;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1050;
+    box-sizing: border-box;
+}
+
+.date-range-wrapper.hidden {
+    display: none !important;
+}
+
+.date-field {
+        display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #64748b;
+}
+
+.date-input {
+    width: 100%;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 6px 8px;
+    font-size: 13px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.btn-reset-date {
+    background: #fee2e2;
+    border: none;
+    color: #dc2626;
+    border-radius: 6px;
+    padding: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+.btn-reset-date:hover {
+    color: #ef4444;
+}
+
+/* Скролл-зона карточек */
+.history-list-scrollable {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-list-scrollable::-webkit-scrollbar {
+    width: 6px;
+}
+
+.history-list-scrollable::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+/* Карточка истории */
+.finance-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 18px 20px;
+    transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.finance-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+
+.finance-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.product-title strong {
+    font-size: 16px;
+    color: #0f172a;
+}
+
+.code-badge {
+    margin-left: 8px;
+    background-color: #f1f5f9;
+    color: #64748b;
+    font-size: 12px;
+    padding: 3px 8px;
+    border-radius: 8px;
+}
+
+.status-badge {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.badge-success {
+    background-color: #dcfce7;
+    color: #166534;
+}
+
+.badge-danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.finance-card-body {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    background-color: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+}
+
+.info-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.info-cell.full-width {
+    grid-column: span 3;
+}
+
+.info-label {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.info-value {
+    font-size: 14px;
+    color: #334155;
+    font-weight: 500;
+}
+
+.price-value {
+    font-weight: 700;
+}
+
+.text-green {
+    color: #16a34a;
+}
+
+.text-red {
+    color: #dc2626;
+}
+
+.finance-card-footer {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 0;
+    color: #94a3b8;
+}
+
+.empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}

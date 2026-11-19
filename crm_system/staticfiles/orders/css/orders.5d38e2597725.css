@@ -1,0 +1,1434 @@
+/* Затемнение заднего фона */
+.drawer-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(2px);
+    z-index: 609;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+/* МАГИЯ: Если в контейнере оплаты появился контент (открыта оплата), 
+   автоматически поднимаем оверлей ВЫШЕ шторки клиента (1000), 
+   но оставляем ниже оплаты (1050) */
+body:has(#payment-drawer-container:not(:empty)) .drawer-overlay.active {
+    z-index: 1045 !important;
+}
+
+#payment-drawer-container {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 1050; /* Поверх всего */
+}
+
+.drawer-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.btn-close-drawer {
+    background: transparent;
+    border: none;
+    color: #7e8299;
+    font-size: 1.3rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-close-drawer:hover {
+    color: #f64e60;
+}
+
+/* Область прокрутки */
+.drawer-sections-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: #f8f9fa;
+}
+
+/* Секции формы */
+.form-section {
+    background: #7444e4;
+    padding: 20px;
+    border-radius: 10px;
+    border: 1px solid #7444e4 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.01);
+}
+
+.section-title {
+    margin: 0 0 16px 0;
+    font-size: 0.85rem;
+    color: #8950fc;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 700;
+}
+
+.section-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+/* Метки полей */
+.form-label {
+    font-size: 0.82rem;
+    color: #3f4254;
+    font-weight: 600;
+    margin-bottom: 6px;
+    display: block;
+}
+
+.req-star {
+    color: #f64e60;
+    margin-left: 2px;
+}
+
+/* Поля ввода и Textarea */
+.custom-input,
+.custom-textarea {
+    width: 100% !important;
+    padding: 10px 14px !important;
+    background: #fcfcfc !important;
+    border: 1px solid #e4e6ef !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    color: #3f4254 !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+.custom-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-group:has(.custom-textarea) {
+    grid-column: span 2;
+}
+
+/* Фокус на полях */
+.custom-input:focus,
+.custom-textarea:focus {
+    border-color: #8950fc !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.12) !important;
+}
+
+/* Чекбоксы / тумблеры */
+.form-group-checkbox-wrapper {
+    grid-column: span 2;
+    background: #f8f9fa;
+    padding: 12px 16px;
+    border-radius: 8px;
+    border: 1px solid #ebedf2;
+}
+
+.toggle-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbccd2;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-switch input:checked+.toggle-slider {
+    background-color: #8950fc;
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+    transform: translateX(20px);
+}
+
+/* Футер и кнопки */
+.drawer-footer {
+    flex-shrink: 0;
+    padding: 16px 24px;
+    background: #ffffff;
+    border-top: 1px solid #ebedf2;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.02);
+}
+
+.btn-secondary {
+    background: #e1effe;
+    color: #7333ea;
+    border: none;
+    padding: 8.9px 14px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-secondary:hover {
+    background: #d1e5fe;
+    transform: translateY(-1px);
+}
+
+/* Выпадающие подсказки */
+.client-dropdown-suggestions,
+.custom-hints-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    border: 1px solid #8950fc;
+    border-radius: 6px;
+    z-index: 1050;
+    max-height: 180px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-top: 4px;
+    padding: 0;
+    list-style: none;
+}
+
+.suggestion-item,
+.custom-hints-dropdown li {
+    padding: 9px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f2;
+    font-size: 0.88rem;
+    color: #3f4254;
+    transition: background 0.15s;
+}
+
+.suggestion-item:hover,
+.custom-hints-dropdown li:hover {
+    background: #f4f0ff;
+    color: #8950fc;
+}
+
+.client-dropdown-suggestions:empty,
+.custom-hints-dropdown:empty {
+    display: none !important;
+    border: none !important;
+}
+
+/* Общие стили для текстовых и числовых полей ввода */
+#drawer-content-loader input[type="text"],
+#drawer-content-loader input[type="number"],
+#drawer-content-loader input.form-control {
+    width: 100% !important;
+    height: 42px !important;
+    padding: 8px 14px !important;
+    background: #fcfcfc !important;
+    border: 1px solid #e4e6ef !important;
+    border-radius: 8px !important;
+    font-size: 0.9rem !important;
+    color: #3f4254 !important;
+    outline: none !important;
+    transition: all 0.2s ease !important;
+    box-sizing: border-box !important;
+}
+
+/* Эффект при фокусе (клик в поле) */
+#drawer-content-loader input[type="text"]:focus,
+#drawer-content-loader input[type="number"]:focus,
+#drawer-content-loader input.form-control:focus {
+    border-color: #8950fc !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.12) !important;
+}
+
+/* Поле только для чтения (Код товара) */
+#drawer-content-loader input.readonly-input {
+    background: #f3f6f9 !important;
+    color: #7e8299 !important;
+    cursor: not-allowed !important;
+}
+
+/* Настройка внешнего вида виджетов Select2 под дизайн полей */
+#drawer-content-loader .select2-container--default .select2-selection--single {
+    height: 42px !important;
+    padding: 6px 12px !important;
+    background: #fcfcfc !important;
+    border: 1px solid #e4e6ef !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    transition: all 0.2s ease !important;
+}
+
+#drawer-content-loader .select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #3f4254 !important;
+    line-height: normal !important;
+    padding-left: 0 !important;
+    font-size: 0.9rem !important;
+}
+
+#drawer-content-loader .select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 40px !important;
+    right: 10px !important;
+}
+
+/* Фокус на Select2 */
+#drawer-content-loader .select2-container--default.select2-container--focus .select2-selection--single,
+#drawer-content-loader .select2-container--default.select2-container--open .select2-selection--single {
+    border-color: #8950fc !important;
+    box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.12) !important;
+    background: #ffffff !important;
+}
+
+/* Панель, выезжающая справа */
+.order-drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 43vw;
+    min-width: 580px;
+    height: 100vh !important;
+    /* Жестко фиксируем высоту экрана */
+    background: #ffffff;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden !important;
+    /* Запрещаем скролл всей шторки целиком */
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+}
+
+.section-fields {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    /* Ровно две колонки */
+    gap: 14px;
+    /* Отступы между полями */
+}
+
+#drawer-content-loader {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.order-drawer.active {
+    transform: translateX(0);
+    /* Выезжает в зону видимости */
+}
+
+/* Внутренние блоки формы */
+.drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    background: #ffffff;
+    border-bottom: 1px solid #8950fc;
+    flex-shrink: 0;
+    /* Запрещает шапке сжиматься */
+}
+
+.drawer-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #8950fc;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-close-drawer {
+    background: transparent;
+    border: none;
+    color: #a2a3b7;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.btn-close-drawer:hover {
+    color: #f64e60;
+}
+
+.drawer-form-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    /* Занимает всю доступную высоту */
+    min-height: 0;
+    /* Критично для корректной работы скролла во флексе */
+    overflow: hidden;
+    /* Прячем общие скроллы, оставляя их только у секций */
+    margin: 0;
+}
+
+/* Прокручиваемый блок с секциями */
+.drawer-sections-wrapper {
+    flex: 1;
+    min-height: 0 !important;
+    /* КРИТИЧНО: заставляет блок ограничиваться высотой и скроллиться */
+    overflow-y: auto !important;
+    /* Включает вертикальную прокрутку */
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Кастомный красивый скроллбар */
+.drawer-sections-wrapper::-webkit-scrollbar {
+    width: 6px;
+}
+
+.drawer-sections-wrapper::-webkit-scrollbar-track {
+    background: #1e1e2d;
+}
+
+.drawer-sections-wrapper::-webkit-scrollbar-thumb {
+    background: #ffffff;
+    border-radius: 4px;
+}
+
+.drawer-sections-wrapper::-webkit-scrollbar-thumb:hover {
+    background: #3699ff;
+}
+
+.form-section {
+    background: #ffffff;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #7444e4;
+}
+
+.section-title {
+    margin: 0 0 14px 0;
+    font-size: 0.95rem;
+    color: #8950fc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group {
+    margin-bottom: 0;
+    /* Убираем старый margin-bottom, так как теперь есть gap в grid */
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.form-group:has(.custom-textarea) {
+    grid-column: span 2;
+}
+
+.form-label {
+    font-size: 0.90rem;
+    color: #080808;
+}
+
+.req-star {
+    color: #f64e60;
+}
+
+.custom-input,
+.custom-select,
+.custom-textarea {
+    width: 100%;
+    padding: 9px 12px;
+    background: #f2f1f1dc;
+    border: 1px solid #8950fc;
+    border-radius: 6px;
+    color: #000000;
+    font-size: 15px;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.custom-input:focus,
+.custom-select:focus,
+.custom-textarea:focus {
+    border-color: #8950fc;
+    box-shadow: 0 0 0 3px rgba(137, 80, 252, 0.15);
+}
+
+.drawer-footer {
+    flex-shrink: 0 !important;
+    /* Запрещает кнопкам сжиматься */
+    padding: 16px 24px;
+    background: #ffffff;
+    border-top: 1px solid #e4e6ef;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+/* 1. Заставляем лоадер контента внутри шторки растягиваться на всю высоту и работать как flex-колонку */
+#drawer-content-loader {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    max-height: 100vh !important;
+    overflow: hidden !important;
+}
+
+/* 2. Контейнер формы должен занимать остаток пространства и сжиматься */
+#form-change {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+}
+
+/* 3. Сама форма тоже становится флекс-колонкой */
+.drawer-form-body {
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+}
+
+/* 4. Обертка с полями получает долгожданный скролл */
+.drawer-sections-wrapper {
+    flex: 1 !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    /* Включает скролл */
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* 5. Футер жестко фиксируется внизу */
+.drawer-footer {
+    flex-shrink: 0 !important;
+    padding: 16px 24px;
+    background: #ffffff;
+    border-top: 1px solid #8950fc;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-submit-order {
+    background: #8950fc;
+    color: #fff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-submit-order:hover {
+    background: #7033e1;
+    transform: translateY(-1px);
+}
+
+.custom-autocomplete-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.custom-hints-dropdown {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    /* Белый фон вместо серого */
+    border: 1px solid #8950fc;
+    /* Фиолетовая рамка вместо красной */
+    border-radius: 6px;
+    z-index: 1050;
+    max-height: 180px;
+    overflow-y: auto;
+    margin: 4px 0 0 0;
+    padding: 0;
+    list-style: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.custom-hints-dropdown li {
+    padding: 9px 12px;
+    color: #3f4254;
+    /* Темный читаемый текст вместо белого */
+    cursor: pointer;
+    font-size: 0.88rem;
+    border-bottom: 1px solid #f1f1f2;
+    transition: background 0.15s, color 0.15s;
+}
+
+.custom-hints-dropdown li:hover {
+    background: #f4f0ff;
+    /* Нежный фиолетовый фон при наведении */
+    color: #8950fc;
+}
+
+.btn-cancel {
+    background: #f10000;
+    color: #ffffff;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    background: #ce0101;
+    transform: translateY(-1px);
+    /* Легкий эффект приподнимания при наведении */
+}
+
+/* Контейнер для подсказок под инпутом */
+.client-dropdown-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: #ffffff;
+    /* Белый фон */
+    border: 1px solid #8950fc;
+    /* Фиолетовая рамка */
+    border-radius: 6px;
+    z-index: 1050;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    margin-top: 4px;
+}
+
+/* Элемент списка подсказок */
+.suggestion-item {
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    border-bottom: 1px solid #f1f1f2;
+    transition: background 0.15s;
+}
+
+.suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.suggestion-item:hover {
+    background: #f4f0ff;
+}
+
+.suggestion-item .client-name {
+    color: #3f4254;
+    /* Темный цвет имени */
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.suggestion-item .client-phone {
+    color: #8950fc;
+    /* Фиолетовый акцент для телефона/роли */
+    font-size: 0.85rem;
+}
+
+/* Полностью скрываем блоки подсказок, если они пустые (чтобы не было лишних полос под инпутами) */
+.client-dropdown-suggestions:empty,
+.custom-hints-dropdown:empty {
+    display: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.type_of_order_select {
+    border-bottom: 1px solid #8950fc;
+    /* Нейтральная линия границы */
+    background-color: #ffffff;
+    /* Белый фон, чтобы под ним ничего не просвечивало */
+}
+
+/* Контейнер для чекбоксов в ряд */
+.custom-options-row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Современный стильный чекбокс */
+.modern-checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 0.88rem;
+    color: #e4e6ef;
+    user-select: none;
+    background: #8950fc;
+    padding: 10px 14px;
+    border-radius: 6px;
+    border: 1px solid #3f3f5a;
+    transition: all 0.2s ease;
+    flex: 1;
+    min-width: 140px;
+}
+
+.modern-checkbox-label:hover {
+    border-color: #8950fc;
+    background: #8950fc;
+}
+
+.modern-checkbox-label input[type="checkbox"] {
+    display: none;
+    /* Скрываем стандартный неуклюжий чекбокс */
+}
+
+/* Кастомный квадратик */
+.modern-checkbox-box {
+    width: 18px;
+    height: 18px;
+    background: #8950fc;
+    border: 2px solid #8950fc;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+/* Состояние при чеке */
+.modern-checkbox-label input[type="checkbox"]:checked~.modern-checkbox-box {
+    background: #8950fc;
+    border-color: #8950fc;
+}
+
+.modern-checkbox-label input[type="checkbox"]:checked~.modern-checkbox-box::after {
+    content: "\f00c";
+    /* Иконка галочки FontAwesome */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 10px;
+    color: #fff;
+}
+
+/* Плавное появление блока суммы предоплаты */
+.prepay-amount-container {
+    animation: fadeInPrepay 0.25s ease-in-out;
+}
+
+@keyframes fadeInPrepay {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Общий контейнер */
+.crm-orders-wrapper {
+    width: 100%;
+    height: 100%;
+}
+
+.crm-orders-container {
+  position: fixed;
+    left: 320px;
+    top: 40px;
+    right: 40px;
+    height: calc(100vh - 80px);
+    background-color: #f8fafc;
+    border-radius: 24px;
+      box-shadow: 8px 8px 8px rgba(0, 0, 0, 0.276);
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+
+/* Верхняя панель */
+.crm-top-panel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.crm-title-block {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.crm-title-block h2 {
+    margin: 0;
+    font-size: 1.6rem;
+    color: #8950fc;
+    font-weight: 700;
+}
+
+.crm-counter {
+    background: #e0f2fe;
+    color: #8950fc;
+    padding: 4px 12px;
+    border-radius: 30px;
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.crm-btn-create {
+    background: #8950fc;
+    color: #fff;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.crm-btn-create:hover {
+    background: #7345d1;
+}
+
+
+
+.crm-search-box .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 0.9rem;
+}
+
+.crm-search-box input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+
+.crm-select:focus {
+    border-color: #2563eb;
+}
+
+/* 5. Селект ВНУТРИ блока дат (чтобы он занимал 100% своей обертки) */
+.crm-date-wrapper select.crm-select {
+    width: 100%;
+}
+
+select.crm-select {
+    width: 100%;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box; /* Важно, чтобы padding не увеличивал ширину */
+}
+
+.crm-custom-dates {
+    position: absolute;
+    top: calc(100% + 4px); /* Отступ от селекта */
+    right: 0; /* Прижимаем к правому краю, чтобы не вылезал за экран */
+    width: 260px; /* Фиксируем ширину, чтобы поля не были гигантскими */
+    background: #fff;
+    border: 1px solid #8950fc; /* Фиолетовая рамка */
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 1050;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    box-sizing: border-box;
+}
+
+.crm-custom-dates.hidden {
+    display: none;
+}
+
+.crm-date-input {
+        width: 100%;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.85rem;
+    color: #374151;
+    background: #f9fafb; /* Легкий серый фон, чтобы выделить поле */
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.crm-date-input:focus {
+    border-color: #8950fc;
+    background: #ffffff;
+}
+
+.crm-date-reset {
+    width: 100%;
+    background: #fee2e2;
+    border: none;
+    color: #dc2626;
+    border-radius: 6px;
+    padding: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.crm-date-reset:hover {
+    background: #fecaca;
+}
+
+/* Скролл и сетка карточек */
+.crm-cards-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Контейнер тумблера */
+.toggle-switch-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    user-select: none;
+    margin-top: 5px;
+}
+
+/* Оболочка переключателя */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 46px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+/* Скрываем стандартный чекбокс */
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+/* Дорожка тумблера */
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #a1a1a1fe;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 24px;
+    border: 1px solid #3f3f5f;
+}
+
+/* Бегущий кружок */
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+    background-color: #ffffff;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 50%;
+}
+
+/* Состояние при включении (checked): сдвиг кружка вправо и смена цвета */
+.toggle-switch input:checked+.toggle-slider {
+    background-color: #8950fc;
+    border-color: #8950fc;
+}
+
+.toggle-switch input:checked+.toggle-slider:before {
+    transform: translateX(22px);
+}
+
+.crm-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 16px;
+    align-items: stretch;
+    padding-top: 6px;
+}
+
+.crm-order-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    height: 220px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    box-sizing: border-box;
+    position: relative;
+    overflow: visible !important;
+    /* Обязательно, чтобы меню не обрезалось границами карточки */
+    z-index: 1;
+    /* Базовый слой для всех карточек */
+}
+
+/* Автоматически поднимаем карточку со словом "активно/открыто" поверх остальных */
+.crm-order-card:has(.status-popover-box[style*="display: block"]) {
+    z-index: 100 !important;
+    /* Эта карточка теперь всегда поверх соседей снизу */
+}
+
+/* Скрываем стрелочки для Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Стили для красивого селекта валюты/процентов */
+.discount-select {
+    background-color: #f3f6f9;
+    color: #3f4254;
+    border: 1px solid #ebedf2;
+    border-left: none; /* убираем двойную границу между инпутом и селектом */
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    padding: 0 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    outline: none;
+    /* Убираем стандартную стрелочку в некоторых браузеры и заменяем своей */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%237e8299' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 4px center;
+    background-size: 14px;
+    padding-right: 20px;
+}
+
+.discount-select:hover {
+    background-color: #e4e6ef;
+    border-color: #d1d3de;
+}
+
+.discount-select:focus {
+    border-color: #8950fc;
+    box-shadow: 0 0 0 2px rgba(137, 80, 252, 0.15);
+    background-color: #fff;
+}
+
+/* Скрываем стрелочки для Firefox */
+input[type="number"] {
+    -moz-appearance: textfield;
+}
+
+.crm-order-card:hover {
+    border-color: #8950fc;
+    box-shadow: 0 8px 20px #6e41c82d;
+    transform: translateY(-1px);
+    /* Сделали поднятие чуть мягче */
+    z-index: 10;
+    /* Поднимаем карточку выше остальных соседей при наведении */
+}
+
+/* Ховер-эффект специально для СРОЧНЫХ карточек заказов */
+.order-card.urgent:hover {
+    /* Используем ту же структуру, но с другим цветом (например, красно-оранжевым под стиль «Срочно») */
+    box-shadow: 0 8px 20px rgba(245, 4, 24, 0.876);
+    /* Красноватый оттенок с прозрачностью */
+    transform: translateY(-1px);
+}
+
+.crm-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.crm-id-block {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.card-id {
+    font-weight: 700;
+    color: #0e0e0e;
+    font-size: 0.95rem;
+}
+
+.card-type-tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    background: #e3deebda;
+    color: #6c3eca;
+    padding: 2px 6px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+.crm-status-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.card-status {
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.crm-card-body {
+    /* Убираем жесткий flex: 1, который сжимает блок */
+    flex: 0 0 auto !important; 
+    
+    /* Разрешаем блоку расти по высоте в зависимости от содержимого */
+    height: auto !important;
+    min-height: unset !important;
+    max-height: none !important;
+    
+    /* Гарантируем, что текст внутри не скрывается */
+    overflow: visible !important;
+    
+    margin-bottom: 12px;
+}
+
+.badge-urgent {
+    background: #fef3c7;
+    color: #d97706;
+    border: 1px solid #fde68a;
+    padding: 5.77px 10px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+/* Тело карточки */
+.device-info-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.device-ico {
+    font-size: 1.25rem;
+    color: #8950fc;
+    background: #eff6ff;
+    padding: 8px;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.device-name {
+    margin: 0 0 4px 0;
+    font-size: 0.98rem;
+    color: #0f172a;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.device-issue-wrapper {
+    height: 38px;
+    /* Выделяем ровно 2 строки текста */
+    overflow: hidden;
+}
+
+.device-text-block {
+    flex: 1;
+    min-width: 0;
+    /* Обязательно для правильной работы ellipsis */
+}
+
+.device-issue {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #475569;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    /* Максимум 2 строки */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+
+/* Эффект легкой пульсации для иконки молнии в шапке */
+@keyframes urgentPulse {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.15);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.crm-order-card.order-urgent .badge-urgent i {
+    animation: urgentPulse 1.8s infinite ease-in-out;
+}
+
+/* Стили для срочной карточки заказа (современный и аккуратный вид) */
+.crm-order-card.order-urgent {
+    border: 1px solid rgba(255, 152, 0, 0.25) !important;
+    /* Тонкая, ненавязчивая рамка */
+    background: linear-gradient(0deg, rgba(255, 152, 0, 0.015), rgba(255, 152, 0, 0.015)), #ffffff;
+    /* Очень легкий теплый оттенок фона */
+    box-shadow: 0 4px 14px rgba(255, 152, 0, 0.08);
+    /* Мягкая, дорогая тень */
+    position: relative;
+    overflow: hidden;
+}
+
+.crm-order-card.order-urgent:hover {
+    box-shadow: 0 8px 20px rgba(239, 80, 66, 0.3);
+    /* Красноватая тень */
+    transform: translateY(-1px);
+    border-color: #ff4757;
+    /* Опционально: усиление рамки при наведении */
+}
+
+/* Аккуратная вертикальная полоска-индикатор слева с градиентом */
+.crm-order-card.order-urgent::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 12px;
+    bottom: 12px;
+    width: 4px;
+    background: linear-gradient(180deg, #ff9800, #f44336);
+    /* Переход от оранжевого к кораллово-красному */
+    border-radius: 0 4px 4px 0;
+    /* Скругленные края полоски */
+}
+
+/* Стилизация бейджа «Срочно» внутри карточки */
+.crm-order-card .badge-urgent {
+    background: rgba(244, 67, 54, 0.1) !important;
+    color: #f44336 !important;
+    border: 1px solid rgba(244, 67, 54, 0.2) !important;
+    font-weight: 600;
+}
+
+.device-issue span {
+    color: #9ca3af;
+    font-weight: 500;
+}
+
+/* Футер карточки */
+.crm-card-footer {
+    margin-top: auto;
+    /* Прижимает футер строго к нижней границе */
+    border-top: 1px solid #e2e8f0;
+    padding-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 0.8rem;
+}
+
+.footer-client-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.footer-client-info i {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.client-phone {
+    color: #000000;
+    font-weight: 500;
+    margin-left: auto;
+    /* Номер телефона смещается вправо */
+    font-size: 0.8rem;
+}
+
+.footer-meta-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #94a3b8;
+    font-size: 0.75rem;
+}
+
+.meta-manager,
+.meta-date {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.crm-empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #9ca3af;
+    gap: 10px;
+}
+
+.crm-empty-state i {
+    font-size: 2.5rem;
+}
+
+/* --- ПАНЕЛЬ ФИЛЬТРОВ (Grid) --- */
+.crm-filter-bar {
+        display: grid;
+    /* Теперь поиск максимум 400px, а селекты растягиваются */
+    grid-template-columns: minmax(200px, 400px) 1fr 1fr 1fr; 
+    gap: 12px;
+    margin-bottom: 20px;
+    align-items: center;
+    position: relative;
+    overflow: visible !important;
+    z-index: 20;
+}
+
+/* --- ПОИСК (занимает свою колонку) --- */
+.crm-search-box {
+    position: relative;
+    width: 100%;
+}
+
+.crm-search-box input {
+    width: 100%;
+    padding: 10px 14px 10px 40px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+}
+
+/* --- СЕЛЕКТЫ (Тип и Статус) --- */
+.crm-select {
+    width: 100%; /* Занимает ровно свою колонку */
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 0.9rem;
+    color: #374151;
+    outline: none;
+    cursor: pointer;
+    box-sizing: border-box;
+}
+
+/* --- БЛОК ДАТ --- */
+.crm-date-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Селект внутри блока дат (чтобы не ломал сетку) */
+.crm-date-wrapper .crm-select {
+    width: 100%;
+}
