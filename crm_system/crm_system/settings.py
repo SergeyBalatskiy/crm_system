@@ -37,10 +37,10 @@ DEBUG = False
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ryb-crm.ru", "www.ryb-crm.ru"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000"
-    "http://localhost:8000"
-    "http://ryb-crm.ru"
-    "http://www.ryb-crm.ru"
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "http://ryb-crm.ru",
+    "http://www.ryb-crm.ru",
 ]
 
 # Application definition
