@@ -34,15 +34,13 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["localhost", "ryb-crm.ru", "www.ryb-crm.ru", "127.0.0.1" ]
 
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:8000",
     "http://localhost:8000",
-    "http://ryb-crm.ru",
     "https://ryb-crm.ru",
     "https://www.ryb-crm.ru",
-    "http://www.ryb-crm.ru",
 ]
 
 # Application definition
