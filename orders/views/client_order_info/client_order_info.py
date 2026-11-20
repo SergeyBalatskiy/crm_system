@@ -90,7 +90,7 @@ class ShowClientOrder(View):
                 )
                 if not prepay_amount.isdigit():
                     prepay_amount = 0
-
+                prepay_amount = int(prepay_amount)
             else:
                 prepay_amount = 0
 
