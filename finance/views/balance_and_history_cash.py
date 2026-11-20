@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from finance.models import CashAccount, FinanceHistoryInfo
 from django.shortcuts import render
-from django.db.models import Q, TextField, F
+from django.db.models import Q, TextField
 from django.views import View
 from django.db.models.functions import Cast
 from datetime import timedelta

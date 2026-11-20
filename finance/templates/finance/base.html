@@ -11,18 +11,17 @@
         integrity="sha384-Q+Dky3iHVJOr6wUjQ4ulh6uQ76an/t+ak1+PjMVaxRjbZamFLAG+u9InkfjbsEQf"
         crossorigin="anonymous"></script>
 
-    <!-- Select2 / для DAL -->
+    
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script type="text/javascript" src="{% static 'autocomplete_light/autocomplete_light.js' %}"></script>
     <script type="text/javascript" src="{% static 'autocomplete_light/select2.js' %}"></script>
 
-   {% comment %} -- JS -- {% endcomment %}
     <script src="{% static 'finance/js/buy_sell_other.js' %}" defer></script>
     <script src="{% static 'finance/js/buy_other.js' %}" defer></script>
     <script src="{% static 'finance/js/sell_other.js' %}" defer></script>
 
-    <!-- Статика CSS -->
+  
     <link rel="stylesheet" href="{% static 'finance/css/buy_sell_other.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
     <link rel="stylesheet" href="{% static 'profile_user/css/stylesheet.css' %}" type="text/css">
@@ -39,7 +38,7 @@
                 <li><a href="{% url 'orders' %}"><i class="fa-regular fa-address-card"></i>Заказы</a></li>
                 <li><a href="{% url 'services_work' %}"><i class="fa-solid fa-hand-holding-dollar"></i>Услуги</a></li>
 
-                <!-- Склад с подменю -->
+          
                 <li class="has-submenu">
                     <a href="{% url 'main-storage' %}"><i class="fa-solid fa-store"></i>Склад</a>
                     <ul class="submenu">
@@ -49,7 +48,7 @@
                     </ul>
                 </li>
 
-                <!-- Финансы с подменю -->
+             
                 <li class="has-submenu">
                     <a href="{% url 'main_cash' %}"><i class="fa-solid fa-money-bill"></i>Финансы</a>
                     <ul class="submenu">

@@ -3,9 +3,6 @@ from django.views.generic.edit import UpdateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from profile_user.forms import ServiceInfoForm
-from profile_user.models import ServiceInfo
-from django.contrib import messages
 from django.urls import reverse_lazy
 from auth_registration.forms import CustomUserCreationForm
 

@@ -9,7 +9,6 @@
 <div class="div-place-form-balance">
     <div class="div-box-form-balance">
 
-        <!-- Верхняя шапка с кассой и кнопкой перенаправления -->
         <div class="finance-header">
             <div class="header-title-box">
                 <h2>История финансовых операций</h2>
@@ -19,7 +18,7 @@
                 </div>
             </div>
 
-            <!-- Кнопка перехода к внесению/списанию кассы -->
+          
             <div class="header-actions">
                 <a href="{% url 'insert_cash' %}" class="btn-action-insert">
                     <i class="fa-solid fa-circle-plus"></i> Продажа товара
@@ -34,23 +33,22 @@
             {% include 'finance/messages.html' %}
         </div>
 
-        <!-- Панель фильтров -->
+      
         <form id="filter-form" method="GET" action="{% url 'main_cash' %}" class="filter-toolbar">
             
-            <!-- Быстрый поиск -->
             <div class="search-input-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по названию, коду, сумме, комментарию..." autocomplete="off">
             </div>
 
-            <!-- Тип операции -->
+          
             <select class="custom-select" id="history_operation_select" name="selected_finance_operation" autocomplete="off">
                 <option value="">Все типы</option>
                 <option value="income">Поступление</option>
                 <option value="outcome">Исход / Списание</option>
             </select>
 
-            <!-- Категория -->
+        
             <select class="custom-select" id="history_category_select" name="selected_finance_category" autocomplete="off">
                 <option value="">Все категории</option>
                 <option value="Продажа">Продажа</option>
@@ -60,7 +58,7 @@
                 <option value="Прочее">Прочее</option>
             </select>
 
-            <!-- Селект даты / Диапазон -->
+   
             <div class="date-filter-container">
                 <select class="custom-select" id="history_date_select" name="search_date_operation" autocomplete="off">
                     <option value="">За всё время</option>
@@ -88,7 +86,6 @@
 
         </form>
 
-        <!-- Контейнер карточек -->
         <div class="history-list-scrollable" id="history-list-container">
             {% include 'finance/partials/history-list.html' %}
         </div>

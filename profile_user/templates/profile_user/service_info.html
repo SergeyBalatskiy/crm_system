@@ -7,11 +7,11 @@
 
 <div class="div-place">
     <div class="div-box service-page-container">
-        <!-- Заголовок и подзаголовок -->
+
         <h1 class="main-page-title">Здравствуйте, {{ user.first_name }} {{ user.last_name }}!</h1>
         <p class="subtitle">Давайте настроим все так, как вам хочется!</p>
 
-        <!-- Карточка формы -->
+        
         <div class="service-card">
             <form method="post" class="service-form">
                 {% csrf_token %}

@@ -5,13 +5,12 @@
 
 <div class="container" id="container">
     
-    <!-- ФОРМА РЕГИСТРАЦИИ -->
     <div class="form-container sign-up">
         <form method="post" action="{% url 'registration' %}">
             <h1>Создание аккаунта</h1>
             {% csrf_token %}
             
-            <!-- ПОЛЯ ВВОДА (вне social-icons) -->
+  
             <div class="form-fields">
                 {% for field in registration_form %}
                     <div class="form-group">
@@ -25,7 +24,7 @@
                 {% endfor %}
             </div>
 
-            <!-- Общие ошибки формы -->
+   
             {% if registration_form.non_field_errors %}
                 <div class="error-message" style="color: red; font-size: 12px; margin-top: 4px;">
                     {{ registration_form.non_field_errors.0 }}
@@ -36,7 +35,7 @@
         </form>
     </div>
 
-    <!-- ФОРМА ВХОДА -->
+
     <div class="form-container sign-in">
         <form method="post" action="{% url 'login' %}">
             <h1>Вход в аккаунт</h1>
@@ -55,7 +54,7 @@
                 {% endfor %}
             </div>
 
-            <!-- Общие ошибки формы (например, "Неверный логин или пароль") -->
+         
             {% if login_form.non_field_errors %}
                 <div class="error-message" style="color: red; font-size: 12px; margin-top: 4px;">
                     {{ login_form.non_field_errors.0 }}
@@ -67,7 +66,7 @@
         </form>
     </div>
 
-    <!-- ПЕРЕКЛЮЧАТЕЛЬ (СЛАЙДЕР) -->
+
     <div class="toggle-container">
         <div class="toggle">
             <div class="toggle-panel toggle-left">

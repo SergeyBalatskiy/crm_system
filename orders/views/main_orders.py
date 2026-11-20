@@ -4,23 +4,18 @@ from django.shortcuts import render
 from django.db.models import Q, TextField
 from django.views import View
 from orders.models import Orders
-from services.forms import ServicesWorkForm
 from django.views.decorators.cache import never_cache
-from django.db import transaction
 from django.http import HttpResponse
-from django.urls import reverse
-from django.contrib import messages
 from datetime import datetime, timedelta
 import json
 from django.db.models.functions import Cast
-from django.db.models import Count
 from django.shortcuts import render
-from django.db.models import Q, Value
+from django.db.models import Q
 from django.utils import timezone
-from django.db.models.functions import Concat
+
 
 # Данный класс отвечает за показ всех созданных заявок на ремонт (orders) + фильтр через уже знакомый метод
-@method_decorator([login_required, never_cache], name='dispatch') 
+@method_decorator([login_required, never_cache], name="dispatch")
 class ShowAndFilterOrders(View):
 
     # Надо еще подумать над тем, нужна ли она вообще здесь...
@@ -28,28 +23,25 @@ class ShowAndFilterOrders(View):
     def htmx_toast_error(message):
         """Возвращает 204 No Content"""
         response = HttpResponse(status=204)
-        response['HX-Trigger'] = json.dumps({
-            'showToast': {
-                'level': 'error',
-                'message': message
-            }
-        })
+        response["HX-Trigger"] = json.dumps(
+            {"showToast": {"level": "error", "message": message}}
+        )
         return response
-    
+
     def get(self, request, *args, **kwargs):
 
         # Получаю абсолютно все заявки на ремонт (Действующие / Готовые / Выданные / Отложенные)
         # Фильтрую по самому свежему заказу!
-        qs = Orders.objects.filter(user=request.user).order_by('-created_at')
+        qs = Orders.objects.filter(user=request.user).order_by("-created_at")
 
         # Счетчик для показа только новых заказов:
-        new_counts = len(qs.filter(user=request.user, category_eng = 'new'))
+        new_counts = len(qs.filter(user=request.user, category_eng="new"))
         print(new_counts)
         # Если у нас НЕ пришел запрос через AJAX (или HTMX) — отдаем ТОЛЬКО кусок со списком
-        if not request.headers.get('HX-Request'):
-            context = {'orders' : qs, 'new_counts' : new_counts}
-            return render(request, 'orders/orders.html', context)
-        
+        if not request.headers.get("HX-Request"):
+            context = {"orders": qs, "new_counts": new_counts}
+            return render(request, "orders/orders.html", context)
+
         # В противном случае:
         # Для удобного будущего суммарного поиска через Q (или)
         main_q = Q()
@@ -65,69 +57,71 @@ class ShowAndFilterOrders(View):
         
         В быстром поиске он позволит опираясь на определенный обьект по айдишнику, доставать сразу же действующую фамилию, имя и 
         потом тут же выдавать нужный нам результат"""
-        qs = qs.annotate(
-            id_str=Cast('id', output_field=TextField()))
+        qs = qs.annotate(id_str=Cast("id", output_field=TextField()))
 
         # Поиск по статусу заказа
-        status = request.GET.get('search_status_order')
+        status = request.GET.get("search_status_order")
         if status:
             """Суть заключается в том, что выбранный нами статус уже и будет нести в себе нужный для нас фильтр в БД"""
-            # С POST-запроса может прийти следующий статус (от status = request.GET.get('search_status_order')):  
+            # С POST-запроса может прийти следующий статус (от status = request.GET.get('search_status_order')):
             # in_process, deferred, success, finished
             main_q &= Q(category_eng=status)
 
         # Поиск по типу заказа (ПЛАТНЫЙ / ГАРАНТИЙНЫЙ)
-        type_of_order_selected = request.GET.get('type_of_order_selected', '')
+        type_of_order_selected = request.GET.get("type_of_order_selected", "")
         if type_of_order_selected:
-            main_q &= Q(type_of_order = type_of_order_selected)
+            main_q &= Q(type_of_order=type_of_order_selected)
 
         # Поиск по "Быстрому поиску"
-        fast_search = request.GET.get('fast_search_all', '').strip()
+        fast_search = request.GET.get("fast_search_all", "").strip()
         if fast_search:
 
             # Тут у меня в будущем будет фильтр по определенным полям...
             text_q = (
-                Q(id_str__icontains=fast_search) | 
-                Q(manager__icontains=fast_search) |
-                Q(client__name__icontains=fast_search) | 
-                Q(client__phone__icontains=fast_search) |
-                Q(manager__icontains=fast_search) |
-                Q(device_type__icontains=fast_search) |
-                Q(color_of_device__icontains=fast_search) |
-                Q(name_of_device__icontains=fast_search) | 
-                Q(device_company__icontains=fast_search) | 
-                Q(problem_with_device__icontains=fast_search))
-                # Привязываю к глобальному поиску
-            main_q &=text_q
+                Q(id_str__icontains=fast_search)
+                | Q(manager__icontains=fast_search)
+                | Q(client__name__icontains=fast_search)
+                | Q(client__phone__icontains=fast_search)
+                | Q(manager__icontains=fast_search)
+                | Q(device_type__icontains=fast_search)
+                | Q(color_of_device__icontains=fast_search)
+                | Q(name_of_device__icontains=fast_search)
+                | Q(device_company__icontains=fast_search)
+                | Q(problem_with_device__icontains=fast_search)
+            )
+            # Привязываю к глобальному поиску
+            main_q &= text_q
 
         # Поиск по дате
-        date_selected = request.GET.get('search_date_operation')
+        date_selected = request.GET.get("search_date_operation")
         if date_selected:
             # Получение точного момента времени
             now = timezone.now()
             # Получение только даты (без времени)
             today = now.date()
             # Словарь с датами в зависимости от выбранного дня
-            dates_dict = {'date_today' : (today, now), 
-                        'date_yesterday' : (today - timedelta(days=1), today),
-                        'date_this_week' : (today - timedelta(days=7), now),
-                        'date_this_month' : (today - timedelta(days=30), now)
-                        }
+            dates_dict = {
+                "date_today": (today, now),
+                "date_yesterday": (today - timedelta(days=1), today),
+                "date_this_week": (today - timedelta(days=7), now),
+                "date_this_month": (today - timedelta(days=30), now),
+            }
             date_finded = dates_dict.get(date_selected)
             if date_finded:
                 main_q &= Q(created_at__range=date_finded)
 
         # Поиск по дате (состоит из СТАРТ и ФИНИШ)
-        date_start_input = request.GET.get('date_start_input')
-        date_end_input = request.GET.get('date_end_input')
-            # Если выбраны даты СТАРТ и ФИНИШ:
+        date_start_input = request.GET.get("date_start_input")
+        date_end_input = request.GET.get("date_end_input")
+        # Если выбраны даты СТАРТ и ФИНИШ:
         if date_start_input and date_end_input:
             # Получаю результат от СТАРТ до ФИНИШ
             date_end_input = datetime.strptime(date_end_input, "%Y-%m-%d").date()
-            main_q &= Q(created_at__range=(date_start_input, date_end_input+timedelta(days=1)))
-        
+            main_q &= Q(
+                created_at__range=(date_start_input, date_end_input + timedelta(days=1))
+            )
+
         # Тот обькт, что я выбрал раньше, я применяю к нему действующие фильтры
         qs = qs.filter(main_q)
-        context = {'orders': qs}
-        return render(request, 'orders/partials/orders_list.html', context)
-
+        context = {"orders": qs}
+        return render(request, "orders/partials/orders_list.html", context)

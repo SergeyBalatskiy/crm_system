@@ -1,25 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.shortcuts import render
-from django.db.models import Q, TextField
 from django.views import View
-from orders.models import Client
-from services.forms import ServicesWorkForm
 from django.views.decorators.cache import never_cache
-from django.db import transaction
 from django.http import HttpResponse
-from django.urls import reverse
-from django.contrib import messages
-from datetime import datetime, timedelta
-import json
+from datetime import datetime
 from num2words import num2words
 import re
-from django.db.models import Sum
-from django.db.models.functions import Cast
 from django.shortcuts import render
-from profile_user.models import WorkersInfo
-from django.db.models import Q, Value
-from django.db.models.functions import Concat
 from orders.models import Orders, CreateServiceWork
 from profile_user.models import DocumentInformation, ServiceInfo
 

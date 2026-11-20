@@ -77,7 +77,6 @@
     <div class="document-show-box">
         <div id="toast-container"></div>
 
-        <!-- Шапка -->
         <div class="header-row">
             <h1>Настройка документов</h1>
 
@@ -107,10 +106,8 @@
 
         <div id="hidden-data-container" style="display: none;"></div>
 
-        <!-- Блок редактора и панели -->
         <div id="editor-container" class="editor-layout" style="display: none;">
             
-            <!-- 1. РЕДАКТОР (Слева) -->
             <div class="editor-main">
                 <form id="editor-form" hx-post="{% url 'tiny_mce' %}" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
                     {% csrf_token %}
@@ -120,7 +117,6 @@
                 </form>
             </div>
 
-            <!-- 2. ПАНЕЛЬ ПЕРЕМЕННЫХ (Справа) -->
             <div class="variables-panel">
                 <h3>Доступные переменные</h3>
                 <p style="font-size: 0.75rem; color: #7e8299; margin-bottom: 15px;">
@@ -187,7 +183,7 @@
             </div>
         </div>
 
-        <!-- Нижние кнопки -->
+
         <div class="bottom-section">
             <div class="custom-divider"></div>
 

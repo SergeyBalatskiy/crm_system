@@ -95,7 +95,7 @@
                 
                 {% for field in get_personal_info %}
                     <div class="form-field-group">
-                        <!-- ХИТРОСТЬ: Проверяем, если label не False, тогда выводим -->
+                     
                         {% if field.label != False %}
                             <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 6px;">
                                 {{ field.label }}

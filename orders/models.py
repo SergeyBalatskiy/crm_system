@@ -3,9 +3,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from profile_user.models import WorkersInfo
-from storage.models import StorageInfo
-from auth_registration.models import Users
 from django.db.models import Sum
 
 User = get_user_model()

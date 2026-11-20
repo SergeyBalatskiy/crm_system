@@ -11,7 +11,6 @@
 <div class="form-editor-place">
     <div class="editor-page-wrapper-box">
 
-        <!-- Заголовок и селект выстроены в одну строку -->
         <div class="form-editor-header">
             <h1>Редактор форм</h1>
             <form method="get" class="navigation-form-select">
@@ -29,7 +28,6 @@
 
         <div id="show_new_form_create"></div>
 
-        <!-- Область с формой и сайдбаром (будет скроллиться только она) -->
         <div class="editor-page-layout">
             <div class="builder-main-content">
                 <div id="show-data-forms" class="builder-container">
@@ -52,7 +50,7 @@
             </aside>
         </div>
 
-        <!-- Разделительная полоса и футер со стрелками (зафиксированы внизу) -->
+     
         <hr class="custom-divider">
 
         <div class="categories-footer">
@@ -79,7 +77,6 @@
         <div class="save-bar-content">
             <button class="btn btn-primary" onclick="saveChanges()">Сохранить</button>
 
-            <!-- Обновленная кнопка Отмена -->
             <button type="button" class="btn btn-danger" onclick="cancelChanges()">
                 Отмена
             </button>
@@ -88,7 +85,6 @@
         </div>
     </div>
 
-    <!-- Оверлей модального окна для настройки авто-ответов -->
     <div id="field-settings-modal" class="modal-overlay hidden" onclick="if(event.target === this) closeFieldModal()">
         <div class="modal-card">
             <button type="button" class="modal-close-btn" onclick="closeFieldModal()">&times;</button>

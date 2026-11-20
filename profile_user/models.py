@@ -9,12 +9,6 @@ User = get_user_model()
 
 # Create your models here.
 class ServiceInfo(models.Model):
-    # Вот здесь САМОЕ ИНТЕРЕСНОЕ И ВЕСЕЛОЕ!!!
-    # Когда мы хотим соединить обьект из одной таблицы с другим обьектом
-    # из другой таблицы, то обязательно указываем OneToOneField
-    # С Аргументами: User,on_delete=models.CASCADE, primary_key=True
-    # Потому что таким образом мы гарантируем, что на 1 пользователя будет
-    # НЕ больше 1 нового обьекта
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, primary_key=True, related_name="service_info"
     )

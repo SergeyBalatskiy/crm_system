@@ -1,6 +1,5 @@
     <div style="display: flex; flex-direction: column; height: 100%; width: 100%; background: #f8f9fa; box-sizing: border-box; font-family: inherit;">
 
-    <!-- ШАПКА ОКНА -->
     <div class="drawer-header" style="flex-shrink: 0; padding: 18px 25px; background: #fff; border-bottom: 1px solid #ebedf2; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.01);">
         <h3 style="margin: 0; font-size: 1.1rem; color: #3f4254; display: flex; align-items: center; gap: 10px; font-weight: 600;">
             <i class="fa-solid fa-screwdriver-wrench" style="color: #8950fc;"></i> Ход работ и услуг (Заказ №{{ connected_id }})
@@ -8,14 +7,13 @@
         <button type="button" class="drawer-close-btn" onclick="closeWideOrderDrawer()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #7e8299; transition: color 0.2s;">&times;</button>
     </div>
 
-    <!-- Блок для системных ошибок или предупреждений -->
     {% if msg %}
         <div id="error-alert" style="flex-shrink: 0; margin: 15px 25px 0 25px; padding: 12px 15px; background: #ffe2e5; color: #f64e60; border-radius: 6px; font-size: 0.9rem; font-weight: 500; transition: opacity 0.5s ease;">
             <i class="fa-solid fa-triangle-exclamation"></i> 
             {{ msg }}
         </div>
     {% endif %}
-    <!-- Форма -->
+   
     <form hx-post="{% url 'create_service_work' %}" 
         hx-target="#drawer-content-loader" 
         hx-swap="innerHTML" 
@@ -24,20 +22,16 @@
         {% csrf_token %}
         <input type="hidden" name="get_id_order" value="{{ connected_id }}">
 
-        <!-- ЦЕНТРАЛЬНАЯ ОБЛАСТЬ (ДВЕ КОЛОНКИ НА ВСЮ ВЫСОТУ ОКОН) -->
         <div class="drawer-body" style="flex: 1; overflow: hidden; padding: 25px; display: flex; gap: 24px; align-items: stretch; box-sizing: border-box;">
 
-            <!-- ЛЕВАЯ КОЛОНКА: Форма добавления новой работы -->
             <div style="flex: 1; background: #ffffff; border: 1px solid #ebedf2; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; overflow-y: auto;">
                 <div style="font-size: 0.9rem; color: #3f4254; margin-bottom: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Добавить новую работу:</div>
 
-                <!-- 1. Название услуги -->
                 <div style="margin-bottom: 15px;">
                     <label style="font-size: 0.82rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.service_provided.label }}</label>
                     {{ create_work_form.service_provided }}
                 </div>
 
-                <!-- 2. Гарантия и 3. Цена (в одну строку) -->
                 <div style="display: flex; gap: 12px; margin-bottom: 15px;">
                     <div style="flex: 1;">
                         <label style="font-size: 0.82rem; color: #3f4254; display: block; margin-bottom: 5px; font-weight: 600;">{{ create_work_form.days_of_garanty.label }}</label>
@@ -49,13 +43,11 @@
                     </div>
                 </div>
 
-                <!-- Кнопка с плюсом для раскрытия деталей со склада -->
                 <div style="margin-top: 15px; border-top: 1px solid #ebedf2; padding-top: 15px;">
                     <button type="button" id="toggle-detail-btn" onclick="toggleDetailSection()" style="background: #f3f6f9; color: #8950fc; border: 1px dashed #8950fc; padding: 10px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; transition: all 0.2s;">
                         <i id="toggle-icon" class="fa-solid fa-plus"></i> <span id="toggle-text">Привязать деталь со склада</span>
                     </button>
 
-                    <!-- Скрытый блок деталей -->
                     <div id="detail-section-fields" style="display: none; margin-top: 15px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ebedf2;">
                         <div style="margin-bottom: 12px;">
                             <label style="font-size: 0.8rem; color: #7e8299; display: block; margin-bottom: 4px; font-weight: 600;">{{ create_work_form.detail_name_was_used.label }}</label>
@@ -75,7 +67,6 @@
                 </div>
             </div>
 
-            <!-- ПРАВАЯ КОЛОНКА: История выполненных работ, Скидка и Итог -->
             <div style="flex: 1; background: #ffffff; border: 1px solid #ebedf2; padding: 20px; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; overflow: hidden; min-width: 0;">
                 
                 <div style="flex-shrink: 0; font-size: 0.9rem; color: #3f4254; margin-bottom: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">История выполненных работ:</div>
@@ -141,7 +132,6 @@
                     {% endif %}
                 </div>
 
-               <!-- КРАСИВО ОФОРМЛЕННЫЙ БЛОК СКИДКИ -->
                 <div style="flex-shrink: 0; background: #f8f9fa; border: 1px solid #ebedf2; padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center;"
                     hx-get="{% url 'get_dsc' %}" 
                     hx-trigger="change, input delay:300ms from:input[name='discount_value']" 
@@ -156,7 +146,6 @@
                     <div style="display: flex; align-items: center; gap: 10px;">
                         <div class="input-group" style="display: flex; width: 140px; box-shadow: none; border-radius: 6px;">
                             
-                            <!-- Поле ввода с автообновлением значения из ответа сервера -->
                             <input type="number" 
                                 name="discount_value" 
                                 value="{{ get_dicount_later|default:0 }}" 
@@ -191,7 +180,6 @@
                                     }
                                 ">
                                                             
-                            <!-- Выпадающий список типов скидки -->
                             <select name="discount_type" class="form-select" style="max-width: 65px; padding: 0.375rem 0.5rem; border-top-right-radius: 6px; border-bottom-right-radius: 6px; border: none; box-shadow: none; outline: none;">
                                 <option value="rub" {% if get_dicount_later == 'rub' %}selected{% endif %}>₽</option>
                                 <option value="percent" {% if get_dicount_later == 'percent' %}selected{% endif %}>%</option>
@@ -200,14 +188,11 @@
                     </div>
                 </div>
 
-                <!-- Скрытый спан для работы HTMX-запроса -->
                 <span id="result-span" style="display: none;"></span>
 
-                <!-- Итоговая цена заказа (справа внизу) -->
                 <div id="final-total-block" 
                     style="flex-shrink: 0; background: linear-gradient(135deg, #8950fc 0%, #7333ea 100%); color: white; padding: 14px 18px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 10px rgba(137,80,252,0.2);">
                     
-                    <!-- Левая часть: актуальная скидка -->
                     <div style="display: flex; align-items: center; gap: 6px; font-size: 0.95rem; font-weight: 600;">
                         <span>Скидка:</span>
                         <span id="final-discount-span" style="font-weight: 700;">
@@ -215,7 +200,6 @@
                         </span>
                     </div>
 
-                    <!-- Правая часть: итоговая сумма -->
                     <div style="display: flex; align-items: center; gap: 6px;">
                         <span style="font-size: 15px; font-weight: 600;">Итого:</span>
                         <span id="final-price-span" style="font-size: 1.15rem; font-weight: 700;">
@@ -227,7 +211,6 @@
             </div>
         </div>
 
-        <!-- ФУТЕР С КНОПКАМИ -->
         <div class="drawer-footer" style="flex-shrink: 0; padding: 15px 25px; background: #fff; border-top: 1px solid #ebedf2; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 6px rgba(0,0,0,0.02);">
             <button type="button" class="btn-cancel" 
                     hx-get="{% url 'client_order' %}?get_id_order={{ connected_id }}"
@@ -304,7 +287,6 @@
             }
         });
 
-        // Перехват отправки формы для удаления пробелов перед отправкой в Django
         document.addEventListener('submit', function(e) {
             var form = e.target;
             if (form.matches('form') || form.querySelector('#id_service_price')) {
@@ -329,7 +311,6 @@
             }
         }, true);
 
-        // Защита числовых полей от букв, минусов и точек
         function initNumericValidations() {
             var numericFields = ['id_service_price', 'id_days_of_garanty', 'id_quantity_was_used'];
 

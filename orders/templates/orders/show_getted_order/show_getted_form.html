@@ -6,17 +6,15 @@
     class="drawer-form-body">
     {% csrf_token %}
 
-    <!-- Передаем ID заказа и тип заказа скрытыми полями -->
     <input type="hidden" name="id" value="{{ get_id }}">
     <input type="hidden" name="type_of_order" value="{{ get_order.type_of_order }}">
     
-    <!-- Шапка шторки -->
+    
     <div class="drawer-header" style="display: flex; justify-content: space-between; align-items: center;">
         <h3><i class="fa-solid fa-pen-to-square" style="color: #9d9d9e;"></i> Заявка #{{ get_order.id }}</h3>
-        
-        <!-- Правая часть шапки: сообщение + крестик -->
+
         <div style="display: flex; align-items: center; gap: 12px;">
-            <!-- Контейнер с сообщением -->
+       
             <div id="header-toast-container">
                 {% if save_success %}
                 <div id="header-success-msg" style="background: #e8fff3; color: #079521; padding: 6px 15px; border-radius: 6px; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; gap: 6px; border: 1px solid #c9f7f5; white-space: nowrap; transition: opacity 0.5s ease;">
@@ -41,7 +39,7 @@
         </div>
     </div>
 
-    <!-- Прокручиваемая область с динамическими секциями из формы -->
+  
     <div class="drawer-sections-wrapper">
         
         {% for section in sections %}
@@ -57,7 +55,7 @@
                             {% if field.is_required %}<span class="req-star">*</span>{% endif %}
                         </label>
 
-                        <!-- 1. Если это поиск клиентов (имя или телефон) -->
+                 
                         {% if field.field_key == 'name' or field.field_key == 'phone' %}
                             <input type="text" 
                                 name="{{ field.field_key }}" 
@@ -76,7 +74,7 @@
 
                             <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
 
-                        <!-- 2. Если это поиск работников (мастер или менеджер) -->
+               
                         {% elif field.field_key == 'master' or field.field_key == 'manager' %}
                             <input type="text" 
                                 name="{{ field.field_key }}" 
@@ -94,11 +92,11 @@
 
                             <div id="suggestions-{{ field.field_key }}" class="client-dropdown-suggestions"></div>
 
-                        <!-- 3. Текстовое поле (textarea) -->
+                   
                         {% elif field.type == 'textarea' %}
                             <textarea name="{{ field.field_key }}" class="custom-textarea" rows="3" {% if field.is_required %}required{% endif %}>{{ field.value|default:'' }}</textarea>
 
-                        <!-- 4. Поля с подсказками (hints) -->
+               
                         {% elif field.hints %}
                             <div class="custom-autocomplete-wrapper" style="position: relative;">
                                 <input type="text" 
@@ -118,7 +116,7 @@
                                 </ul>
                             </div>
 
-                        <!-- 5. Чекбоксы -->
+                
                         {% elif field.type == 'checkbox' %}
                             <div class="form-group-checkbox-wrapper">
                                 <label class="toggle-switch-container">
@@ -134,7 +132,6 @@
                                     <span class="form-label" style="margin-bottom: 0; cursor: pointer;">{{ field.label }}</span>
                                 </label>
 
-                                <!-- Блок предоплаты -->
                                 {% if field.field_key == 'prepay' %}
                                     <div id="prepay-amount-container" style="display: {% if get_order.prepay > 0 or field.value == 'true' or field.value == True %}block{% else %}none{% endif %}; margin-top: 12px;">
                                         <div style="font-size: 13px; color: #8950fc; margin-bottom: 6px; font-weight: 500;">
@@ -152,7 +149,6 @@
                                 {% endif %}
                             </div>
 
-                        <!-- 6. Стандартные поля ввода -->
                         {% else %}
                             <input type="{{ field.type|default:'text' }}" 
                                 name="{{ field.field_key }}" 
@@ -171,10 +167,8 @@
 
     </div>
 
-    <!-- Зафиксированный футер с красивыми и аккуратными кнопками -->
     <div class="drawer-footer" style="display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 12px 20px; background: #b866e8f8; border-top: 1px solid #ebedf2;">
         
-        <!-- Левая группа: Закрыть + Статус -->
         <div style="display: flex; align-items: center; gap: 8px;">
             <button type="button" class="btn-cancel" onclick="closeOrderDrawer()" style="padding: 8px 14px; background: #e9ecef; color: #495057; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem;">
                 Закрыть
@@ -198,10 +192,8 @@
             </div>
         </div>
 
-        <!-- Правая группа: Печать, Ход работ и Сохранить -->
         <div style="display: flex; align-items: center; gap: 8px;">
             
-            <!-- Кнопка печати с поповером -->
             <div style="position: relative; display: inline-block;">
                 <button type="button" 
                     hx-get="{% url 'print_document' %}?get_id_order={{ get_order.id }}" 
@@ -219,7 +211,6 @@
                 </div>
             </div>
 
-            <!-- Ход работ -->
             <button type="button" class="btn-secondary"
                 hx-get="{% url 'create_service_work' %}?get_id_order={{ get_order.id }}"
                 hx-target="#drawer-content-loader"
@@ -228,7 +219,6 @@
                 Ход работ
             </button>
 
-            <!-- Основная кнопка сохранения -->
             <button type="submit" class="btn-submit-order"
                 style="padding: 8px 16px; background: #8950fc; color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 0.9rem; white-space: nowrap; box-shadow: 0 4px 12px rgba(137,80,252,0.3);">
                 Сохранить

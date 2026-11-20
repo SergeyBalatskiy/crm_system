@@ -2,7 +2,7 @@
     
     <div style="font-size: 0.7rem; color: #3a393a; padding: 2px 4px; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; border-bottom: 1px solid #ebedf2; margin-bottom: 2px;">Изменить статус:</div>
     
-    <!-- Группа: В работе -->
+   
     {% if in_process %}
         <div style="font-size: 0.68rem; color: #3a393a; font-weight: 700; text-transform: uppercase; margin-top: 4px; padding-left: 4px;">В работе</div>
         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">
@@ -19,7 +19,7 @@
         </div>
     {% endif %}
 
-    <!-- Группа: Отложенные -->
+   
     {% if deferred %}
         <div style="font-size: 0.68rem; color: #3a393a; font-weight: 700; text-transform: uppercase; margin-top: 6px; padding-left: 4px; border-top: 1px solid #f1f1f2; padding-top: 6px;">Отложенные</div>
         <div style="display: flex; flex-direction: column; gap: 4px; align-items: flex-start;">

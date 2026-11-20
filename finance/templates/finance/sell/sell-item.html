@@ -8,7 +8,6 @@
 <div class="div-place-form-sell">
     <div class="div-box-form-sell">
         
-        <!-- Шапка страницы (Flexbox-контейнер только для H1 и Select) -->
         <div class="page-header-wrapper">
             <h1 class="page-title">Продажа товара</h1>
         </div>
@@ -62,7 +61,7 @@
                     </div>
 
                     <div class="table-actions">
-                        <!-- Явный вызов функции onclick -->
+         
                         <button type="button" onclick="addSellRow()" class="btn-add-row">
                             <i class="fa-solid fa-plus"></i> Добавить товар на продажу
                         </button>
@@ -74,7 +73,7 @@
                 </div>
             </form>
 
-            <!-- Скрытый шаблон новой строки -->
+     
             <template id="sell-row-template">
                 <tr class="django-form item-row">
                     <td class="row-number"></td>

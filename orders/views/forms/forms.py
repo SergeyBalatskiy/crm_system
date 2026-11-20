@@ -5,8 +5,7 @@ from django.views import View
 from orders.models import Client
 from django.views.decorators.cache import never_cache
 from django.db import transaction
-from django.db.models.functions import Cast
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.db.models import Q
 from profile_user.models import FormsForOrder
 from orders.models import Orders
@@ -14,7 +13,6 @@ from finance.models import CashAccount, FinanceHistoryInfo
 from django.db.models import F
 from django.http import HttpResponse
 from datetime import datetime
-import json
 
 
 # Данный класс отвечает за обращение в БД за получением формы и вывод ее

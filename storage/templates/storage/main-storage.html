@@ -12,22 +12,18 @@
 <div class="div-place-storage-history">
     <div class="div-box-storage-history">
 
-        <!-- Шапка -->
         <div class="history-header">
             <h2>Товары на складе</h2>
             <span class="history-count">Активных позиций: {{ storage_actual_items|length }}</span>
         </div>
 
-        <!-- Панель фильтров -->
         <form id="filter-form" method="GET" action="{% url 'main-storage' %}" class="filter-toolbar">
             
-            <!-- 1. Быстрый поиск -->
             <div class="search-input-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по названию, коду, поставщику..." autocomplete="off">
             </div>
 
-            <!-- 2. Тумблер "Заканчивается" -->
             <div class="toggle-wrapper">
                 <label class="switch">
                     <input type="checkbox" name="min_items_remainder" id="min-items-toggle" value="yes">
@@ -36,7 +32,6 @@
                 <span class="toggle-label">Мало на складе</span>
             </div>
 
-            <!-- 3. Диапазон дат -->
             <div class="date-range-wrapper">
                 <div class="date-field">
                     <label for="date_start_input">От:</label>
@@ -50,7 +45,6 @@
 
         </form>
 
-        <!-- Контейнер для списка карточек (обновляется через AJAX) -->
         <div class="history-list" id="main-list-container">
             {% include 'storage/partials/main-list.html' %}
         </div>

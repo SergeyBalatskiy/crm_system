@@ -1,7 +1,6 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'storage/css/messages.css' %}">
 
-<!-- Контейнер должен быть в DOM всегда -->
 <div class="messages-wrapper">
     {% if messages %}
         {% for message in messages %}

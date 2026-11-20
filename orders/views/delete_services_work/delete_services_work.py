@@ -1,9 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from services.models import ServicesInfo
 from dal_select2.views import Select2QuerySetView
-from django.db.models import Q, TextField
-from django.db.models.functions import Cast
 from orders.models import CreateServiceWork
 from django.db.models import Sum
 from storage.models import StorageInfo, HistoryStorageInfo

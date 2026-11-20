@@ -3,10 +3,8 @@
 
 {% block content %}
 
-<!-- Оверлей (затемнение фона) -->
 <div id="drawer-overlay" class="drawer-overlay" onclick="closeOrderDrawer()"></div>
 
-<!-- Выезжающая шторка -->
 <div id="order-drawer" class="order-drawer">
     <div id="drawer-content-loader"></div>
 </div>
@@ -14,7 +12,6 @@
 <div class="crm-orders-wrapper">
     <div class="crm-orders-container">
 
-        <!-- Верхняя панель управления -->
         <div class="crm-top-panel">
             <div class="crm-title-block">
                 <h2>Управление заказами</h2>
@@ -31,7 +28,6 @@
             </button>
         </div>
 
-        <!-- Панель фильтров (интерактивная) -->
         <form id="filter-form" method="GET" action="{% url 'orders' %}" class="crm-filter-bar"
               hx-get="{% url 'orders' %}"
               hx-trigger="input changed delay:300ms, change, refreshOrders from:body"
@@ -39,20 +35,17 @@
               hx-push-url="false"
               hx-swap="innerHTML">
             
-            <!-- Поиск -->
             <div class="crm-search-box">
                 <i class="fa-solid search-icon fa-magnifying-glass"></i>
                 <input type="text" name="fast_search_all" value="{{ request.GET.fast_search_all }}" placeholder="Поиск по клиенту, телефону, модели или ID..." autocomplete="new-password">
             </div>
 
-            <!-- Тип заказа -->
             <select class="crm-select" name="type_of_order_selected" autocomplete="new-password">
                 <option value="">Все типы</option>
                 <option value="paid" {% if request.GET.type_of_order_selected == 'paid' %}selected{% endif %}>Платный</option>
                 <option value="warranty" {% if request.GET.type_of_order_selected == 'warranty' %}selected{% endif %}>Гарантийный</option>
             </select>
 
-            <!-- Статус -->
             <select class="crm-select" name="search_status_order" autocomplete="new-password">
                 <option value="">Все статусы</option>
                 <option value="new" {% if request.GET.search_status_order == 'new' %}selected{% endif %}>Новые</option>
@@ -63,10 +56,7 @@
              
             </select>
 
-            <!-- Даты -->
-            <!-- Даты -->
 <div class="crm-date-wrapper">
-    <!-- Основной селект для быстрого выбора -->
     <select class="crm-select" id="history_date_select" name="search_date_operation" autocomplete="new-password" onchange="toggleDateRange(this)" style="width: 100%;">
         <option value="">За всё время</option>
         <option value="date_today" {% if request.GET.search_date_operation == 'date_today' %}selected{% endif %}>Сегодня</option>
@@ -76,7 +66,6 @@
         <option value="custom" {% if request.GET.search_date_operation == 'custom' %}selected{% endif %}>📅 Период...</option>
     </select>
 
-    <!-- Выпадающий блок с датами (скрыт по умолчанию, если не выбран custom) -->
     <div class="crm-custom-dates {% if request.GET.search_date_operation != 'custom' %}hidden{% endif %}" id="custom-date-range">
         <input type="date" name="date_start_input" value="{{ request.GET.date_start_input }}" class="crm-date-input" autocomplete="new-password">
         <input type="date" name="date_end_input" value="{{ request.GET.date_end_input }}" class="crm-date-input" autocomplete="new-password">
@@ -85,7 +74,6 @@
 </div>
         </form>
 
-        <!-- Сетка карточек заказов (сюда HTMX подгружает только список) -->
         <div id="orders-container" class="crm-cards-scroll">
             {% include "orders/partials/orders_list.html" %}
         </div>

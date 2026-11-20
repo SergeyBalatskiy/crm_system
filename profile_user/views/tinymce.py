@@ -1,9 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.urls import path
 from profile_user.forms import DocumentInfoForm
 from profile_user.models import DocumentInformation
 from django.http import HttpResponse

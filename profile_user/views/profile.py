@@ -1,20 +1,14 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.urls import path
-from django.contrib.auth.models import User
 from orders.models import Orders
 from finance.models import CashAccount, FinanceHistoryInfo
 from django.shortcuts import render
 from django.db.models import Sum
-from datetime import timedelta
-from datetime import datetime
 from django.http import JsonResponse
-from django.utils import timezone
-from django.db.models import Q, TextField, F
-from django.db.models.functions import TruncMonth
+from django.db.models import Q
 
 
 # Функция, которая отвечает за фильтрацию "Финансовых данных" и дальнейшее отображение в HTML (В виде диаграммы)

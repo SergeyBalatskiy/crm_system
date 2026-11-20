@@ -1,14 +1,13 @@
 {% for item in storage_actual_items %}
 <div class="history-card" data-id="{{ item.individual_code }}">
-    
-    <!-- Шапка карточки -->
+
     <div class="history-card-header">
         <div class="product-info">
             <span class="product-name">{{ item.name_product }}</span>
             <span class="product-code">Код: {{ item.individual_code }}</span>
         </div>
 
-        <!-- Бейдж статуса остатка -->
+     
         {% if item.remainder <= item.minimum_items_for_notification %}
             <span class="badge badge-danger">Заканчивается (осталось <span class="format-num">{{ item.remainder }}</span> шт.)</span>
         {% else %}
@@ -16,7 +15,6 @@
         {% endif %}
     </div>
 
-    <!-- Тело с параметрами -->
     <div class="history-card-body">
         <div class="info-grid">
             <div class="info-item">
@@ -44,7 +42,7 @@
         </div>
     </div>
 
-    <!-- Футер -->
+   
     <div class="history-card-footer">
         <div class="time-stamp">
             <span></span>

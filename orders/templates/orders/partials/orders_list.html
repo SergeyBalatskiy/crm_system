@@ -8,10 +8,9 @@
             hx-swap="innerHTML"
             onclick="openOrderDrawer()"
             style="cursor: pointer; display: flex; flex-direction: column; justify-content: space-between; min-height: 220px; height: 100%; padding: 16px; box-sizing: border-box;">
-                    
-            <!-- Верхняя часть (Шапка + Тело) -->
+          
             <div>
-                <!-- Шапка карточки: Название слева, бейджи справа -->
+   
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
                     <div class="device-info-row" style="display: flex; align-items: center; gap: 8px; margin: 0;">
                         <i class="fa-solid fa-laptop-code device-ico"></i>
@@ -23,7 +22,7 @@
                         <span class="badge-urgent" title="Срочный заказ"><i class="fa-solid fa-bolt"></i> Срочно</span>
                         {% endif %}
 
-                        <!-- Кнопка статуса, которая вызывает поповер -->
+                     
                         <button type="button" 
                             hx-get="{% url 'change_status_order' %}?get_id_order={{ i.id }}" 
                             hx-target="#status-popover-{{ i.id }}"  
@@ -33,7 +32,7 @@
                             {{ i.name_category }}
                         </button>
 
-                        <!-- Компактное выпадающее окошко (поповер) -->
+                    
                         <div id="status-popover-{{ i.id }}" class="status-popover-box" 
                             style="display: none; position: absolute; right: 0; top: calc(100% + 6px); background: #ffffff; border: 1px solid #ebedf2; border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.12); z-index: 1000;"
                             onclick="event.stopPropagation()">
@@ -41,7 +40,7 @@
                     </div>
                 </div>
 
-                <!-- Основной контент -->
+     
                 <div class="crm-card-body">
                    <div style="display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: #3f4254; margin-bottom: 8px;">
                         {% if i.device_type %}
@@ -60,7 +59,7 @@
                 </div>
             </div>
 
-            <!-- Прижатый к низу Футер -->
+ 
             <div class="crm-card-footer" style="border-top: 1px solid #ebedf2; padding-top: 10px; margin-top: auto;">    
                 <div class="footer-client-info" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
                     <span class="client-name"><i class="fa-regular fa-user"></i> {{ i.client.name }}</span>

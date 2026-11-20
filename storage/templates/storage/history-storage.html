@@ -12,22 +12,18 @@
 <div class="div-place-storage-history">
     <div class="div-box-storage-history">
 
-        <!-- Шапка истории -->
         <div class="history-header">
             <h2>История операций склада</h2>
             <span class="history-count">Записей всего: {{ storage_history_items|length }}</span>
         </div>
 
-        <!-- Панель фильтров -->
         <form id="filter-form" method="GET" action="{% url 'filter_and_history_storage' %}" class="filter-toolbar">
             
-            <!-- Поле быстрый поиск -->
             <div class="search-input-wrapper">
                 <i class="fa-solid fa-magnifying-glass search-icon"></i>
                 <input type="text" name="fast_search_all" id="search-input" placeholder="Поиск по названию, коду, поставщику..." autocomplete="off">
             </div>
 
-            <!-- Селект типа операции -->
             <select class="custom-select" id="history_operation_select" name="search_history_operation" autocomplete="off">
                 <option value="">Все типы операций</option>
                 <option value="acceptable_data">Поступление</option>
@@ -38,10 +34,8 @@
                 <option value="returned_from_services">Возврат с ремонта</option>
             </select>
 
-            <!-- ГИБРИДНЫЙ БЛОК ДАТЫ -->
             <div class="date-filter-container">
                 
-                <!-- 1. Селект быстрых пресетов -->
                 <select class="custom-select" id="history_date_select" name="search_date_operation" autocomplete="off">
                     <option value="">За всё время</option>
                     <option value="date_today">Сегодня</option>
@@ -51,7 +45,7 @@
                     <option value="custom">📅 Указать период...</option>
                 </select>
 
-                <!-- 2. Календарь (От... До...) - по умолчанию скрыт -->
+            
                 <div class="date-range-wrapper hidden" id="custom-date-range">
                     <div class="date-field">
                         <label for="date_start_input">От:</label>
@@ -61,7 +55,6 @@
                         <label for="date_end_input">До:</label>
                         <input type="date" name="date_end_input" id="date_end_input" class="date-input" autocomplete="off">
                     </div>
-                    <!-- Кнопка сброса обратно на селект -->
                     <button type="button" class="btn-reset-date" id="btn-reset-date" title="Вернуться к быстрым фильтрам">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
@@ -71,7 +64,7 @@
 
         </form>
 
-        <!-- Контейнер со списком карточек -->
+       
         <div class="history-list" id="history-list-container">
             {% include 'storage/partials/history-list.html' %}
         </div>
