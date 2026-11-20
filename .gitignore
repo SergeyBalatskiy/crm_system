@@ -1,11 +1,27 @@
-.venv/
-.pylintrc
-__pycache__/
-.vscode
-.idea
 .env
-django.log
-security.log
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# Django
+*.log
 db.sqlite3
+staticfiles/
 media/
-debug.log
+
+# Docker
+docker-compose.override.yml
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/

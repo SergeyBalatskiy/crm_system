@@ -5,7 +5,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('auth_registration.urls')),
     path('profile/', include('profile_user.urls')),
+    path('tinymce/', include('tinymce.urls')),
     path('storage/', include('storage.urls')),
-    path('finance/', include('finance.urls')),
     path('services/', include('services.urls')),
+    path('finance/', include('finance.urls')),
+    path('orders/', include('orders.urls')),
+
 ]

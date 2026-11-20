@@ -34,13 +34,15 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "ryb-crm.ru", "www.ryb-crm.ru"]
+ALLOWED_HOSTS = ["*"]
 
 CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:8000"
-    "http://localhost:8000"
-    "http://ryb-crm.ru"
-    "http://www.ryb-crm.ru"
+    "http://127.0.0.1:8000",
+    "http://localhost:8000",
+    "http://ryb-crm.ru",
+    "https://ryb-crm.ru",
+    "https://www.ryb-crm.ru",
+    "http://www.ryb-crm.ru",
 ]
 
 # Application definition
@@ -208,3 +210,5 @@ TINYMCE_JS_URL = "https://cdnjs.cloudflare.com/ajax/libs/tinymce/6.8.2/tinymce.m
 SESSION_COOKIE_AGE = 86400
 
 SESSION_SAVE_EVERY_REQUEST = True
+import logging
+logging.basicConfig(level=logging.DEBUG)
