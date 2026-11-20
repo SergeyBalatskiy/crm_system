@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.db.models import Sum
 from django.http import JsonResponse
 from django.db.models import Q
+from datetime import timezone
 
 
 # Функция, которая отвечает за фильтрацию "Финансовых данных" и дальнейшее отображение в HTML (В виде диаграммы)
@@ -63,7 +64,8 @@ def show_graphical_diagram(request):
     outcome_data = []
 
     for item in filtered_objects:
-        date_time.append(item["created_at"].strftime("%d.%m.%y, %H:%M"))
+        local_date = timezone.localtime(item["created_at"])
+        date_time.append(local_date.strftime("%d.%m.%y, %H:%M"))
         income_data.append(int(item["total_income"] or 0))
         outcome_data.append(int(item["total_outcome"] or 0))
 
