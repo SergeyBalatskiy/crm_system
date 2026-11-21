@@ -1,4 +1,4 @@
-# 🚀 CRM System 🚀
+# CRM System 
 
 [Русский](README.md) | [English](README.en.md)
 
@@ -6,13 +6,13 @@ A web-based CRM application designed for service centers to manage orders, custo
 
 The project is built with Python and Django, uses PostgreSQL as its database, and relies on Docker, Gunicorn, and Nginx for deployment.
 
-## 🧾 Project Overview 🧾
+## Project Overview 
 
 The main goal of the project is to bring the key operational processes of a service center into one centralized system.
 
 The CRM provides tools for managing orders, tracking financial transactions, working with documents, managing services, and monitoring inventory.
 
-## 🔑 Key Features 🔑
+## Key Features
 
 - **Order Management** - create orders, update statuses, calculate totals and discounts.
 - **Customer Management** - search and work with customer information.
@@ -23,7 +23,7 @@ The CRM provides tools for managing orders, tracking financial transactions, wor
 - **User Profiles** - manage personal information and employee records.
 - **Dynamic Forms** - create and configure forms for different business processes.
 
-## 💼 Technology Stack 💼
+## Technology Stack
 
 | Technology | Purpose |
 |---|---|
@@ -53,7 +53,7 @@ The project is organized into Django applications, each responsible for a specif
 | `storage` | Inventory management and stock history |
 | `crm_system` | Main Django project configuration |
 
-## 📰 Application Architecture 📰
+## Application Architecture
 
 The application uses the following component structure:
 
@@ -76,9 +76,9 @@ Docker Compose manages three main services:
 - `db` - PostgreSQL database.
 - `nginx` - reverse proxy handling HTTP and HTTPS requests.
 
-## ▶️ Local Setup ▶️
+## Local Setup 
 
-### ❗ Requirements ❗
+### Requirements 
 
 - Git
 - Docker
@@ -132,7 +132,7 @@ The application will be available at:
 http://localhost:8000
 ```
 
-## 📌 Production Deployment 📌
+## Production Deployment 
 
 The production environment uses Docker Compose, Gunicorn, Nginx, and PostgreSQL.
 
